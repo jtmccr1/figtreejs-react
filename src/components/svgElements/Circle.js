@@ -3,5 +3,5 @@ import React from "react"
 
 export default function Circle(props){
 	// useSpring(props);
-	return <circle {...props} />
+	return( <circle {...props} />)
 }

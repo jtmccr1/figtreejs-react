@@ -10,7 +10,7 @@ export default function BranchPath(props){
     const path = pathGenerator(edge);
 
     return(
-        <Path d={path} fill={"none"} strokeWidth={2} stroke={"black"}/>
+        <Path key={edge.id} d={path} fill={"none"} strokeWidth={2} stroke={"black"}/>
     )
 }
 

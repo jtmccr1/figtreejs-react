@@ -10,7 +10,7 @@ export default function Node(props){
 
     return(
         <G className={`node ${vertex.classes.join(" ")} `}  transform={`translate(${scales.x(vertex.x)},${scales.y(vertex.y)})`}>
-            ${children.map(child=>child(props))}
+            {children.map(child=>child(props))}
         </G>
     )
 }
