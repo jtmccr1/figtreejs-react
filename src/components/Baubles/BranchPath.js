@@ -8,7 +8,6 @@ export default function BranchPath(props){
     const{edge}=props;
     const pathGenerator = branchPathGenerator(scales);
     const path = pathGenerator(edge);
-    console.log(path)
 
     return(
         <Path d={path} fill={"none"} strokeWidth={2} stroke={"black"}/>
@@ -30,7 +29,6 @@ function branchPathGenerator(scales) {
         //             {x: 0 + dontNeedCurve * curveRadius, y: 0},
         //             {x: scales.x(e.v1.x) - scales.x(e.v0.x ), y: 0}
         //         ]) :
-        console.log(e.v0.y)
 
         return (
             branchLine(
