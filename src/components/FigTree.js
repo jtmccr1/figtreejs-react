@@ -1,33 +1,49 @@
 import React, { useState } from 'react';
-import G from "./svgElements/G";
 import Branch from "./Baubles/Branch";
+import BranchPath from "./Baubles/BranchPath"
 import Node from "./Baubles/Node"
+import NodeShape from "./Baubles/NodeShape"
 import {scaleLinear} from "d3-scale";
 import {extent} from "d3-array";
 
 
 export default function FigTree(props){
-    const {layout,margins,size,branchChildren,nodeChildren,tree} = props;
+    const {layout,margins,size,tree} = props;
 
     const [update,updateUpdate] =useState(0);
+    const [hovered,updateHovered] = useState([]);
     const {vertices,edges} = layout(tree);
     const scales=setUpScales(size,margins,vertices,edges);
 
     // TODO springs will have to go here. This is fine as we want one state to rule them all and in the darkness bind them
 
+
     return(
-        <G transform={`translate(${margins.left},${margins.top})`}>
-            <G id={"annotation-layer"}/>
-            <G id={"axis-layer"}/>
-            <G id={"branches-layer"}>
-            {edges.map(edge=><Branch key = {edge.id} edge={edge} scales={scales} children={branchChildren}/>)}
-            </G>
-            <G id={"node-backgrounds-layer"}>
-            </G>
-            <G id={"node-layer"}>
-                {vertices.map(vertex=> <Node {...{vertex,scales,children:nodeChildren,r:5,onClick:()=>{tree.rotate(vertex.node);console.log("rotate");updateUpdate(update+1)}}}/>   )}
-            </G>
-        </G>
+        <g transform={`translate(${margins.left},${margins.top})`}>
+            <g id={"annotation-layer"}/>
+            <g id={"axis-layer"}/>
+            <g id={"branches-layer"}>
+            {edges.map(edge=>{
+                return (
+                        <Branch key = {edge.id} edge={edge} scales={scales}>
+                            <BranchPath scales={scales} edge={edge}/>
+                        </Branch>)}
+                        )}
+            </g>
+            <g id={"node-backgrounds-layer"}>
+            </g>
+            <g id={"node-layer"}>
+                {vertices.map(vertex=> {
+                   return( <Node key={vertex.key}{...{vertex,scales}}>
+                        <NodeShape shape={"circle"} styles={{r:(hovered.includes(vertex.id)?6:4)}} // make it's own component so it can handle transitions
+                                onClick={()=>{tree.rotate(vertex.node);console.log("rotate");updateUpdate(update+1)}}
+                        onMouseEnter={()=>updateHovered(hovered.concat(vertex.id))}
+                        onMouseLeave={()=>updateHovered(hovered.filter(id=>id!==vertex.id))}/>
+                    </Node>);
+                        }
+                  )}
+            </g>
+        </g>
     )
 }
 function setUpScales(size,margins,vertices,edges){

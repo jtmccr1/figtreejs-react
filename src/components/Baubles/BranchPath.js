@@ -1,16 +1,16 @@
-import Path from "../svgElements/Path";
 import React from "react";
 import {curveStepBefore, line} from "d3-shape";
+import{useSpring,animated} from "react-spring";
 
 export default function BranchPath(props){
 
     const {scales} = props;
     const{edge}=props;
     const pathGenerator = branchPathGenerator(scales);
-    const path = pathGenerator(edge);
+    const path = useSpring({d:pathGenerator(edge)});
 
     return(
-        <Path key={edge.id} d={path} fill={"none"} strokeWidth={2} stroke={"black"}/>
+        <animated.path key={edge.id} {...path} fill={"none"} strokeWidth={2} stroke={"black"}/>
     )
 }
 

@@ -1,8 +1,6 @@
 Branch example:
 
 ```jsx
-import SVG from "../svgElements/SVG";
-import G from "../svgElements/G";
 import {scaleLinear} from "d3-scale";
 
 const scales = {x: scaleLinear().domain([0,200]).range([0,200]),
@@ -10,9 +8,9 @@ const scales = {x: scaleLinear().domain([0,200]).range([0,200]),
 
 const edge={x:50,y:50,classes:["internal-node","tester"],v0:{x:10,y:10},v1:{x:100,y:40}};
 
-<SVG width={200} height={200}>
-	<G transform={"translate(100,100)"}>
+<svg width={200} height={200}>
+	<g transform={"translate(100,100)"}>
         <BranchPath scales={scales} edge={edge}/>
-	</G>
-</SVG>
+	</g>
+</svg>
 ```

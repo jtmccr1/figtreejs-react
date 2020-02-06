@@ -1,16 +1,20 @@
 Node example:
 
 ```jsx
-import SVG from "../svgElements/SVG";
-import Circle from "../svgElements/Circle";
 import {scaleLinear} from "d3-scale";
-
+import NodeShape from "./NodeShape";
 const scales = {x: scaleLinear().domain([0,200]).range([0,200]),
                y:scaleLinear().domain([0,200]).range([0,200])}
 
-const vertex ={x:10,y:10,classes:["internal-node"]};
+const vertex1 ={x:10,y:100,classes:["internal-node"]};
+const vertex2 ={x:100,y:100,classes:["internal-node"]};
 
-<SVG width={200} height={200}>
-        <Node scales={scales} vertex = {vertex} children={[Circle]} r={"10"} fill={"steelblue"}/>
-</SVG>
+<svg width={200} height={200}>
+        <Node scales={scales} vertex = {vertex1}>
+		    <NodeShape shape={"circle"} styles={{r:10,fill:"steelblue"}}/>
+        </Node>
+         <Node scales={scales} vertex = {vertex2}>
+            <NodeShape shape={"rect"} styles={{width:20,height:10,fill:"steelblue"}}/>
+        </Node>
+</svg>
 ```
