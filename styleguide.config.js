@@ -10,8 +10,10 @@ module.exports = {
       name:"Baubles",
       components: "src/components/Baubles/*.js"
     },
-    {name: 'Basic SVG components',
-      components: 'src/components/svgElements/*.js'},
+    {
+      name:"Decorations",
+      components: "src/components/decorations/*.js"
+    },
 
     ],
   webpackConfig: {

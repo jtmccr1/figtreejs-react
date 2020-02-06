@@ -10,13 +10,10 @@ import {extent} from "d3-array";
 export default function FigTree(props){
     const {layout,margins,size,tree} = props;
 
-    const [update,updateUpdate] =useState(0);
+    const [update,updateUpdate] =useState(0); // hack of the century until tree becomes immutable
     const [hovered,updateHovered] = useState([]);
     const {vertices,edges} = layout(tree);
     const scales=setUpScales(size,margins,vertices,edges);
-
-    // TODO springs will have to go here. This is fine as we want one state to rule them all and in the darkness bind them
-
 
     return(
         <g transform={`translate(${margins.left},${margins.top})`}>
