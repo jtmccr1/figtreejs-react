@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useState} from 'react';
 import Branches from "./Baubles/Branches";
 import {scaleLinear} from "d3-scale";
 import {extent} from "d3-array";
@@ -18,12 +18,13 @@ export default function FigTree(props){
                         case "Nodes":
                         return React.cloneElement(child, {
                             vertices,
-                            scales
+                            scales,
+
                         });
                         case "Branches":
                             return React.cloneElement(child, {
                                 edges,
-                                scales
+                                scales,
                             });
                         case "Axis":
                             return React.cloneElement(child, {
