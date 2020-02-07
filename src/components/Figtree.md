@@ -3,7 +3,9 @@ FigTree example:
 ```jsx
 import {Tree} from "../utils/tree";
 import {rectangularLayout} from "../utils/layouts/rectangularLayout.f.js";
-import Branch from "./Baubles/Branch";
+import Nodes from "./Baubles/Nodes";
+import NodeShape from "./Baubles/NodeShape";
+import Branches from "./Baubles/Branches";
 import BranchPath from "./Baubles/BranchPath";
 
 const newickString =
@@ -11,9 +13,15 @@ const newickString =
 
  const tree = Tree.parseNewick(newickString);
  const margins = {top:10,right:10,bottom:10,left:10};
- const size = {width:200,height:200};
 
-<svg {...size}>
-    <FigTree size={size} tree={tree} margins={margins} layout={rectangularLayout} />
-</svg>
+<FigTree tree={tree} width={200} height={200} margins={margins} layout={rectangularLayout}>
+        <Nodes>
+            <NodeShape  shape={"circle"}  attrs={{r:5,fill:(v)=>v.degree>1?"red":"blue"}}/>
+        </Nodes>
+        <Branches >
+            <BranchPath attrs={{stroke:"black",fill:"none"}}/>
+        </Branches>
+        
+</FigTree>
+
 ```

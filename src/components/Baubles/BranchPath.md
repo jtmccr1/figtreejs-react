@@ -1,4 +1,4 @@
-Branch example:
+Branches example:
 
 ```jsx
 import {scaleLinear} from "d3-scale";

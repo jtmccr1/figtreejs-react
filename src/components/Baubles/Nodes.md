@@ -1,6 +1,7 @@
 Node example:
 
 ```jsx
+/*
 import {scaleLinear} from "d3-scale";
 import NodeShape from "./NodeShape";
 const scales = {x: scaleLinear().domain([0,200]).range([0,200]),
@@ -16,5 +17,5 @@ const vertex2 ={x:100,y:100,classes:["internal-node"]};
          <Node scales={scales} vertex = {vertex2}>
             <NodeShape shape={"rect"} styles={{width:20,height:10,fill:"steelblue"}}/>
         </Node>
-</svg>
+</svg>*/
 ```

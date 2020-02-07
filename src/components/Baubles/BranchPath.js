@@ -4,14 +4,21 @@ import{useSpring,animated} from "react-spring";
 
 export default function BranchPath(props){
 
-    const {scales} = props;
-    const{edge}=props;
+    const {scales,edge,attrs,...rest} = props;
     const pathGenerator = branchPathGenerator(scales);
     const path = useSpring({d:pathGenerator(edge)});
+    // if attr entry is a function call it on the vertex.
+    let updatedAttrs={};
+    for (const key of Object.keys(attrs)){
+        if(attrs[key] && {}.toString.call(attrs[key]) === '[object Function]'){
+            updatedAttrs[key]=attrs[key](vertex)
+        }else{
+            updatedAttrs[key]=attrs[key]
+        }
+    }
+    updatedAttrs= useSpring({...updatedAttrs});
 
-    return(
-        <animated.path key={edge.id} {...path} fill={"none"} strokeWidth={2} stroke={"black"}/>
-    )
+    return(<animated.path {...path} {...updatedAttrs} {...rest}/>)
 }
 
 function branchPathGenerator(scales) {
@@ -19,7 +26,7 @@ function branchPathGenerator(scales) {
         const branchLine = line()
             .x((v) => v.x)
             .y((v) => v.y)
-            .curve(curveStepBefore)
+            .curve(curveStepBefore);
         // const factor = e.v0.y - e.v1.y > 0 ? 1 : -1;
         // const dontNeedCurve = e.v0.y - e.v1.y === 0 ? 0 : 1;
         // const output = curveRadius > 0 ?

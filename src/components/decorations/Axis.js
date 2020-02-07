@@ -7,6 +7,8 @@ export  default function Axis(props) {
     const {scale,direction,title,tick} = props;
     const ticks = scale.ticks(tick.number);
 
+
+//TODO break this into parts as in the markdown
     return(
         <g className={"axis"} transform={props.transform}>
             <path d={getPath(scale,direction)} stroke={"black"}/>
@@ -27,15 +29,12 @@ export  default function Axis(props) {
     )
 }
 
-Axis.defualtProps={
-  scale:undefined,
-    title:{text:"",padding:40,style:{}},
-    tick:{number:5,format:format(".1f"),padding:20,style:{},length:6},
-    direction:"horizontal",
-
-
-
-};
+Axis.defaultProps= {
+    scale: undefined,
+    title: {text: "", padding: 40, style: {}},
+    tick: {number: 5, format: format(".1f"), padding: 20, style: {}, length: 6},
+    direction: "horizontal",
+}
 
 function getPath(scale,direction){
     const f = line().x(d=>d[0]).y(d=>d[1]);
@@ -50,7 +49,7 @@ function getTickLine(length,direction){
     if(direction==="horizontal"){
         return{x1:0,y1:0,y2:length,x2:0}
     }else if(direction==="vertical"){
-        return{x1:0,y1:0,y2:0,x2:-length}
+        return{x1:0,y1:0,y2:0,x2:-1*length}
 
     }
 }

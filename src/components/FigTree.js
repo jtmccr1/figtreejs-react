@@ -1,46 +1,41 @@
-import React, { useState } from 'react';
-import Branch from "./Baubles/Branch";
-import BranchPath from "./Baubles/BranchPath"
-import Node from "./Baubles/Node"
-import NodeShape from "./Baubles/NodeShape"
+import React from 'react';
+import Branches from "./Baubles/Branches";
 import {scaleLinear} from "d3-scale";
 import {extent} from "d3-array";
 
 
 export default function FigTree(props){
-    const {layout,margins,size,tree} = props;
+    const {layout,margins,width,height,tree} = props;
 
-    const [update,updateUpdate] =useState(0); // hack of the century until tree becomes immutable
-    const [hovered,updateHovered] = useState([]);
     const {vertices,edges} = layout(tree);
-    const scales=setUpScales(size,margins,vertices,edges);
+    const scales=setUpScales({width,height},margins,vertices,edges);
 
     return(
-        <g transform={`translate(${margins.left},${margins.top})`}>
-            <g id={"annotation-layer"}/>
-            <g id={"axis-layer"}/>
-            <g id={"branches-layer"}>
-            {edges.map(edge=>{
-                return (
-                        <Branch key = {edge.id} edge={edge} scales={scales}>
-                            <BranchPath scales={scales} edge={edge}/>
-                        </Branch>)}
-                        )}
+        <svg width={width} height={height} > // make own component with defaults
+            <g transform={`translate(${margins.left},${margins.top})`}>
+                {React.Children.map(props.children, (child, index) => {
+                    switch(child.type.name){
+                        case "Nodes":
+                        return React.cloneElement(child, {
+                            vertices,
+                            scales
+                        });
+                        case "Branches":
+                            return React.cloneElement(child, {
+                                edges,
+                                scales
+                            });
+                        case "Axis":
+                            return React.cloneElement(child, {
+                                scales
+                            });
+                        default:
+                            throw new Error(`FigTree component ${child.type.name} not recognized.`)
+                    }
+
+                }).reverse()}
             </g>
-            <g id={"node-backgrounds-layer"}>
-            </g>
-            <g id={"node-layer"}>
-                {vertices.map(vertex=> {
-                   return( <Node key={vertex.key}{...{vertex,scales}}>
-                        <NodeShape shape={"circle"} styles={{r:(hovered.includes(vertex.id)?6:4)}} // make it's own component so it can handle transitions
-                                onClick={()=>{tree.rotate(vertex.node);console.log("rotate");updateUpdate(update+1)}}
-                        onMouseEnter={()=>updateHovered(hovered.concat(vertex.id))}
-                        onMouseLeave={()=>updateHovered(hovered.filter(id=>id!==vertex.id))}/>
-                    </Node>);
-                        }
-                  )}
-            </g>
-        </g>
+        </svg>
     )
 }
 function setUpScales(size,margins,vertices,edges){
