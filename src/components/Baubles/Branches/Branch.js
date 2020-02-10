@@ -1,23 +1,20 @@
-import React from "react"
 import {animated, useSpring} from "react-spring";
-import NodeShape from "./NodeShape";
+import React from "react";
 import {areEqualShallow} from "../../../utils/utilities";
 
-/**
- * This positions a group at x,y with classes and calls a nodeShape with the remaining props.
- * @param props
- * @return {*}
- */
-const basicNode =(props)=>{
+const basicBranch = (props) =>{
     const {x,y,classes,interactions} = props;
     const position = useSpring({transform:`translate(${x},${y})`});
-
     return(
-        <animated.g className={`node ${classes.join(" ")} `} {...position} {...interactions} >
+        <animated.g className={`branch ${classes.join(" ")} `} {...position} {...interactions} >
             {props.children}
         </animated.g>
     )
 };
+
+const Branch = React.memo(basicBranch,samesies);
+
+export default Branch;
 
 function samesies(prev,curr){
     const prevChildren = [].concat(prev.children).map(child=>child.props);
@@ -38,9 +35,4 @@ function samesies(prev,curr){
     }
     return true
 
-    }
-
-const Node = React.memo(basicNode,samesies);
-
-export default Node;
-
+}

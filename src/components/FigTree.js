@@ -1,5 +1,5 @@
 import React,{useState,useMemo} from 'react';
-import Branches from "./Baubles/Branches";
+import Branches from "./Baubles/Branches/Branches";
 import {scaleLinear} from "d3-scale";
 import {extent} from "d3-array";
 

@@ -1,7 +1,7 @@
 import React,{useState,useMemo} from 'react';
 import Figure from "../src/components/Figure"
 import {FigTree,Nodes, NodeShape,Branches,BranchPath,Tree,rectangularLayout} from "../src/";
-import Branch from "../src/components/Baubles/Branch";
+import Branch from "../src/components/Baubles/Branches/Branch";
 import Node from "../src/components/Baubles/Nodes/Node";
 import {extent} from "d3-array";
 import {scaleLinear} from "d3-scale";
@@ -19,32 +19,33 @@ const tree = Tree.parseNewick(newickString);
      const [hovered,updateHover] = useState("none");
      const [branchHovered,updateBranchHovered] = useState("none");
      const {vertices,edges} = useMemo(()=>{console.log("layout");return rectangularLayout(tree)},[tree]);
-     const scales=useMemo(()=>{console.log("setting up scales");return setUpScales({width,height},margins,vertices,edges)},[tree]);
+     const {xScale,yScale}=useMemo(()=>{console.log("setting up scales");return setUpScales({width,height},margins,vertices,edges)},[tree]);
 
 
 
    return(
        <Figure tree={tree} width={1000} height={900} margins={margins}>
+           <Branches >
+               {/*<Branches strokeWidth ... .. .. ..*/}
+               {edges.map(e=>{
+                   return (
+                       <Branch key={`branch-${e.id}`} classes={e.classes} x={xScale(e.x)} y={yScale(e.y)} >
+                           <BranchPath {...{x0:xScale(e.v0.x),y0:yScale(e.v0.y),x1:xScale(e.v1.x), y1:yScale(e.v1.y)}}  strokeWidth={3} stroke={"black"}/>
+                       </Branch>
+                   )
+               })}
+           </Branches>
            <Nodes>
                {vertices.map(v=>{
                    return (
-                       <Node key={v.id} classes={v.classes} x={scales.x(v.x)} y={scales.y(v.y)} interactions={{onMouseEnter:()=>updateHover(v.id), onMouseLeave:()=>updateHover("none")}}>
-                            <NodeShape r={v.id===hovered?9:6} fill={v.id===hovered?"yellow":'blue'} />
+                       <Node key={`node-${v.id}`} classes={v.classes} x={xScale(v.x)} y={yScale(v.y)} interactions={{onMouseEnter:()=>updateHover(v.id), onMouseLeave:()=>updateHover("none")}}>
+                           <NodeShape r={v.id===hovered?9:6} fill={v.id===hovered?"blue":'steelblue'} />
                          </Node>
                    )
                })}
            </Nodes>
 
-{/*           <Branches>
-               {edges.map(e=>{
-                   return (
-                       <Branch key={e.id} x={scales.x(e.x)} y={scales.y(y)} >
-                           <BranchPath scales={scales} edge={e}/>
-                       </Branch>
-                   )
-               })}
 
-           </Branches>*/}
        </Figure>
 
    )
@@ -54,12 +55,12 @@ function setUpScales(size,margins,vertices,edges){
     // almost always the same except when the trendline is added as an edge without vertices
     const ydomain =  extent(vertices.map(d=>d.y).concat(edges.reduce((acc,e)=>acc.concat([e.v1.y,e.v0.y]),[])));
 
-    const x = scaleLinear()
+    const xScale = scaleLinear()
         .domain(xdomain)
         .range([0, size.width - margins.right-margins.left]);
 
-    const y = scaleLinear()
+    const yScale = scaleLinear()
         .domain(ydomain)
         .range([size.height -margins.bottom-margins.top,0]);
-    return {x,y};
+    return {xScale,yScale};
 }

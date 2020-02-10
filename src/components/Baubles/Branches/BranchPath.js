@@ -2,19 +2,16 @@ import React from "react";
 import {curveStepBefore, line} from "d3-shape";
 import{useSpring,animated} from "react-spring";
 
-export default function BranchPath(props){
+const BranchPath=(props)=>{
 
-    const {scales,edge,...attrs} = props;
-    const pathGenerator = branchPathGenerator(scales);
-    const path = useSpring({d:pathGenerator(edge)});
-    // if attr entry is a function call it on the vertex.
-    attrs= useSpring({...attrs});
+    let {x0,y0,x1,y1,...attrs} = props;
+    let path ={d:branchPathGenerator({x0,y0,x1,y1})};
 
-    return(<animated.path {...path} {...attrs} />)
+    const allAttrs= useSpring({...attrs});
+    return(<animated.path {...allAttrs}  {...path} fill={"none"} />)
 }
 
-function branchPathGenerator(scales) {
-    return (e) => {
+function branchPathGenerator({x0,y0,x1,y1}) {
         const branchLine = line()
             .x((v) => v.x)
             .y((v) => v.y)
@@ -31,10 +28,10 @@ function branchPathGenerator(scales) {
 
         return (
             branchLine(
-                [{x: 0, y: scales.y(e.v0.y) - scales.y(e.v1.y)},
-                    {x: scales.x(e.v1.x) - scales.x(e.v0.x), y: 0}
+                [{x: 0, y: y0 - y1},
+                    {x: x1 - x0, y: 0}
                 ]))
         // return (output)
 
-    };
 }
+export default React.memo(BranchPath)
