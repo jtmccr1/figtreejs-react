@@ -21,16 +21,14 @@ const tree = Tree.parseNewick(newickString);
      const {vertices,edges} = useMemo(()=>{console.log("layout");return rectangularLayout(tree)},[tree]);
      const {xScale,yScale}=useMemo(()=>{console.log("setting up scales");return setUpScales({width,height},margins,vertices,edges)},[tree]);
 
-
-
    return(
        <Figure tree={tree} width={1000} height={900} margins={margins}>
            <Branches >
                {/*<Branches strokeWidth ... .. .. ..*/}
                {edges.map(e=>{
                    return (
-                       <Branch key={`branch-${e.id}`} classes={e.classes} x={xScale(e.x)} y={yScale(e.y)} >
-                           <BranchPath {...{x0:xScale(e.v0.x),y0:yScale(e.v0.y),x1:xScale(e.v1.x), y1:yScale(e.v1.y)}}  strokeWidth={3} stroke={"black"}/>
+                       <Branch key={`branch-${e.id}`} classes={e.classes} x={xScale(e.x)} y={yScale(e.y)} interactions={{onMouseEnter:()=>updateBranchHovered(e.id), onMouseLeave:()=>updateBranchHovered("none")}}>
+                           <BranchPath {...{x0:xScale(e.v0.x),y0:yScale(e.v0.y),x1:xScale(e.v1.x), y1:yScale(e.v1.y)}}  strokeWidth={e.id===branchHovered?5:3} stroke={"black"}/>
                        </Branch>
                    )
                })}
