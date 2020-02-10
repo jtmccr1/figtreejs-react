@@ -1,4 +1,4 @@
-import React,{useState} from 'react';
+import React,{useState,useMemo} from 'react';
 import Branches from "./Baubles/Branches";
 import {scaleLinear} from "d3-scale";
 import {extent} from "d3-array";
@@ -7,8 +7,11 @@ import {extent} from "d3-array";
 export default function FigTree(props){
     const {layout,margins,width,height,tree} = props;
 
-    const {vertices,edges} = layout(tree);
-    const scales=setUpScales({width,height},margins,vertices,edges);
+    const {vertices,edges} = useMemo(()=>{console.log("layout");return layout(tree)},[tree]);
+    const scales=useMemo(()=>{console.log("setting up scales");return setUpScales({width,height},margins,vertices,edges)},[tree]);
+
+    const updatedVertices = vertices.map(v=>({...v, x:scales.x(v.x), y:scales.y(v.y)}));
+    const upddatedEdges = edges.map(e=>({...e, x:scales.x(e.x), y:scales.y(e.y)}));
 
     return(
         <svg width={width} height={height} > // make own component with defaults

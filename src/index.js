@@ -4,8 +4,8 @@ import {rootToTipLayout} from "./utils/layouts/rootToTipLayout";
 import {Tree} from "./utils/tree";
 import Branches from "./components/Baubles/Branches";
 import BranchPath from "./components/Baubles/BranchPath";
-import Nodes from "./components/Baubles/Nodes"
-import NodeShape from "./components/Baubles/NodeShape";
+import Nodes from "./components/Baubles/Nodes/Nodes"
+import NodeShape from "./components/Baubles/Nodes/NodeShape";
 import Axis from "./components/decorations/Axis";
 import FigTree from "./components/FigTree";
 
