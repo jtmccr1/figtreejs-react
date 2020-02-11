@@ -1,5 +1,8 @@
 import {Type} from "./tree";
 import {extent} from "d3-array";
+import {timeParse} from "d3-time-format";
+import {dateToDecimal, decimalToDate} from "./utilities";
+import {BitSet} from "bitset/bitset";
 
 export default class ImmutableTree{
     constructor(nodes){
@@ -10,10 +13,11 @@ export default class ImmutableTree{
     // Set node number in alphabetical order
 
     static parseNewick(newickString, options={}) {
-        options ={...{labelName: "label",datePrefix:undefined,dateFormat:"decimal"},...options};
+        options ={...{labelName: "label",datePrefix:undefined,dateFormat:"%Y-%m-%d"},...options};
 
+        verifyNewickString(newickString);
         let nodeCount=0;
-
+        let tipCount=0;
         function newickSubstringParser(newickString){
             // check for semicolon
             //strip first and last parenthesis and annotations ect. call again on children.
@@ -38,20 +42,44 @@ export default class ImmutableTree{
                 nodeString = newickString;
             }
             //TODO get rid of leading and trailing empty matches
-            const [emptyMatch,name,annotationsString,label,length,emptyMatch2]=nodeString.split(nodeData);
+            let [emptyMatch,name,annotationsString,label,length,emptyMatch2]=nodeString.split(nodeData);
+
+            if(name){
+                name = stripQuotes(name)
+            }
+            if(label){
+                label = stripQuotes(label)
+            }
             const node = {
                 id:name?name:label?label:(`node${(nodeCount+=1)}`),
                 name:name?name:null,
                 label:label?label:null,
                 length:length!==undefined?parseFloat(length):undefined,
-                children:childNodes.length>0?childNodes.map(n=> Object.keys(n.nodesById)[0]):null,
+                children:childNodes.length>0?childNodes.map(n=> Object.keys(n.nodesById)[0]):null, //children are the first ones in the list
         };
+            const descendentNodesById ={...childNodes.reduce((acc,curr)=>({...acc,...curr.nodesById}),{})};
+            //set clade
+            if(!node.children){
+                node.clade=new BitSet([tipCount]);
+                tipCount+=1;
+            }else{
+                node.clade = node.children.reduce((acc,child)=>acc.xor(descendentNodesById[child].clade),new BitSet());
+                //TODO double check this bit.
+            }
+
+            //TODO add clade map
 
             const annotations = annotationsString!==undefined? parseAnnotation(annotationsString):{};
+            let date;
+            if(options.datePrefix && name){
+                date =getDate(name,options.datePrefix,options.dateFormat);
+                annotations.date = date;
+            }
+
+
+
             const typedAnnotations = typeAnnotations(annotations);
             // TODO get clades
-            //TODO parse dates
-            //TODO strip names/labels ect of quotes
             const nodesById = {[node.id]:node,...childNodes.reduce((acc,curr)=>({...acc,...curr.nodesById}),{})};
             const annotationsById = {[node.id]:annotations,...childNodes.reduce((acc,curr)=>({...acc,...curr.annotationsById}),{})};
             const annotationTypes =[typedAnnotations,...childNodes.map(child=>child.annotationTypes)].reduce((acc,curr)=>{return reconcileAnnotations(curr,acc)},{});
@@ -90,11 +118,9 @@ function parseAnnotation(annotationString){
                 }else{
                     out[annotationKey]=parseFloat(data);
                 }
-
             }
     }
     return constructProbabilitySet(out)
-
 }
 
 function constructProbabilitySet(out){
@@ -124,7 +150,7 @@ function reconcileAnnotations(incomingAnnotations,currentAnnotations={}){
         if (!annotation) {
             currentAnnotations[key] = types;
         } else {
-            const type = types.type
+            const type = types.type;
             if (annotation.type !== type) {
                 if ((type === Type.INTEGER && annotation.type === Type.FLOAT) ||
                     (type === Type.FLOAT && annotation.type === Type.INTEGER)) {
@@ -147,7 +173,6 @@ function reconcileAnnotations(incomingAnnotations,currentAnnotations={}){
                     annotation.values = annotation.values ? annotation.values.concat(types.values) : types.values
                 } else if (annotation.extent || types.extent) {
                     annotation.extent = annotation.extent ? extent(annotation.extent.concat(types.extent)) : types.extent
-
                 }
             }
         }
@@ -160,8 +185,10 @@ function typeAnnotations(annotations){
     for (let [key, addValues] of Object.entries(annotations)) {
             const annotation = {};
              annotationTypes[key] = annotation;
-
-        if (Array.isArray(addValues)) {
+        if(addValues instanceof Date){
+            annotation.type=Type.DATE;
+            annotation.extent = [addValues,addValues];
+        } else if (Array.isArray(addValues)) {
             // is a set of  values
             let type;
             if(addValues.map(v=>isNaN(v)).reduce((acc,curr)=>acc&&curr,true)) {
@@ -267,4 +294,51 @@ function typeAnnotations(annotations){
         // annotationTypes[key] = annotation;
     }
     return annotationTypes;
+}
+
+function stripQuotes(string){
+        // remove any quoting and then trim whitespace
+    return removeEndQuotes(removeFrontQuotes(string))
+}
+function removeFrontQuotes(s){
+    if (s.startsWith("\"") || s.startsWith("'")) {
+         return s.slice(1);
+    }
+    return s;
+}
+
+function removeEndQuotes(s){
+    if (s.endsWith("\"") || s.endsWith("'")) {
+        return s.slice(0, s.length - 1);
+    }
+    return s;
+}
+function verifyNewickString(s){
+    if(s[s.length-1]!==";"){
+        throw new Error("Unknown format. Newick strings should end in ;")
+    }
+    if(((s.match(/\(/g) || []).length)!==((s.match(/\)/g) || []).length)){
+    throw new Error("Unmatched parenthesis in newick string")
+    }
+}
+
+function getDate(name,datePrefix,dateFormat){
+        const parts = name.split(datePrefix);
+        if (parts.length === 0) {
+            throw new Error(`the tip, ${name}, doesn't have a date separated by the prefix, '${datePrefix}'`);
+        }
+        const dateBit = parts[parts.length-1];
+        if(dateFormat==="decimal"){
+           const decimalDate = parseFloat(parts[parts.length - 1]);
+            return decimalToDate(decimalDate);
+        }else{
+            let date = timeParse(dateFormat)(dateBit);
+            if(!date){
+                date = timeParse(dateFormat)(`${dateBit}-15`)
+            }
+            if(!date){
+                date = timeParse(dateFormat)(`${dateBit}-06-15`)
+            }
+            return date
+        }
 }

@@ -15,6 +15,7 @@ export const Type = {
     INTEGER : Symbol("INTEGER"),
     FLOAT: Symbol("FLOAT"),
     PROBABILITIES: Symbol("PROBABILITIES"),
+    DATE:Symbol("DATE")
 };
 
 export const CollapseStyles = {
