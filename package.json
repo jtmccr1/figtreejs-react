@@ -9,7 +9,8 @@
     "dev": "next",
     "build-pages": "next build",
     "start": "next start",
-    "test": "jest"
+    "test": "jest",
+    "test:debug": "node --inspect node_modules/.bin/jest --runInBand"
   },
   "keywords": [],
   "author": "",
