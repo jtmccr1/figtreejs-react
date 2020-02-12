@@ -496,3 +496,8 @@ function getDate(name,datePrefix,dateFormat){
         }
 }
 
+function exposedCommas(string,open="("){
+    const close=open==="("?")":"}";
+    count=0;
+    [...string].reduce()
+}
