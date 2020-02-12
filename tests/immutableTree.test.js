@@ -8,43 +8,68 @@ describe("Tree Tests",()=>{
         const tree = ImmutableTree.parseNewick(treeString,{datePrefix:"|"});
 
         expect(tree).toEqual({
+            root:"node2",
             nodesById: {
                 node2: {
                     id: 'node2',
                     name: null,
                     label: null,
                     length: 120,
-                    children: ["node1", "C|1960"]
+                    children: ["node1", "C|1960"],
+                    clade:"111",
+                    postOrder:4,
                 },
                 node1: {
                     id: 'node1',
                     name: null,
                     length: 3,
                     label: null,
-                    children: ["A|2020-01", "B|1980-01-11"]
+                    children: ["A|2020-01", "B|1980-01-11"],
+                    clade:'11',
+                    postOrder: 2,
+                    parent:"node2"
                 },
                 "C|1960": {
                     id: 'C|1960',
                     name: "C|1960",
                     length: 4,
                     label: null,
-                    children: null
+                    children: null,
+                    clade:'100',
+                    postOrder:3,
+                    parent:"node2"
                 },
                 "A|2020-01": {
                     id: 'A|2020-01',
                     name: "A|2020-01",
                     length: 1,
                     label: null,
-                    children: null
+                    children: null,
+                    clade:'1',
+                    postOrder:0,
+                    parent:"node1"
                 },
                 "B|1980-01-11": {
                     id: 'B|1980-01-11',
                     name: "B|1980-01-11",
                     length: 2,
                     label: null,
-                    children: null
+                    children: null,
+                    clade:"10",
+                    postOrder:1,
+                    parent:"node1"
                 }
             },
+            cladeMap:{
+              "1":"A|2020-01",
+              "10":"B|1980-01-11",
+              "100": "C|1960",
+              "11":"node1",
+              "111":"node2",
+            },
+            externalNodes:["A|2020-01","B|1980-01-11","C|1960"],
+            internalNodes:["node2","node1"],
+            postOrder:["A|2020-01","B|1980-01-11","node1","C|1960","node2"],
             annotationsById:{
                 node2: {},
                 node1: {},

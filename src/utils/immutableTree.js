@@ -17,7 +17,8 @@ export default class ImmutableTree{
 
         verifyNewickString(newickString);
         let nodeCount=0;
-        let tipCount=0;
+        let tipCount=-1;
+        let postOrderTally=-1;
         function newickSubstringParser(newickString){
             // check for semicolon
             //strip first and last parenthesis and annotations ect. call again on children.
@@ -38,7 +39,6 @@ export default class ImmutableTree{
                    childNodes=childNodes.concat(newickSubstringParser(child))
                 }
             }else{
-                //Add tip to tip list
                 nodeString = newickString;
             }
             //TODO get rid of leading and trailing empty matches
@@ -55,19 +55,19 @@ export default class ImmutableTree{
                 name:name?name:null,
                 label:label?label:null,
                 length:length!==undefined?parseFloat(length):undefined,
-                children:childNodes.length>0?childNodes.map(n=> Object.keys(n.nodesById)[0]):null, //children are the first ones in the list
+                children:childNodes.length>0?childNodes.map(n=>n.root):null,
+                postOrder:(postOrderTally+=1),
         };
+
             const descendentNodesById ={...childNodes.reduce((acc,curr)=>({...acc,...curr.nodesById}),{})};
-            //set clade
-            if(!node.children){
-                node.clade=new BitSet([tipCount]);
-                tipCount+=1;
-            }else{
-                node.clade = node.children.reduce((acc,child)=>acc.xor(descendentNodesById[child].clade),new BitSet());
-                //TODO double check this bit.
+            if(node.children){
+                for(const childId of node.children){
+                    descendentNodesById[childId].parent = node.id;
+                }
             }
 
-            //TODO add clade map
+            node.clade= node.children? node.children.reduce((acc,child)=>acc.or(new BitSet(descendentNodesById[child].clade)),new BitSet()).toString():
+                    new BitSet([( tipCount+=1)]).toString();
 
             const annotations = annotationsString!==undefined? parseAnnotation(annotationsString):{};
             let date;
@@ -79,13 +79,15 @@ export default class ImmutableTree{
 
 
             const typedAnnotations = typeAnnotations(annotations);
-            // TODO get clades
-            const nodesById = {[node.id]:node,...childNodes.reduce((acc,curr)=>({...acc,...curr.nodesById}),{})};
+            const nodesById = {[node.id]:node,...descendentNodesById};
             const annotationsById = {[node.id]:annotations,...childNodes.reduce((acc,curr)=>({...acc,...curr.annotationsById}),{})};
             const annotationTypes =[typedAnnotations,...childNodes.map(child=>child.annotationTypes)].reduce((acc,curr)=>{return reconcileAnnotations(curr,acc)},{});
+            const cladeMap={[node.clade]:node.id,...childNodes.reduce((acc,curr)=>({...acc,...curr.cladeMap}),{})}
+            const externalNodes =[(!node.children?node.id:null),...childNodes.reduce((acc,curr)=>acc.concat(curr.externalNodes),[])].filter(n=>n);
+            const internalNodes=[(node.children?node.id:null),...childNodes.reduce((acc,curr)=>acc.concat(curr.internalNodes),[])].filter(n=>n);
+            const postOrder=[...childNodes.reduce((acc,curr)=>acc.concat(curr.postOrder),[]),node.id,];
 
-
-            return ({nodesById,annotationsById,annotationTypes})
+            return ({nodesById,annotationsById,annotationTypes,cladeMap,externalNodes,internalNodes,postOrder,root:node.id})
 
         }
         return newickSubstringParser(newickString);
