@@ -1,7 +1,7 @@
 import {Type} from "./tree";
 import {extent,max} from "d3-array";
 import {timeParse} from "d3-time-format";
-import {dateToDecimal, decimalToDate} from "./utilities";
+import {decimalToDate} from "./utilities";
 import {BitSet} from "bitset/bitset";
 
 export class ImmutableTree{
@@ -172,14 +172,22 @@ export class ImmutableTree{
             const internalNode =/\((.*)\)(.*)/;
             // identify commas not included in (),[],or {}
             const exposedCommas=/,(?=(?:(?:(?![\)]).)*[\(])|[^\(\)]*$)(?=(?:(?:(?![\]]).)*[\[])|[^\[\]]*$)(?=(?:(?:(?![\}]).)*[\{])|[^\{\{]*$)/g;
-            const nodeData = /(.*?)(?:\[&?(.*)\])*(?:#(.+))*:(\d*\.?\d*)/g;
+            const nodeData = /(.*?)(?:\[&?(.*)\])*(?:#(.+))*(.*):(\d*\.?\d*)/g;
             const isInternalNode = internalNode.test(newickString);
             let nodeString,
                 childrenString,
                 childNodes=[];
             if(isInternalNode){
                 [childrenString,nodeString] = newickString.split(internalNode).filter(s=>s);
+                console.group("Internal")
+                console.log(childrenString);
+                console.log(nodeString);
+                console.groupEnd();
                 const children = childrenString.split(exposedCommas);
+                //TODO make test and fix exposed commas regex that fails on large dataset
+                console.group("split")
+                console.log(children);
+
                 for(const child of children){
                    childNodes=childNodes.concat(newickSubstringParser(child))
                 }
@@ -187,7 +195,7 @@ export class ImmutableTree{
                 nodeString = newickString;
             }
             //TODO get rid of leading and trailing empty matches
-            let [emptyMatch,name,annotationsString,label,length,emptyMatch2]=nodeString.split(nodeData);
+            let [emptyMatch,name,annotationsString,id,label,length,emptyMatch2]=nodeString.split(nodeData);
 
             if(name){
                 name = options.tipNames?options.tipNames[name]:stripQuotes(name)
@@ -197,7 +205,7 @@ export class ImmutableTree{
             }
 
             const node = {
-                id:name?name:label?label:(`node${(nodeCount+=1)}`),
+                id:name?name:id?id:(`node${(nodeCount+=1)}`),
                 name:name?name:null,
                 label:label?label:null,
                 length:length!==undefined?parseFloat(length):null,

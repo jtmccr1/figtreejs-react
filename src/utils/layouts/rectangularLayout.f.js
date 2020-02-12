@@ -2,43 +2,65 @@ import {mean} from "d3-array";
 import {makeEdges, makeVertexFromNode} from "./layoutHelpers";
 
 
+/*class rectangularLayout{
+
+    constructor(tree){
+        this.tree=tree
+    }
+
+    getY(){
+        const self =this;
+        const cache = {};
+        return (function f(id) {
+            let value;
+            if (id in cache) {
+                value = cache[id];
+            } else {
+                value = this.tree.getChildren(id)?mean(this.tree.getChildren(id).map(child=>self.getY(child))):this.tree.externalNodes().indexOf(id);
+                cache[id] = value;
+            }
+            return value;
+        })(id)
+    }
+    getX(){
+        const self =this;
+        const cache = {};
+        return (function f(id) {
+            let value;
+            if (id in cache) {
+                value = cache[id];
+            } else {
+                value = this.tree.getDivergence(id);
+                cache[id] = value;
+            }
+            return value;
+        })(id)
+    }
+
+
+}*/
+
 
 
 export function rectangularVertices(tree){
-    let currentY=0;
-    const vertices=[];
+    let currentY=-1;
+    const vertexMap={};
 
-    const traverse = function(node,siblingPositions=[]){
-        const myChildrenPositions=[];
+    return tree.getPostOder().map(id=>{
+        const v ={...makeVertexFromNode(tree.getNode(id),tree),
+            x:tree.getDivergence(id),
+            y:tree.getChildren(id)?mean(tree.getChildren(id).map(child=>vertexMap[child].y)):(currentY+=1)
+        };
+        vertexMap[id]=v;
+        return v
+    });
 
-        if(node.children){
-
-            for(const child of node.children){
-                traverse(child,myChildrenPositions);
-            }
-            siblingPositions.push(mean(myChildrenPositions));
-            const vertex = {...makeVertexFromNode(node),
-                y:mean(myChildrenPositions),
-                x:node.divergence};
-            vertices.push(vertex);
-        }else{
-            currentY+=1;
-            siblingPositions.push(currentY);
-            const vertex = {...makeVertexFromNode(node), y:currentY, x:node.divergence};
-            vertices.push(vertex);
-        }
-    };
-
-    traverse(tree.rootNode);
-    //slow!
-    return vertices;
 }
-
 
 
 const layoutFactory=makeVertices=>tree=>{
     const vertices = makeVertices(tree);
-    const edges = makeEdges(vertices);
+    const edges = makeEdges(vertices,tree);
     return {vertices,edges}
 };
 

@@ -1,23 +1,22 @@
 import {mean} from "d3-array";
 import {Type} from "../tree";
 
-function getVertexClassesFromNode(node){
-    let classes = [(!node.children ? "external-node" : "internal-node")];
-    const tree = node.tree;
-    if (node.annotations) {
+export function getVertexClassesFromNode(id,tree){
+    let classes = [(!tree.getChildren(id) ? "external-node" : "internal-node")];
+    if (tree.tree.annotationTypes) {
         classes = [
             ...classes,
-            ...Object.entries(node.annotations)
+            ...Object.entries(tree.getNodeAnnotations(id))
                 .filter(([key]) => {
-                    return tree.annotations[key] &&
-                        (tree.annotations[key].type === Type.DISCRETE ||
-                            tree.annotations[key].type === Type.BOOLEAN ||
-                            tree.annotations[key].type === Type.INTEGER);
+                    return tree.getAnnotation(key) &&
+                        (tree.getAnnotation(key).type === Type.DISCRETE ||
+                            tree.getAnnotation(key).type === Type.BOOLEAN ||
+                            tree.getAnnotation(key).type === Type.INTEGER);
                 })
                 .map(([key, value]) =>{
-                    if(tree.annotations[key].type===Type.DISCRETE || tree.annotations[key].type === Type.INTEGER){
+                    if(tree.getAnnotation(key).type===Type.DISCRETE || tree.getAnnotation(key).type === Type.INTEGER){
                         return `${key}-${value}`;
-                    }else if(tree.annotations[key].type === Type.BOOLEAN && value ){
+                    }else if(tree.getAnnotation(key).type === Type.BOOLEAN && value ){
                         return `${key}`
                     }
                 })];
@@ -25,24 +24,12 @@ function getVertexClassesFromNode(node){
     return classes;
 }
 
-// TODO update this to handel location for other layouts that aren't left to right
-export function makeVertexFromNode(node){
-    const leftLabel= !!node.children;
-    const labelBelow= (!!node.children && (!node.parent || node.parent.children[0] !== node));
+export function makeVertexFromNode(id,tree){
+    const leftLabel= !!tree.getChildren(id);
+    const labelBelow= (!!tree.getChildren(id) && (!tree.getParent(id) || tree.getChildren(tree.getParent(id))[0] !== id));
 
     return {
-        name:node.name,
-        length:node.length,
-        height:node.height,
-        divergence:node.divergence,
-        level:node.level,
-        label:node.label,
-        annotations:node.annotations,
-        key: node.id,
-        id:node.id,
-        parent:node.parent?node.parent.id:null,
-        children:node.children?node.children.map(child=>child.id):null,
-        degree: (node.children ? node.children.length + 1 : 1),// the number of edges (including stem)
+        id:id,
         textLabel:{
             labelBelow:labelBelow,
             x:leftLabel?"-6":"12",
@@ -50,27 +37,23 @@ export function makeVertexFromNode(node){
             alignmentBaseline: leftLabel?(labelBelow ? "bottom": "hanging" ):"middle",
             textAnchor:leftLabel?"end":"start",
         },
-
-
-        classes: getVertexClassesFromNode(node),
-        node:node,
+        classes: getVertexClassesFromNode(id,tree),
     };
 }
 
 
-export function makeEdges(vertices){
-    const nodeMap = new Map(vertices.map(v=>[v.node,v]));
-    return vertices.filter(v=>v.node.parent).map(v=>{
+export function makeEdges(vertices,tree){
+    return vertices.filter(v=>tree.getParent(v.id)).map(v=>{
+        const parentVertex=vertices.find(vert=>vert.id===tree.getParent(v.id));
         return {
-            v0: nodeMap.get(v.node.parent),
+            v0: parentVertex,
             v1: v,
-            key: v.key,
             id:v.id,
             classes:v.classes,
-            x:nodeMap.get(v.node.parent).x,
+            x:parentVertex,
             y:v.y,
             textLabel:{
-                x:mean([v.x,nodeMap.get(v.node.parent).x]),
+                x:mean([v.x,parentVertex.x]),
                 y: -6,
                 alignmentBaseline: "bottom",
                 textAnchor:"middle",
@@ -81,6 +64,6 @@ export function makeEdges(vertices){
 
 export const layoutFactory=makeVertices=>tree=>{
     const vertices = makeVertices(tree);
-    const edges = makeEdges(vertices);
+    const edges = makeEdges(vertices,tree);
     return {vertices,edges}
 };
