@@ -1,4 +1,4 @@
-import ImmutableTree from "../src/utils/immutableTree";
+import {ImmutableTree} from "../src/utils/immutableTree";
 import {Type} from "../src/utils/tree";
 import {timeParse} from "d3-time-format";
 
@@ -67,6 +67,7 @@ describe("Tree Tests",()=>{
               "11":"node1",
               "111":"node2",
             },
+            clades:["1","10","11","100","111"],
             externalNodes:["A|2020-01","B|1980-01-11","C|1960"],
             internalNodes:["node2","node1"],
             postOrder:["A|2020-01","B|1980-01-11","node1","C|1960","node2"],
@@ -103,3 +104,4 @@ describe("Tree Tests",()=>{
         })
     })
 });
+

@@ -4,13 +4,11 @@ import {timeParse} from "d3-time-format";
 import {dateToDecimal, decimalToDate} from "./utilities";
 import {BitSet} from "bitset/bitset";
 
-export default class ImmutableTree{
+export class ImmutableTree{
     constructor(nodes){
         this.nodes = {};
 
     }
-
-    // Set node number in alphabetical order
 
     static parseNewick(newickString, options={}) {
         options ={...{labelName: "label",datePrefix:undefined,dateFormat:"%Y-%m-%d"},...options};
@@ -19,6 +17,7 @@ export default class ImmutableTree{
         let nodeCount=0;
         let tipCount=-1;
         let postOrderTally=-1;
+
         function newickSubstringParser(newickString){
             // check for semicolon
             //strip first and last parenthesis and annotations ect. call again on children.
@@ -50,6 +49,7 @@ export default class ImmutableTree{
             if(label){
                 label = stripQuotes(label)
             }
+
             const node = {
                 id:name?name:label?label:(`node${(nodeCount+=1)}`),
                 name:name?name:null,
@@ -67,7 +67,7 @@ export default class ImmutableTree{
             }
 
             node.clade= node.children? node.children.reduce((acc,child)=>acc.or(new BitSet(descendentNodesById[child].clade)),new BitSet()).toString():
-                    new BitSet([( tipCount+=1)]).toString();
+                    new BitSet([(options.tipMap?options.tipMap[name]:(tipCount+=1))]).toString();
 
             const annotations = annotationsString!==undefined? parseAnnotation(annotationsString):{};
             let date;
@@ -85,14 +85,13 @@ export default class ImmutableTree{
             const cladeMap={[node.clade]:node.id,...childNodes.reduce((acc,curr)=>({...acc,...curr.cladeMap}),{})}
             const externalNodes =[(!node.children?node.id:null),...childNodes.reduce((acc,curr)=>acc.concat(curr.externalNodes),[])].filter(n=>n);
             const internalNodes=[(node.children?node.id:null),...childNodes.reduce((acc,curr)=>acc.concat(curr.internalNodes),[])].filter(n=>n);
-            const postOrder=[...childNodes.reduce((acc,curr)=>acc.concat(curr.postOrder),[]),node.id,];
-
-            return ({nodesById,annotationsById,annotationTypes,cladeMap,externalNodes,internalNodes,postOrder,root:node.id})
+            const postOrder=[...childNodes.reduce((acc,curr)=>acc.concat(curr.postOrder),[]),node.id];
+            const clades = [...childNodes.reduce((acc,curr)=>acc.concat(curr.clades),[]),node.clade];
+            return ({nodesById,annotationsById,annotationTypes,cladeMap,clades,externalNodes,internalNodes,postOrder,root:node.id})
 
         }
         return newickSubstringParser(newickString);
     }
-
 
 }
 
@@ -146,7 +145,7 @@ function constructProbabilitySet(out){
     }
     return finalObject;
 }
-function reconcileAnnotations(incomingAnnotations,currentAnnotations={}){
+export function reconcileAnnotations(incomingAnnotations,currentAnnotations={}){
     for (let [key, types] of Object.entries(incomingAnnotations)) {
         let annotation = currentAnnotations[key];
         if (!annotation) {
