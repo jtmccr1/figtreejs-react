@@ -1,10 +1,10 @@
 import {ImmutableTree} from "../src/utils/immutableTree";
 import {Type} from "../src/utils/tree";
 import {timeParse} from "d3-time-format";
+const treeString="(('A|2020-01':1,B|1980-01-11[&length_range={1,1.5},location=\"Janesburgh\",location.prob={0.8,0.2},location.set={\"Janesburgh\",\"JanosAires\"}]:2):3,C|1960[&length_range={2,4},location=\"Mabalako\",location.prob=1.0,location.set={\"Mabalako\"}]:4);"
 
 describe("Tree Tests",()=>{
     it("parse newick tree parse, type and reconcile annotations",()=>{
-        const treeString="(('A|2020-01':1,B|1980-01-11[&length_range={1,1.5},location=\"Janesburgh\",location.prob={0.8,0.2},location.set={\"Janesburgh\",\"JanosAires\"}]:2):3,C|1960[&length_range={2,4},location=\"Mabalako\",location.prob=1.0,location.set={\"Mabalako\"}]:4):120;"
         const tree = ImmutableTree.parseNewick(treeString,{datePrefix:"|"});
 
         expect(tree).toEqual({
@@ -14,7 +14,7 @@ describe("Tree Tests",()=>{
                     id: 'node2',
                     name: null,
                     label: null,
-                    length: 120,
+                    length: null,
                     children: ["node1", "C|1960"],
                     clade:"111",
                     postOrder:4,
@@ -102,6 +102,17 @@ describe("Tree Tests",()=>{
                 date:{type:Type.DATE,extent:[timeParse("%Y-%m-%d")("1960-06-15"),timeParse("%Y-%m-%d")("2020-01-15")]}
             }
         })
+    });
+    it("Should calculate divergence",()=>{
+        const tree = new ImmutableTree(ImmutableTree.parseNewick(treeString));
+
+        expect(tree.getDivergence("A|2020-01")).toEqual(4)
+    });
+    it("Should calculate hieght",()=>{
+        const tree = new ImmutableTree(ImmutableTree.parseNewick(treeString));
+
+        expect(tree.getHeight("A|2020-01")).toEqual(1)
+
     })
 });
 

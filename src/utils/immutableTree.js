@@ -1,13 +1,159 @@
 import {Type} from "./tree";
-import {extent} from "d3-array";
+import {extent,max} from "d3-array";
 import {timeParse} from "d3-time-format";
 import {dateToDecimal, decimalToDate} from "./utilities";
 import {BitSet} from "bitset/bitset";
 
 export class ImmutableTree{
-    constructor(nodes){
-        this.nodes = {};
+    constructor(tree){
+        this.tree=tree;
+    }
+    getRoot(){
+        return this.tree.root;
+    }
+    getNode(id){
+        if(!(id in this.tree.nodesById)){
+            throw new Error(`id ${id} not recognized in tree`)
+        }
+        return {...this.tree.nodesById[id]}
+    }
+    getParent(id){
+        if(!(id in this.tree.nodesById)){
+            throw new Error(`id ${id} not recognized in tree`)
+        }
+        const node= this.getNode(id);
+        if("parent" in node){
+            return node.parent;
+        }else{
+            return null;
+        }
+    }
+    getChildren(id){
+        if(!(id in this.tree.nodesById)){
+            throw new Error(`id ${id} not recognized in tree`)
+        }
+        return this.tree.nodesById[id].children;
+    }
+    getLength(id){
+        if(!(id in this.tree.nodesById)){
+            throw new Error(`id ${id} not recognized in tree`)
+        }
+        return this.tree.nodesById[id].length;
+    }
+    getClade(id){
+        if(!(id in this.tree.nodesById)){
+            throw new Error(`id ${id} not recognized in tree`)
+        }
+        return this.tree.nodesById[id].clade;
+    }
+    getClades(){
+        return this.tree.clades;
+    }
+    getNodeAnnotations(id){
+        return {...this.tree.annotationsById[id]}
+    }
 
+    getAnnotation(id){
+        return {...this.tree.annotationTypes[id]}
+    }
+    getExternalNodes(){
+        return [...this.tree.externalNodes];
+    }
+    getInternalNodes(){
+        return [...this.tree.internalNodes];
+    }
+    getPostOder(){
+        return [...this.tree.postOrder];
+    }
+    getPreOrder(){
+        return [...this.tree.postOrder].reverse();
+    }
+    getDivergence(id){
+        if(!(id in this.tree.nodesById)){
+            throw new Error(`id ${id} not recognized in tree`)
+        }
+
+        const self =this;
+        const cache = {};
+        return (function f(id) {
+                let value;
+
+                if (id in cache) {
+                    value = cache[id];
+                } else {
+                    value = id!==self.getRoot()? f(self.getParent(id))+self.getLength(id):0;
+                    cache[id] = value;
+                }
+                return value;
+            })(id)
+    }
+    getRootToTipLengths(){
+        return this.tree.postOrder.map(id=>this.getDivergence(id))
+    }
+
+    getHeight(id){
+        if(!(id in this.tree.nodesById)){
+            throw new Error(`id ${id} not recognized in tree`)
+        }
+
+        const self=this;
+        let maxDivergence=null;
+        return (function f(id) {
+            if (!maxDivergence) {
+                maxDivergence = max(self.getRootToTipLengths());
+            }
+            return maxDivergence-self.getDivergence(id);
+        })(id)
+    }
+
+
+
+
+    static  parseNexus(nexus,options={}){
+
+        const trees=[];
+
+        // odd parts ensure we're not in a taxon label
+        //TODO make this parsing more robust
+        const nexusTokens = nexus.split(/\s*(?:^|[^\w\d])Begin(?:^|[^\w\d])|(?:^|[^\w\d])begin(?:^|[^\w\d])|(?:^|[^\w\d])end(?:^|[^\w\d])|(?:^|[^\w\d])End(?:^|[^\w\d])|(?:^|[^\w\d])BEGIN(?:^|[^\w\d])|(?:^|[^\w\d])END(?:^|[^\w\d])\s*/)
+        const firstToken = nexusTokens.shift().trim();
+        if(firstToken.toLowerCase()!=='#nexus'){
+            throw Error("File does not begin with #NEXUS is it a nexus file?")
+        }
+        for(const section of nexusTokens){
+            const workingSection = section.replace(/^\s+|\s+$/g, '').split(/\n/);
+            const sectionTitle = workingSection.shift();
+            if(sectionTitle.toLowerCase().trim() ==="trees;"){
+                let inTaxaMap=false;
+                const tipMap ={};
+                const tipNames={};
+                for(const token of workingSection){
+                    if(token.trim().toLowerCase()==="translate"){
+                        inTaxaMap=true;
+                    }else{
+                        if(inTaxaMap){
+                            if(token.trim()===";"){
+                                inTaxaMap=false;
+                            }else{
+                                const taxaData = token.trim().replace(",","").split(/\s*\s\s*/);
+                                tipMap[taxaData[0]]=taxaData[1];
+                                tipNames[taxaData[1]]=taxaData[0];
+                            }
+                        }else{
+                            const treeString = token.substring(token.indexOf("("));
+                            if(tipMap.size>0) {
+                                const thisTree = ImmutableTree.parseNewick(treeString, {...options, tipMap,tipNames});
+                                trees.push(thisTree);
+                            }else{
+                                const thisTree = ImmutableTree.parseNewick(treeString, {...options});
+                                trees.push(thisTree);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return trees;
     }
 
     static parseNewick(newickString, options={}) {
@@ -44,7 +190,7 @@ export class ImmutableTree{
             let [emptyMatch,name,annotationsString,label,length,emptyMatch2]=nodeString.split(nodeData);
 
             if(name){
-                name = stripQuotes(name)
+                name = options.tipNames?options.tipNames[name]:stripQuotes(name)
             }
             if(label){
                 label = stripQuotes(label)
@@ -54,7 +200,7 @@ export class ImmutableTree{
                 id:name?name:label?label:(`node${(nodeCount+=1)}`),
                 name:name?name:null,
                 label:label?label:null,
-                length:length!==undefined?parseFloat(length):undefined,
+                length:length!==undefined?parseFloat(length):null,
                 children:childNodes.length>0?childNodes.map(n=>n.root):null,
                 postOrder:(postOrderTally+=1),
         };
@@ -75,8 +221,6 @@ export class ImmutableTree{
                 date =getDate(name,options.datePrefix,options.dateFormat);
                 annotations.date = date;
             }
-
-
 
             const typedAnnotations = typeAnnotations(annotations);
             const nodesById = {[node.id]:node,...descendentNodesById};
@@ -343,3 +487,4 @@ function getDate(name,datePrefix,dateFormat){
             return date
         }
 }
+

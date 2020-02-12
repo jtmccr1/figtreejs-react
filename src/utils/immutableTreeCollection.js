@@ -1,7 +1,13 @@
-import {reconcileAnnotations} from "./immutableTree";
+import {ImmutableTree, reconcileAnnotations} from "./immutableTree";
 
 export default class ImmutableTreeCollection {
-    constructor(nodes) {
+    constructor(collection) {
+        this.collection=collection;
+    }
+
+    static parseNexus(string,options){
+        const trees= ImmutableTree.parseNexus(nexus,options={});
+        return ImmutableTreeCollection.collectTrees(trees);
     }
 
     static collectTrees(trees){
