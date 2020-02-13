@@ -1,13 +1,13 @@
 import {ImmutableTree, reconcileAnnotations} from "./immutableTree";
 
-export default class ImmutableTreeCollection {
+export default class ImmutableCladeCollection {
     constructor(collection) {
         this.collection=collection;
     }
 
     static parseNexus(string,options){
         const trees= ImmutableTree.parseNexus(nexus,options={});
-        return ImmutableTreeCollection.collectTrees(trees);
+        return ImmutableCladeCollection.collectTrees(trees);
     }
 
     static collectTrees(trees){
@@ -17,14 +17,13 @@ export default class ImmutableTreeCollection {
 
 export function treeReducer(tree,collection={}){
     const clades = collection.clades?collection.clades.concat(tree.clades.filter(c=>!collection.clades.includes(c))):tree.clades;
-    const trees = collection.trees?collection.trees.concat(tree):[tree];
     const annotationTypes =collection.annotationTypes?reconcileAnnotations(tree.annotationTypes,collection.annotationTypes):tree.annotationTypes;
 
     const treeClades = tree.clades.reduce((acc,clade)=>({...acc,[clade]:cladeMaker(tree,clade)}),{});
 
     const cladesById= collection.cladesById?mergeClades(collection.cladesById,treeClades):treeClades;
 
-    return {trees,cladesById,annotationTypes,clades}
+    return {cladesById,annotationTypes,clades}
 
 }
 
@@ -37,7 +36,6 @@ function cladeMaker(tree,clade){
     }
     return cladeAnnotations;
 }
-
 function mergeClades(clades1,clades2){
     const clades1Keys = Object.keys(clades1);
     const clades2Keys = Object.keys(clades2);
@@ -46,7 +44,6 @@ function mergeClades(clades1,clades2){
     return {...clades1,...clades2,...matchingClades.reduce((acc,key)=>({...acc,[key]:mergeClade(clades1[key],clades2[key])}),{})}
 
 }
-
 export function mergeClade(clade1,clade2){
     const clade1Keys = Object.keys(clade1);
     const clade2Keys = Object.keys(clade2);

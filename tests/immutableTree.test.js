@@ -1,4 +1,4 @@
-import {ImmutableTree} from "../src/utils/immutableTree";
+import {splitAtExposedCommas, ImmutableTree} from "../src/utils/immutableTree";
 import {Type} from "../src/utils/tree";
 import {timeParse} from "d3-time-format";
 const treeString="(('A|2020-01':1,B|1980-01-11[&length_range={1,1.5},location=\"Janesburgh\",location.prob={0.8,0.2},location.set={\"Janesburgh\",\"JanosAires\"}]:2):3,C|1960[&length_range={2,4},location=\"Mabalako\",location.prob=1.0,location.set={\"Mabalako\"}]:4);"
@@ -13,19 +13,17 @@ describe("Tree Tests",()=>{
                 node2: {
                     id: 'node2',
                     name: null,
-                    label: null,
                     length: null,
                     children: ["node1", "C|1960"],
-                    clade:"111",
+                    clade:"7",
                     postOrder:4,
                 },
                 node1: {
                     id: 'node1',
                     name: null,
                     length: 3,
-                    label: null,
                     children: ["A|2020-01", "B|1980-01-11"],
-                    clade:'11',
+                    clade:'3',
                     postOrder: 2,
                     parent:"node2"
                 },
@@ -33,9 +31,8 @@ describe("Tree Tests",()=>{
                     id: 'C|1960',
                     name: "C|1960",
                     length: 4,
-                    label: null,
                     children: null,
-                    clade:'100',
+                    clade:'4',
                     postOrder:3,
                     parent:"node2"
                 },
@@ -43,7 +40,6 @@ describe("Tree Tests",()=>{
                     id: 'A|2020-01',
                     name: "A|2020-01",
                     length: 1,
-                    label: null,
                     children: null,
                     clade:'1',
                     postOrder:0,
@@ -53,21 +49,20 @@ describe("Tree Tests",()=>{
                     id: 'B|1980-01-11',
                     name: "B|1980-01-11",
                     length: 2,
-                    label: null,
                     children: null,
-                    clade:"10",
+                    clade:"2",
                     postOrder:1,
                     parent:"node1"
                 }
             },
             cladeMap:{
               "1":"A|2020-01",
-              "10":"B|1980-01-11",
-              "100": "C|1960",
-              "11":"node1",
-              "111":"node2",
+              "2":"B|1980-01-11",
+              "4": "C|1960",
+              "3":"node1",
+              "7":"node2",
             },
-            clades:["1","10","11","100","111"],
+            clades:["1","2","3","4","7"],
             externalNodes:["A|2020-01","B|1980-01-11","C|1960"],
             internalNodes:["node2","node1"],
             postOrder:["A|2020-01","B|1980-01-11","node1","C|1960","node2"],
@@ -103,6 +98,13 @@ describe("Tree Tests",()=>{
             }
         })
     });
+    it("Handle exponential terms in branch lengths",()=>{
+        const treeString= "((a:1e-4,B:1)internal:4E-5,c:3);"
+        const tree = new ImmutableTree(ImmutableTree.parseNewick(treeString));
+
+        expect(tree.getDivergence("a")).toBeCloseTo(0.00014, 7);
+    });
+
     it("Should calculate divergence",()=>{
         const tree = new ImmutableTree(ImmutableTree.parseNewick(treeString));
 
@@ -114,5 +116,18 @@ describe("Tree Tests",()=>{
         expect(tree.getHeight("A|2020-01")).toEqual(1)
 
     })
+    it("Should split string at exposed commas",()=>{
+        const s = "('A|2020-01':1,B|1980-01-11[&length_range={1,1.5},location=\"Janesburgh\",location.prob={0.8,0.2},location.set={\"Janesburgh\",\"JanosAires\"}]:2):3,C|1960[&length_range={2,4},location=\"Mabalako\",location.prob=1.0,location.set={\"Mabalako\"}]:4";
+        expect(splitAtExposedCommas(s)).toEqual(["('A|2020-01':1,B|1980-01-11[&length_range={1,1.5},location=\"Janesburgh\",location.prob={0.8,0.2},location.set={\"Janesburgh\",\"JanosAires\"}]:2):3","C|1960[&length_range={2,4},location=\"Mabalako\",location.prob=1.0,location.set={\"Mabalako\"}]:4"])
+    });
+
+/*    it("Should calculate root to tip lengths",()=>{
+        const newickString =
+            '((((((virus1:0.1,virus2:0.12)0.95:0.08,(virus3:0.011,virus4:0.0087)1.0:0.15)0.65:0.03,virus5:0.21)1.0:0.2,(virus6:0.45,virus7:0.4)0.51:0.02)1.0:0.1,virus8:0.4)1.0:0.1,(virus9:0.04,virus10:0.03)1.0:0.6);';
+        const treeData = ImmutableTree.parseNewick(newickString);
+        const tree = new ImmutableTree(treeData);
+
+        expect(tree.getRootToTipLengths()).toEqual()
+    })*/
 });
 

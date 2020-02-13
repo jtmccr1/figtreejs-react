@@ -4,6 +4,6 @@
        {
          "regenerator": true
        }
-     ]]
+     ],["@babel/plugin-proposal-throw-expressions"]]
 
 }

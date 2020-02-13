@@ -1,6 +1,5 @@
-import {equalAngleLayout} from "./utils/layouts/equaleanglelayout.f";
-import {rectangularLayout} from "./utils/layouts/rectangularLayout.f";
-import {rootToTipLayout} from "./utils/layouts/rootToTipLayout";
+import {ImmutableTree} from "./utils/immutableTree";
+import ImmutableCladeCollection from "./utils/immutableCladeCollection";
 import {Tree} from "./utils/tree";
 import Branches from "./components/Baubles/Branches/Branches";
 import BranchPath from "./components/Baubles/Branches/BranchPath";
@@ -8,5 +7,6 @@ import Nodes from "./components/Baubles/Nodes/Nodes"
 import NodeShape from "./components/Baubles/Nodes/NodeShape";
 import Axis from "./components/decorations/Axis";
 import FigTree from "./components/FigTree";
+import {rectangularVertex,makeEdge} from "./utils/layouts";
 
-export {equalAngleLayout,rectangularLayout,rootToTipLayout,Tree,Branches,BranchPath,Nodes,NodeShape,Axis,FigTree}
+export {Tree,Branches,BranchPath,Nodes,NodeShape,Axis,FigTree,ImmutableTree,ImmutableCladeCollection,rectangularVertex,makeEdge}

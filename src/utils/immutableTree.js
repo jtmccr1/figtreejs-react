@@ -2,7 +2,7 @@ import {Type} from "./tree";
 import {extent,max} from "d3-array";
 import {timeParse} from "d3-time-format";
 import {decimalToDate} from "./utilities";
-import {BitSet} from "bitset/bitset";
+import BitSet from "bitset/bitset";
 
 export class ImmutableTree{
     constructor(tree){
@@ -95,7 +95,6 @@ export class ImmutableTree{
         if(!(id in this.tree.nodesById)){
             throw new Error(`id ${id} not recognized in tree`)
         }
-
         const self=this;
         let maxDivergence=null;
         return (function f(id) {
@@ -171,22 +170,14 @@ export class ImmutableTree{
             //                      [children]data - name, label, branch length ect.
             const internalNode =/\((.*)\)(.*)/;
             // identify commas not included in (),[],or {}
-            const exposedCommas=/,(?=(?:(?:(?![\)]).)*[\(])|[^\(\)]*$)(?=(?:(?:(?![\]]).)*[\[])|[^\[\]]*$)(?=(?:(?:(?![\}]).)*[\{])|[^\{\{]*$)/g;
-            const nodeData = /(.*?)(?:\[&?(.*)\])*(?:#(.+))*(.*):(\d*\.?\d*)/g;
+            const nodeData = /(?:(.*)(?=\[&))?(?:\[&(.+)])?(?:(.+)(?=:))?:(\d+\.?\d*(?:[eE]-?\d+)?)/g;
             const isInternalNode = internalNode.test(newickString);
             let nodeString,
                 childrenString,
                 childNodes=[];
             if(isInternalNode){
                 [childrenString,nodeString] = newickString.split(internalNode).filter(s=>s);
-                console.group("Internal")
-                console.log(childrenString);
-                console.log(nodeString);
-                console.groupEnd();
-                const children = childrenString.split(exposedCommas);
-                //TODO make test and fix exposed commas regex that fails on large dataset
-                console.group("split")
-                console.log(children);
+                const children = splitAtExposedCommas(childrenString);
 
                 for(const child of children){
                    childNodes=childNodes.concat(newickSubstringParser(child))
@@ -195,7 +186,15 @@ export class ImmutableTree{
                 nodeString = newickString;
             }
             //TODO get rid of leading and trailing empty matches
-            let [emptyMatch,name,annotationsString,id,label,length,emptyMatch2]=nodeString.split(nodeData);
+            let [emptyMatch,name,annotationsString,label,length,emptyMatch2]=nodeString.split(nodeData);
+
+            if(!isInternalNode&&!annotationsString){
+                name=label;
+                label=null;
+            }else if(isInternalNode&&name){
+                label=name;
+                name=null;
+            }
 
             if(name){
                 name = options.tipNames?options.tipNames[name]:stripQuotes(name)
@@ -205,9 +204,8 @@ export class ImmutableTree{
             }
 
             const node = {
-                id:name?name:id?id:(`node${(nodeCount+=1)}`),
+                id:name?name:label?(options.labelName==="label"?label:(`node${(nodeCount+=1)}`)): (`node${(nodeCount+=1)}`),
                 name:name?name:null,
-                label:label?label:null,
                 length:length!==undefined?parseFloat(length):null,
                 children:childNodes.length>0?childNodes.map(n=>n.root):null,
                 postOrder:(postOrderTally+=1),
@@ -220,10 +218,16 @@ export class ImmutableTree{
                 }
             }
 
-            node.clade= node.children? node.children.reduce((acc,child)=>acc.or(new BitSet(descendentNodesById[child].clade)),new BitSet()).toString():
-                    new BitSet([(options.tipMap?options.tipMap[name]:(tipCount+=1))]).toString();
+            node.clade= node.children? node.children.reduce((acc,child)=>acc.or(new BitSet(`0x${descendentNodesById[child].clade}`)),new BitSet()).toString(16):
+                    new BitSet([(options.tipMap?options.tipMap[name]:(tipCount+=1))]).toString(16);
 
             const annotations = annotationsString!==undefined? parseAnnotation(annotationsString):{};
+            if(options.labelName!=="label"){
+                if(label){
+                    annotations[options.labelName]=label;
+                }
+            }
+
             let date;
             if(options.datePrefix && name){
                 date =getDate(name,options.datePrefix,options.dateFormat);
@@ -234,7 +238,7 @@ export class ImmutableTree{
             const nodesById = {[node.id]:node,...descendentNodesById};
             const annotationsById = {[node.id]:annotations,...childNodes.reduce((acc,curr)=>({...acc,...curr.annotationsById}),{})};
             const annotationTypes =[typedAnnotations,...childNodes.map(child=>child.annotationTypes)].reduce((acc,curr)=>{return reconcileAnnotations(curr,acc)},{});
-            const cladeMap={[node.clade]:node.id,...childNodes.reduce((acc,curr)=>({...acc,...curr.cladeMap}),{})}
+            const cladeMap={[node.clade]:node.id,...childNodes.reduce((acc,curr)=>({...acc,...curr.cladeMap}),{})};
             const externalNodes =[(!node.children?node.id:null),...childNodes.reduce((acc,curr)=>acc.concat(curr.externalNodes),[])].filter(n=>n);
             const internalNodes=[(node.children?node.id:null),...childNodes.reduce((acc,curr)=>acc.concat(curr.internalNodes),[])].filter(n=>n);
             const postOrder=[...childNodes.reduce((acc,curr)=>acc.concat(curr.postOrder),[]),node.id];
@@ -248,16 +252,15 @@ export class ImmutableTree{
 }
 
 function parseAnnotation(annotationString){
-    const exposedCommas=/,(?=(?:(?:(?![\)]).)*[\(])|[^\(\)]*$)(?=(?:(?:(?![\]]).)*[\[])|[^\[\]]*$)(?=(?:(?:(?![\}]).)*[\{])|[^\{\}]*$)/g;
     const setRegex = /\{(.+)\}/;
     // const setRegex = /\{(.+)\}/;
     const out = {};
-    for( const annotation of annotationString.split(exposedCommas)){
+    for( const annotation of splitAtExposedCommas(annotationString)){
 
         let [annotationKey,data] = annotation.split("=");
             annotationKey=annotationKey.replace(".","_");
             if(setRegex.test(data)) {
-                data = data.split(setRegex).filter(s => s !== "").reduce((acc,curr)=>acc.concat(curr.split(exposedCommas)),[]);
+                data = data.split(setRegex).filter(s => s !== "").reduce((acc,curr)=>acc.concat(splitAtExposedCommas(curr)),[]);
                 if (data.reduce((acc, curr) => (acc & !isNaN(curr)), true)) {
                     data = data.map(d => parseFloat(d));
                 }else{
@@ -496,8 +499,19 @@ function getDate(name,datePrefix,dateFormat){
         }
 }
 
-function exposedCommas(string,open="("){
-    const close=open==="("?")":"}";
-    count=0;
-    [...string].reduce()
+export function splitAtExposedCommas(string){
+    const open=["(","[","{"];
+    const close=[")","]","}"];
+    let count=0;
+    return    [...string].reduce((acc,curr)=>{
+        if(open.includes(curr)){
+            count+=1;
+        }else if(close.includes(curr)){
+            count-=1;
+        }else if(count===0 &&curr===","){
+          return  acc.concat([[]])
+        }
+         acc[acc.length-1] =  acc[acc.length-1].concat(curr);
+         return acc;
+    },[[]]).map(s=>s.join(""))
 }
