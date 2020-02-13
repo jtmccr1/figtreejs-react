@@ -1,9 +1,17 @@
-import {Type} from "./tree";
 import {extent,max} from "d3-array";
 import {timeParse} from "d3-time-format";
 import {decimalToDate} from "./utilities";
 import BitSet from "bitset/bitset";
 
+export const Type = {
+    DISCRETE : Symbol("DISCRETE"),
+    BOOLEAN : Symbol("BOOLEAN"),
+    INTEGER : Symbol("INTEGER"),
+    FLOAT: Symbol("FLOAT"),
+    PROBABILITIES: Symbol("PROBABILITIES"),
+    DATE:Symbol("DATE")
+};
+//TODO use immutable.js to really make immutable
 export class ImmutableTree{
     constructor(tree){
         this.tree=tree;
@@ -50,23 +58,23 @@ export class ImmutableTree{
         return this.tree.clades;
     }
     getNodeAnnotations(id){
-        return {...this.tree.annotationsById[id]}
+        return this.tree.annotationsById[id]
     }
 
     getAnnotation(id){
-        return {...this.tree.annotationTypes[id]}
+        return this.tree.annotationTypes[id]
     }
     getExternalNodes(){
-        return [...this.tree.externalNodes];
+        return this.tree.externalNodes;
     }
     getInternalNodes(){
         return [...this.tree.internalNodes];
     }
     getPostOder(){
-        return [...this.tree.postOrder];
+        return this.tree.postOrder;
     }
     getPreOrder(){
-        return [...this.tree.postOrder].reverse();
+        return this.tree.postOrder.reverse();
     }
     getDivergence(id){
         if(!(id in this.tree.nodesById)){
@@ -163,6 +171,18 @@ export class ImmutableTree{
         let tipCount=-1;
         let postOrderTally=-1;
 
+        const treeData = {
+            nodesById:{},
+            annotationsById:{},
+            annotationTypes:{},
+            cladeMap:{},
+            clades:[],
+            externalNodes:[],
+            internalNodes:[],
+            postOrder:[],
+            root:""}
+
+
         function newickSubstringParser(newickString){
             // check for semicolon
             //strip first and last parenthesis and annotations ect. call again on children.
@@ -180,7 +200,7 @@ export class ImmutableTree{
                 const children = splitAtExposedCommas(childrenString);
 
                 for(const child of children){
-                   childNodes=childNodes.concat(newickSubstringParser(child))
+                   childNodes.push(newickSubstringParser(child))
                 }
             }else{
                 nodeString = newickString;
@@ -207,18 +227,17 @@ export class ImmutableTree{
                 id:name?name:label?(options.labelName==="label"?label:(`node${(nodeCount+=1)}`)): (`node${(nodeCount+=1)}`),
                 name:name?name:null,
                 length:length!==undefined?parseFloat(length):null,
-                children:childNodes.length>0?childNodes.map(n=>n.root):null,
+                children:childNodes.length>0?childNodes:null,
                 postOrder:(postOrderTally+=1),
         };
 
-            const descendentNodesById ={...childNodes.reduce((acc,curr)=>({...acc,...curr.nodesById}),{})};
             if(node.children){
                 for(const childId of node.children){
-                    descendentNodesById[childId].parent = node.id;
+                    treeData.nodesById[childId].parent = node.id;
                 }
             }
 
-            node.clade= node.children? node.children.reduce((acc,child)=>acc.or(new BitSet(`0x${descendentNodesById[child].clade}`)),new BitSet()).toString(16):
+            node.clade= node.children? node.children.reduce((acc,child)=>acc.or(new BitSet(`0x${treeData.nodesById[child].clade}`)),new BitSet()).toString(16):
                     new BitSet([(options.tipMap?options.tipMap[name]:(tipCount+=1))]).toString(16);
 
             const annotations = annotationsString!==undefined? parseAnnotation(annotationsString):{};
@@ -235,20 +254,35 @@ export class ImmutableTree{
             }
 
             const typedAnnotations = typeAnnotations(annotations);
-            const nodesById = {[node.id]:node,...descendentNodesById};
-            const annotationsById = {[node.id]:annotations,...childNodes.reduce((acc,curr)=>({...acc,...curr.annotationsById}),{})};
-            const annotationTypes =[typedAnnotations,...childNodes.map(child=>child.annotationTypes)].reduce((acc,curr)=>{return reconcileAnnotations(curr,acc)},{});
-            const cladeMap={[node.clade]:node.id,...childNodes.reduce((acc,curr)=>({...acc,...curr.cladeMap}),{})};
-            const externalNodes =[(!node.children?node.id:null),...childNodes.reduce((acc,curr)=>acc.concat(curr.externalNodes),[])].filter(n=>n);
-            const internalNodes=[(node.children?node.id:null),...childNodes.reduce((acc,curr)=>acc.concat(curr.internalNodes),[])].filter(n=>n);
-            const postOrder=[...childNodes.reduce((acc,curr)=>acc.concat(curr.postOrder),[]),node.id];
-            const clades = [...childNodes.reduce((acc,curr)=>acc.concat(curr.clades),[]),node.clade];
-            return ({nodesById,annotationsById,annotationTypes,cladeMap,clades,externalNodes,internalNodes,postOrder,root:node.id})
+            treeData.nodesById[node.id] = node;
+            treeData.annotationsById[node.id] = annotations;
+            treeData.annotationTypes=reconcileAnnotations(typedAnnotations,treeData.annotationTypes);
+            treeData.cladeMap[node.clade] = node.id;
+            if(!isInternalNode){
+                treeData.externalNodes.push(node.id);
+            }else{
+                treeData.internalNodes.unshift(node.id);
+            }
+            treeData.postOrder.push(node.id);
+            treeData.clades.push(node.clade);
+            treeData.root=node.id;
 
+            return node.id;
         }
-        return newickSubstringParser(newickString);
+        newickSubstringParser(newickString);
+
+        return treeData;
     }
 
+}
+
+function copyChildClade(object,accessor,childData){
+    for(const child of childData){
+        for(const [key,value] of Object.entries(child[accessor])){
+            object[key]=value
+        }
+    }
+    return object;
 }
 
 function parseAnnotation(annotationString){
@@ -503,15 +537,23 @@ export function splitAtExposedCommas(string){
     const open=["(","[","{"];
     const close=[")","]","}"];
     let count=0;
-    return    [...string].reduce((acc,curr)=>{
-        if(open.includes(curr)){
+    const commas=[-1];
+    for(let i=0;i<string.length;i++){
+        if(open.includes(string[i])){
             count+=1;
-        }else if(close.includes(curr)){
+        }else if(close.includes(string[i])){
             count-=1;
-        }else if(count===0 &&curr===","){
-          return  acc.concat([[]])
+        }else if(count===0 &&string[i]===","){
+            commas.push(i)
         }
-         acc[acc.length-1] =  acc[acc.length-1].concat(curr);
-         return acc;
-    },[[]]).map(s=>s.join(""))
+    }
+    commas.push(string.length);
+
+    const splits = [];
+
+    for(let i=1;i<commas.length;i++){
+        splits.push(string.slice(commas[i-1]+1,commas[i]))
+    }
+    return splits;
+
 }

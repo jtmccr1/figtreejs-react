@@ -1,6 +1,5 @@
 import ImmutableCladeCollection, {mergeClade, treeReducer} from "../src/utils/immutableCladeCollection"
-import {ImmutableTree} from "../src/utils/immutableTree";
-import {Type} from "../src/utils/tree";
+import {ImmutableTree,Type} from "../src/utils/immutableTree";
 
 describe("Testing tree collection",()=>{
     const tree1String="((A[&rate=1]:2.1,B[&rate=1.1]:3)[&rate=1.5]:5,C[&rate=4]:1);";

@@ -1,12 +1,10 @@
 import {mean} from "d3-array";
-import {Type} from "../tree";
+import {Type} from "../immutableTree";
 
 export function getVertexClassesFromNode(id,tree){
     let classes = [(!tree.getChildren(id) ? "external-node" : "internal-node")];
     if (tree.tree.annotationTypes) {
-        classes = [
-            ...classes,
-            ...Object.entries(tree.getNodeAnnotations(id))
+        classes=classes.concat(Object.entries(tree.getNodeAnnotations(id))
                 .filter(([key]) => {
                     return tree.getAnnotation(key) &&
                         (tree.getAnnotation(key).type === Type.DISCRETE ||
@@ -19,7 +17,7 @@ export function getVertexClassesFromNode(id,tree){
                     }else if(tree.getAnnotation(key).type === Type.BOOLEAN && value ){
                         return `${key}`
                     }
-                })];
+                }));
     }
     return classes;
 }

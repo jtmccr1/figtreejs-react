@@ -2,22 +2,19 @@
   "name": "figtreejs-react",
   "version": "1.0.0",
   "description": "",
-  "main": "lib/index.js",
+  "main": "index.js",
   "scripts": {
-    "docs": "styleguidist server",
+    "dev": "styleguidist server",
     "build": "rollup -c",
-    "dev": "next",
-    "build-pages": "next build",
-    "start": "next start",
-    "test": "jest",
-    "test:debug": "node --inspect node_modules/.bin/jest --runInBand"
+    "build:dev": "NODE_ENV=development rollup -c",
+    "build:prod": "NODE_ENV=production rollup -c",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "peerDependencies": {
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0"
+    "react": ">= 16.x.x"
   },
   "devDependencies": {
     "@babel/core": "^7.8.4",
@@ -26,8 +23,8 @@
     "@babel/preset-env": "^7.8.4",
     "@babel/preset-react": "^7.8.3",
     "babel-loader": "^8.0.6",
+    "babel-plugin-module-resolver": "^4.0.0",
     "jest": "^25.1.0",
-    "next": "^9.2.1",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-styleguidist": "^10.6.1",
@@ -36,11 +33,11 @@
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-peer-deps-external": "^2.2.2",
+    "rollup-plugin-replace": "^2.2.0",
     "rollup-plugin-uglify": "^6.0.4",
     "webpack": "^4.41.5"
   },
   "dependencies": {
-    "babel-plugin-module-resolver": "^4.0.0",
     "bitset": "^5.1.1",
     "d3-array": "^2.4.0",
     "d3-format": "^1.4.3",
