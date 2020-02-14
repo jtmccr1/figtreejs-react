@@ -2,34 +2,128 @@ import babel from "rollup-plugin-babel";
 import commonjs from "rollup-plugin-commonjs";
 import resolve from "rollup-plugin-node-resolve";
 import external from "rollup-plugin-peer-deps-external";
-import replace from "rollup-plugin-replace";
+import { terser } from "rollup-plugin-terser";
+import { uglify } from "rollup-plugin-uglify";
+import packageJSON from "./package.json";
 
-const NODE_ENV = process.env.NODE_ENV || "development";
-const outputFile = NODE_ENV === "production" ? "./lib/prod.js" : "./lib/dev.js";
 const input = "./src/index.js";
+const minifyExtension = pathToFile => pathToFile.replace(/\.js$/, ".min.js");
 
 export default [
     // CommonJS
     {
         input,
         output: {
-            file: outputFile,
-            format: "cjs"
+            file: packageJSON.main,
+            format: "cjs",
+            sourcemap: true
         },
         plugins: [
-            replace({
-                "process.env.NODE_ENV": JSON.stringify(NODE_ENV)
-            }),
             babel({
-                exclude: "node_modules/**",
-                runtimeHelpers: true
-
+                exclude: "node_modules/**"
             }),
-            resolve([ {preferBuiltins: true}]),
-            commonjs()
-        ],
-        external: id => /^react/.test(id)
-
+            external(),
+            resolve(),
+            commonjs({include: ['src/*','node_modules/**']})
+        ]
     },
-
+    {
+        input,
+        output: {
+            file: minifyExtension(packageJSON.main),
+            format: "cjs",
+            sourcemap: true
+        },
+        plugins: [
+            babel({
+                exclude: "node_modules/**"
+            }),
+            external(),
+            resolve(),
+            commonjs({include: ['src/*','node_modules/**']}),
+            terser()
+        ]
+    },
+    // UMD
+    {
+        input,
+        output: {
+            file: packageJSON.browser,
+            format: "umd",
+            sourcemap: true,
+            name: "reactSampleComponentsLibrary",
+            globals: {
+                react: "React",
+                "@emotion/styled": "styled",
+                "@emotion/core": "core"
+            }
+        },
+        plugins: [
+            babel({
+                exclude: "node_modules/**"
+            }),
+            external(),
+            resolve(),
+            commonjs({include: ['src/*','node_modules/**']})
+        ]
+    },
+    {
+        input,
+        output: {
+            file: minifyExtension(packageJSON.browser),
+            format: "umd",
+            sourcemap: true,
+            name: "reactSampleComponentsLibrary",
+            globals: {
+                react: "React",
+                "@emotion/styled": "styled",
+                "@emotion/core": "core"
+            }
+        },
+        plugins: [
+            babel({
+                exclude: "node_modules/**"
+            }),
+            external(),
+            resolve(),
+            commonjs({include: ['src/*','node_modules/**']}),
+            terser()
+        ]
+    },
+    // ES
+    {
+        input,
+        output: {
+            file: packageJSON.module,
+            format: "es",
+            sourcemap: true,
+            exports: "named"
+        },
+        plugins: [
+            babel({
+                exclude: "node_modules/**"
+            }),
+            external(),
+            resolve(),
+            commonjs({include: ['src/*','node_modules/**']})
+        ]
+    },
+    {
+        input,
+        output: {
+            file: minifyExtension(packageJSON.module),
+            format: "es",
+            sourcemap: true,
+            exports: "named"
+        },
+        plugins: [
+            babel({
+                exclude: "node_modules/**"
+            }),
+            external(),
+            resolve(),
+            commonjs({include: ['src/*','node_modules/**']}),
+            terser()
+        ]
+    }
 ];

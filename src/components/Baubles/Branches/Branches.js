@@ -3,22 +3,17 @@ import Branch from "./Branch";
 import BranchPath from "./BranchPath";
 import {scaleLinear} from "d3-scale";
 import {extent} from "d3-array";
+import {mapAttrsToProps} from "../helpers";
 
 export default function Branches(props){
-    const {label,curvature,onHover,OnClick,edges,domain}=props;
+    const {label,curvature,onHover,OnClick,edges,scales,attrs}=props;
+    const attrMapper = useMemo (()=>mapAttrsToProps(attrs),[attrs]);
 
-    const xScale=useMemo(()=>scaleLinear().range([0,domain.x])
-            .domain(extent(edges.reduce((acc,curr)=>{acc.push(curr.v0.x);acc.push(curr.v1.x);return acc},[]))),
-        [edges,domain]);
-    const yScale=useMemo(()=>scaleLinear().range([0,domain.y])
-            .domain(extent(edges.reduce((acc,curr)=>{acc.push(curr.v0.y);acc.push(curr.v1.y);return acc},[]))),
-        [edges,domain]);
     return(<g className={"branch-layer"}>
         {edges.map(e => {
             return (
-                <Branch key={`branch-${e.id}`} classes={e.classes} x={xScale(e.x)} y={yScale(e.y)}>
-                    <BranchPath {...{x0: xScale(e.v0.x), y0: yScale(e.v0.y), x1: xScale(e.v1.x), y1: yScale(e.v1.y)}}
-                                strokeWidth={3} stroke={"black"}/>
+                <Branch key={`branch-${e.id}`} classes={e.classes} x={scales.x(e.x)} y={scales.y(e.y)}>
+                    <BranchPath x0={scales.x(e.v0.x)} y0= {scales.y(e.v0.y)} x1={scales.x(e.v1.x)} y1={scales.y(e.v1.y)} {...attrMapper(e)} />
                 </Branch>
             )
         })
@@ -28,6 +23,7 @@ export default function Branches(props){
 
         Branches.defaultProps={
                 label:{},
+                filter:(e)=>true,
                 curvature:{},
                 onHover:{},
                 onClick:{},

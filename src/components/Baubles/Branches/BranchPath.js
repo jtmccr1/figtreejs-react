@@ -32,6 +32,13 @@ function branchPathGenerator({x0,y0,x1,y1}) {
                     {x: x1 - x0, y: 0}
                 ]))
         // return (output)
-
 }
 export default React.memo(BranchPath)
+
+BranchPath.defaultProps={
+    strokeWidth:2,
+    stroke:" #541753",
+    strokeLinecap:"round",
+    strokeLinejoin:"round"
+}
+

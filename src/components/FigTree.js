@@ -1,20 +1,25 @@
-import React,{useState,useMemo} from 'react';
-import Branches from "./Baubles/Branches/Branches";
+import React,{useState,useMemo,useCallback} from 'react';
+
 import {scaleLinear} from "d3-scale";
 import {extent} from "d3-array";
+import {makeEdge,rectangularVertex} from "../utils/layouts/index";
+import Branches from "./Baubles/Branches/Branches";
 
-
+/**
+ * The FigTree component
+ * This takes a tree and layout options. It calls the layout and handles state for this figure.
+ * It also passes it's scales to it's children props as well as the edges to the branches and the nodes to the nodes.
+ */
 export default function FigTree(props){
-    const {layout,margins,width,height,tree} = props;
+   //TODO avoid prop drilling
+    const {layout,margins,width,height,tree,standAlone} = props;
 
-    const {vertices,edges} = useMemo(()=>{console.log("layout");return layout(tree)},[tree]);
-    const scales=useMemo(()=>{console.log("setting up scales");return setUpScales({width,height},margins,vertices,edges)},[tree]);
+    const vertices = tree.getPostOder().map(id=>rectangularVertex(id,tree));
+    const edges =   tree.getPostOder().filter(id=>id!==tree.getRoot()).map(id=>makeEdge(rectangularVertex)(id,tree));
+    const scales=useMemo(()=>{console.log("setting up scales");return setUpScales({width,height},margins,vertices)},[tree]);
 
-    const updatedVertices = vertices.map(v=>({...v, x:scales.x(v.x), y:scales.y(v.y)}));
-    const upddatedEdges = edges.map(e=>({...e, x:scales.x(e.x), y:scales.y(e.y)}));
-
+     //TODO scales in state so can be updated by legends
     return(
-        <svg width={width} height={height} > // make own component with defaults
             <g transform={`translate(${margins.left},${margins.top})`}>
                 {React.Children.map(props.children, (child, index) => {
                     switch(child.type.name){
@@ -22,7 +27,6 @@ export default function FigTree(props){
                         return React.cloneElement(child, {
                             vertices,
                             scales,
-
                         });
                         case "Branches":
                             return React.cloneElement(child, {
@@ -36,16 +40,13 @@ export default function FigTree(props){
                         default:
                             throw new Error(`FigTree component ${child.type.name} not recognized.`)
                     }
-
                 }).reverse()}
             </g>
-        </svg>
     )
 }
-function setUpScales(size,margins,vertices,edges){
-    const xdomain = extent(vertices.map(d=>d.x).concat(edges.reduce((acc,e)=> acc.concat([e.v1.x,e.v0.x]),[])));
-    // almost always the same except when the trendline is added as an edge without vertices
-    const ydomain =  extent(vertices.map(d=>d.y).concat(edges.reduce((acc,e)=>acc.concat([e.v1.y,e.v0.y]),[])));
+function setUpScales(size,margins,vertices){
+    const xdomain = extent(vertices.map(d=>d.x));
+    const ydomain =  extent(vertices.map(d=>d.y));
 
     const x = scaleLinear()
         .domain(xdomain)
@@ -55,4 +56,12 @@ function setUpScales(size,margins,vertices,edges){
         .domain(ydomain)
         .range([size.height -margins.bottom-margins.top,0]);
     return {x,y};
+}
+
+FigTree.defaultProps= {
+    width: undefined,
+    height: undefined,
+    layout: rectangularVertex,
+    standAlone: true,
+    children: [<Branches/>]
 }

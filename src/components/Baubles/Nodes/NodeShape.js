@@ -12,6 +12,8 @@ export const NodeShape =(props)=>{
 NodeShape.defaultProps={
 	r:4,
 	fill:"steelblue",
+	strokeWidth:0,
+	stroke:'black',
 };
 
 export default React.memo(NodeShape);

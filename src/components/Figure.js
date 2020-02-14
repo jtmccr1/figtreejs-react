@@ -3,13 +3,13 @@ import React from "react"
 export default function Figure(props){
     const{width,height,margins} = props;
 
-    const domain={x:(width-margins.left-margins.right),y:(height-margins.top-margins.bottom)}
+    const range={x:(width-margins.left-margins.right),y:(height-margins.top-margins.bottom)}
 
     return(
         <svg width={width} height={height} > // make own component with defaults
             <g transform={`translate(${margins.left},${margins.top})`}>
                 {React.Children.map(props.children, (child, index) => {
-                    return React.cloneElement(child, {domain})
+                    return React.cloneElement(child, {range})
                 })}
             </g>
         </svg>
