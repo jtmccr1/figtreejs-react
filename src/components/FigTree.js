@@ -12,10 +12,10 @@ import Branches from "./Baubles/Branches/Branches";
  */
 export default function FigTree(props){
    //TODO avoid prop drilling
-    const {layout,margins,width,height,tree,standAlone} = props;
+    const {layout,margins,width,height,tree,} = props;
 
-    const vertices = tree.getPostOder().map(id=>rectangularVertex(id,tree));
-    const edges =   tree.getPostOder().filter(id=>id!==tree.getRoot()).map(id=>makeEdge(rectangularVertex)(id,tree));
+    const vertices = tree.getPostOder().map(id=>layout(id,tree));
+    const edges =   tree.getPostOder().filter(id=>id!==tree.getRoot()).map(id=>makeEdge(layout)(id,tree));
     const scales=useMemo(()=>{console.log("setting up scales");return setUpScales({width,height},margins,vertices)},[tree]);
 
      //TODO scales in state so can be updated by legends
@@ -59,9 +59,9 @@ function setUpScales(size,margins,vertices){
 }
 
 FigTree.defaultProps= {
-    width: undefined,
+    width: undefined, /** Width of svg */
     height: undefined,
     layout: rectangularVertex,
-    standAlone: true,
-    children: [<Branches/>]
+    children: [<Branches/>],
+    margins:{top:10,bottom:10,left:10,right:10}
 }

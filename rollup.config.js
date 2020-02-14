@@ -51,7 +51,7 @@ export default [
             file: packageJSON.browser,
             format: "umd",
             sourcemap: true,
-            name: "reactSampleComponentsLibrary",
+            name: "figtreejs",
             globals: {
                 react: "React",
                 "@emotion/styled": "styled",
@@ -73,7 +73,7 @@ export default [
             file: minifyExtension(packageJSON.browser),
             format: "umd",
             sourcemap: true,
-            name: "reactSampleComponentsLibrary",
+            name: "figtreejs",
             globals: {
                 react: "React",
                 "@emotion/styled": "styled",
