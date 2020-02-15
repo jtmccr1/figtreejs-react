@@ -11,7 +11,7 @@ const tree = new ImmutableTree(treeData);
 
 <svg width={600} height={400}>
     <FigTree  margins={{top:10,bottom:10,left:10,right:10}} width={600} height={400} tree={tree} >
-        <Nodes filter={v=>!tree.getChildren(v.id)}  onHover={{r:10,fill:'#ae7e56',strokeWidth:2}} />
+        <Nodes filter={v=>!tree.getChildren(v.id)}  highlightOnHover={{r:10,fill:'#ae7e56',strokeWidth:2}} />
         <Branches />
     </FigTree>
 </svg>

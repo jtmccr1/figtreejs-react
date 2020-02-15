@@ -1,45 +1,57 @@
 import React, {useMemo,useState,useCallback} from "react"
 import NodeShape from "./NodeShape";
 import Node from "./Node";
-import {mapAttrsToProps} from "../helpers";
+import {applyInteractions, mapAttrsToProps} from "../../../utils/baubleHelpers";
 
 export default function Nodes(props){
-//TODO make
-    const {label,curvature,onHover,OnClick,vertices,filter,scales,attrs}=props;
+
+    const {labelOnHover,highlightOnHover,
+        vertices,filter,scales,attrs,
+        labelAttrs, labelMaker,interactions}=props;
+    //I am assuming if the user wants to apply attributes based on what is hovered or seleted they
+    // they have access to that. highlighONHover is a nice short cut but for the moment I don't need to
+    // focus on handeling all that.
+    //hooks?
     const attrMapper = mapAttrsToProps(attrs);
-
-    //Allows for optional self control and lifted state. Maybe context better for these.
-    //TODO lift to HOC
-
-    // Make so that onHover can be a function that is passed in as well as selectNode
-    // maybe selectNode is a option for OnClick.
+    const labelAttrMapper = mapAttrsToProps(labelAttrs)
+    const hoverAttrMapper = highlightOnHover && mapAttrsToProps(highlightOnHover);
+    const appliedInteractions = applyInteractions(interactions);
+    // refactor so OnHover prop is a function that fires on hover. same for onClick. the lift to hoc so can use in multiple components
+    // Highlight on Hover is built in option that takes an attr like object to be applied to the hovered node.
+    // If part of a figure, and  the hovered node state and updater will be lifted come from the figure. This way they will
+    // be shared by all subfigures.
     const [hoveredNode,hoverNode] =props.hoverNode?[props.hoveredNode,props.hoverNode]: useState("");
     const hoverer = useCallback((id) =>({onMouseEnter:()=>hoverNode(id),onMouseLeave:()=>hoverNode("")}),[hoverNode]);
-
-    const [selectedNode,selectNode] =props.selectNode?[props.selectedNode,props.selectNode]: useState("");
+    const [selectedNodes,selectNode] =props.selectNode?[props.selectedNodes,props.selectNode]: useState(""); // use reducer so can add with command ro just select
     const selector = useCallback((id) =>({onMouseEnter:()=>hoverNode(id),onMouseLeave:()=>hoverNode("")}),[hoverNode]);
 
  return(
      <g className={props.className}>
-         {vertices.filter(filter).map(v=>{
-             return (
-                 <Node key={`node-${v.id}`} classes={v.classes} x={scales.x(v.x)} y={scales.y(v.y)}  interactions={(hoverer(v.id))} >
-                     <NodeShape {...attrMapper(v)} {...(v.id===hoveredNode&&onHover)}  />
-                 </Node>
-             )
-         })}
+         {vertices.reduce((all,v)=>{
+             if(filter(v)){
+                 all.push( <Node key={`node-${v.id}`} classes={v.classes.concat((v.id===hoveredNode?"hovered":[]))} x={scales.x(v.x)} y={scales.y(v.y)}  interactions={{...hoverer(v.id),...appliedInteractions(v)}} >
+                     <NodeShape {...attrMapper(v)} {...((highlightOnHover&&v.id===hoveredNode)&&hoverAttrMapper(v))} />
+                     {(labelOnHover)? v.id===hoveredNode&&<text {...v.textLabel} className={"label"}>{labelMaker(v)}</text>:
+                         <text> {...v.textLabel} className={"label"}>{labelMaker(v)}</text>}
+                 </Node>)
+             }
+             return all;
+         },[])}
      </g>
  )
 }
 
 Nodes.defaultProps={
-    label:{},
+    labelMaker:(v)=>v.id,
+    labelAttrs:{},
+    labelOnHover:false, // only show label on hover
     filter:(v)=>true,
-    onHover:{},
+    highlightOnHover:{},
     onClick:{},
     attrs:{},
     vertices:[],
-    className:"node-layer"
+    className:"node-layer",
+    interactions:{},
 };
 
 function Hoverer(callback){

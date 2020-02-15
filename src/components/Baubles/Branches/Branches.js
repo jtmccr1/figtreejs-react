@@ -3,7 +3,7 @@ import Branch from "./Branch";
 import BranchPath from "./BranchPath";
 import {scaleLinear} from "d3-scale";
 import {extent} from "d3-array";
-import {mapAttrsToProps} from "../helpers";
+import {mapAttrsToProps} from "../../../utils/baubleHelpers";
 
 export default function Branches(props){
     const {label,curvature,onHover,OnClick,edges,scales,attrs}=props;

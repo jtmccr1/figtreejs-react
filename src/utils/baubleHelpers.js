@@ -12,3 +12,14 @@ export function mapAttrsToProps(attrs) {
     }
 
 }
+
+export function applyInteractions(fs) {
+    return function (v) {
+        const props = {};
+        for (const [key, value] of Object.entries(fs)) {
+                props[key] = ()=>value(v)
+        }
+        return props;
+    }
+
+}
