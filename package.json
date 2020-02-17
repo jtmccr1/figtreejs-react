@@ -9,7 +9,7 @@
     "/lib"
   ],
   "scripts": {
-    "test": "jest",
+    "test": "jest --watch",
     "start": "styleguidist server",
     "build": "rollup -c",
     "prepublishOnly": "rm -rf lib && npm run build",
