@@ -31,8 +31,6 @@ export default function Nodes(props){
              if(filter(v)){
                  all.push( <Node key={`node-${v.id}`} classes={v.classes.concat((v.id===hoveredNode?"hovered":[]))} x={scales.x(v.x)} y={scales.y(v.y)}  interactions={{...hoverer(v.id),...appliedInteractions(v)}} >
                      <NodeShape {...attrMapper(v)} {...((highlightOnHover&&v.id===hoveredNode)&&hoverAttrMapper(v))} />
-                     {/*{(labelOnHover)? v.id===hoveredNode&& <text {...v.textLabel} className={"label"}>{labelMaker(v)}</text>:*/}
-                     {/*    <text> {...v.textLabel} className={"label"}>{labelMaker(v)}</text>}*/}
                  </Node>)
              }
              return all;

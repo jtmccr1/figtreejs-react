@@ -292,7 +292,8 @@ function parseAnnotation(annotationString){
     for( const annotation of splitAtExposedCommas(annotationString)){
 
         let [annotationKey,data] = annotation.split("=");
-            annotationKey=annotationKey.replace(".","_");
+        //TODO ensure this is working
+            annotationKey=annotationKey.replace(/\./g,"_");
             if(setRegex.test(data)) {
                 data = data.split(setRegex).filter(s => s !== "").reduce((acc,curr)=>acc.concat(splitAtExposedCommas(curr)),[]);
                 if (data.reduce((acc, curr) => (acc & !isNaN(curr)), true)) {
@@ -318,8 +319,9 @@ function constructProbabilitySet(out){
     const finalObject ={};
     const skippedKeys = [];
     for(const probabilityKey of keys){
-        if(/.+_prob/.test(probabilityKey)){
-            const base = probabilityKey.split("_prob").filter(s=>s!=="");
+        //TODO get this working
+        if(/.+_set_prob/.test(probabilityKey)){
+            const base = probabilityKey.split("_set_prob").filter(s=>s!=="");
             const traitkey = `${base}_set`;
             const probabilities=[].concat(out[probabilityKey]);
             if(keys.includes(traitkey)) {
@@ -437,6 +439,7 @@ function typeAnnotations(annotations){
                     type = (type === undefined) ? Type.DISCRETE : type;
 
                     if (type === Type.PROBABILITIES) {
+                        console.warn(annotations)
                         throw Error(`the values of annotation, ${key}, should be all boolean or all floats`);
                     }
                 } else {

@@ -11,7 +11,7 @@ import Branches from "./Baubles/Branches/Branches";
  * It also passes it's scales to it's children props as well as the edges to the branches and the nodes to the nodes.
  */
 export default function FigTree(props){
-   //TODO avoid prop drilling
+
     const {layout,margins,width,height,tree,} = props;
 
     const vertices = tree.getPostOder().map(id=>layout(id,tree));
