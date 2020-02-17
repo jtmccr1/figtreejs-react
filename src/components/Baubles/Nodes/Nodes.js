@@ -20,6 +20,8 @@ export default function Nodes(props){
     // Highlight on Hover is built in option that takes an attr like object to be applied to the hovered node.
     // If part of a figure, and  the hovered node state and updater will be lifted come from the figure. This way they will
     // be shared by all subfigures.
+
+
     const [hoveredNode,hoverNode] =props.hoverNode?[props.hoveredNode,props.hoverNode]: useState("");
     const hoverer = useCallback((id) =>({onMouseEnter:()=>hoverNode(id),onMouseLeave:()=>hoverNode("")}),[hoverNode]);
     const [selectedNodes,selectNode] =props.selectNode?[props.selectedNodes,props.selectNode]: useState(""); // use reducer so can add with command ro just select

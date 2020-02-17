@@ -5,7 +5,7 @@ export function rectangularVertex(id,tree){
     let cache={};
     return (function f(id,tree){
         if(id in cache){
-            return cache[id]; //TODO use immutable lib if you realy want it.
+            return cache[id];
         }else{
             const vertex = makeVertexFromNode(id,tree);
             vertex.x = tree.getDivergence(id);

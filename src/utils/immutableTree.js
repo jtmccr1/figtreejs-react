@@ -319,19 +319,20 @@ function constructProbabilitySet(out){
     const finalObject ={};
     const skippedKeys = [];
     for(const probabilityKey of keys){
-        //TODO get this working
+
         if(/.+_set_prob/.test(probabilityKey)){
-            const base = probabilityKey.split("_set_prob").filter(s=>s!=="");
+            const base = probabilityKey.split("_set_prob").filter(s=>s!=="")[0];
             const traitkey = `${base}_set`;
             const probabilities=[].concat(out[probabilityKey]);
+            skippedKeys.push(traitkey);
             if(keys.includes(traitkey)) {
                 const probabilitySet = {};
                 for (let i = 0; i < out[traitkey].length; i++) {
                     probabilitySet[out[traitkey][i]] = probabilities[i];
-                    finalObject[`${base}_probSet`] = {...probabilitySet};
                 }
+                finalObject[`${base}_probSet`] = {...probabilitySet};
             }
-        }
+        }else if(!(skippedKeys.includes(probabilityKey)))
         finalObject[probabilityKey]=out[probabilityKey];
     }
     return finalObject;

@@ -14,7 +14,18 @@ export default function FigTree(props){
 
     const {layout,margins,width,height,tree,} = props;
 
+    console.time("vertices");
     const vertices = tree.getPostOder().map(id=>layout(id,tree));
+    console.timeEnd("vertices");
+
+    // console.time("vertLoop");
+    // let i=0;
+    // for(const v of tree.getPostOder()){
+    //     i+=tree.getDivergence(v.id);
+    // }
+    // console.timeEnd("vertLoop");
+
+
     const edges =   tree.getPostOder().filter(id=>id!==tree.getRoot()).map(id=>makeEdge(layout)(id,tree));
     const scales=useMemo(()=>{console.log("setting up scales");return setUpScales({width,height},margins,vertices)},[tree]);
 
