@@ -1,7 +1,7 @@
 import {splitAtExposedCommas, ImmutableTree} from "../src/utils/immutableTree";
 import {Type} from "../src/utils/immutableTree";
 import {timeParse} from "d3-time-format";
-const treeString="(('A|2020-01':1,B|1980-01-11[&length_range={1,1.5},location=\"Janesburgh\",location.prob={0.8,0.2},location.set={\"Janesburgh\",\"JanosAires\"}]:2):3,C|1960[&length_range={2,4},location=\"Mabalako\",location.prob=1.0,location.set={\"Mabalako\"}]:4);"
+const treeString="(('A|2020-01':1,B|1980-01-11[&length_range={1,1.5},location=\"Janesburgh\",location.set.prob={0.8,0.2},location.set={\"Janesburgh\",\"JanosAires\"}]:2):3,C|1960[&length_range={2,4},location=\"Mabalako\",location.prob=1.0,location.set={\"Mabalako\"}]:4);"
 
 describe("Tree Tests",()=>{
     it("parse newick tree parse, type and reconcile annotations",()=>{
