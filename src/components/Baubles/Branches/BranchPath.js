@@ -37,7 +37,7 @@ export default React.memo(BranchPath)
 
 BranchPath.defaultProps={
     strokeWidth:2,
-    stroke:" #541753",
+    stroke:"#541753",
     strokeLinecap:"round",
     strokeLinejoin:"round"
 }

@@ -35,7 +35,7 @@ export function makeVertexFromNode(id,tree){
             alignmentBaseline: leftLabel?(labelBelow ? "bottom": "hanging" ):"middle",
             textAnchor:leftLabel?"end":"start",
         },
-        classes: []//getVertexClassesFromNode(id,tree),
+        classes: getVertexClassesFromNode(id,tree)
     };
 }
 

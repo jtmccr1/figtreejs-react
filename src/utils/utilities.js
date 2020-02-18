@@ -87,3 +87,8 @@ export function areEqualShallow(a, b) {
     }
     return true;
 }
+
+export const customDateFormater=(formatString) => (d) => {
+    const dateFormat = timeFormat(formatString);
+    return `${dateFormat(decimalToDate(d))}`;
+};

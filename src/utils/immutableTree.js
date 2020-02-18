@@ -15,43 +15,39 @@ export const Type = {
 export class ImmutableTree{
     constructor(tree){
         this.tree=tree;
+        this.getDivergence=this.getDivergence();
     }
     getRoot(){
         return this.tree.root;
     }
     getNode(id){
-        if(!(id in this.tree.nodesById)){
+/*        if(!(id in this.tree.nodesById)){
             throw new Error(`id ${id} not recognized in tree`)
-        }
-        return {...this.tree.nodesById[id]}
+        }*/
+        return this.tree.nodesById[id]
     }
     getParent(id){
-        if(!(id in this.tree.nodesById)){
+/*        if(!(id in this.tree.nodesById)){
             throw new Error(`id ${id} not recognized in tree`)
-        }
-        const node= this.getNode(id);
-        if("parent" in node){
-            return node.parent;
-        }else{
-            return null;
-        }
+        }*/
+        return this.getNode(id).parent
     }
     getChildren(id){
-        if(!(id in this.tree.nodesById)){
+/*        if(!(id in this.tree.nodesById)){
             throw new Error(`id ${id} not recognized in tree`)
-        }
+        }*/
         return this.tree.nodesById[id].children;
     }
     getLength(id){
-        if(!(id in this.tree.nodesById)){
+/*        if(!(id in this.tree.nodesById)){
             throw new Error(`id ${id} not recognized in tree`)
-        }
+        }*/
         return this.tree.nodesById[id].length;
     }
     getClade(id){
-        if(!(id in this.tree.nodesById)){
+/*        if(!(id in this.tree.nodesById)){
             throw new Error(`id ${id} not recognized in tree`)
-        }
+        }*/
         return this.tree.nodesById[id].clade;
     }
     getClades(){
@@ -68,41 +64,42 @@ export class ImmutableTree{
         return this.tree.externalNodes;
     }
     getInternalNodes(){
-        return [...this.tree.internalNodes];
+        return this.tree.internalNodes;
     }
     getPostOder(){
         return this.tree.postOrder;
     }
+
+
     getPreOrder(){
         return this.tree.postOrder.reverse();
     }
-    getDivergence(id){
-        if(!(id in this.tree.nodesById)){
+    getDivergence(){
+/*        if(!(id in this.tree.nodesById)){
             throw new Error(`id ${id} not recognized in tree`)
-        }
+        }*/
 
         const self =this;
         const cache = {};
-        return (function f(id) {
+        return (function divergenceHelper(id) {
                 let value;
-
                 if (id in cache) {
                     value = cache[id];
                 } else {
-                    value = id!==self.getRoot()? f(self.getParent(id))+self.getLength(id):0;
+                    value = id!==self.getRoot()? divergenceHelper(self.getParent(id))+self.getLength(id):0;
                     cache[id] = value;
                 }
                 return value;
-            })(id)
+            })
     }
     getRootToTipLengths(){
         return this.tree.postOrder.map(id=>this.getDivergence(id))
     }
 
     getHeight(id){
-        if(!(id in this.tree.nodesById)){
+/*        if(!(id in this.tree.nodesById)){
             throw new Error(`id ${id} not recognized in tree`)
-        }
+        }*/
         const self=this;
         let maxDivergence=null;
         return (function f(id) {
@@ -112,6 +109,15 @@ export class ImmutableTree{
             return maxDivergence-self.getDivergence(id);
         })(id)
     }
+
+    orderByNodeDensity(increasing = true, node = this.getRoot()) {
+        const factor = increasing ? 1 : -1;
+        orderNodes.call(this, node, (nodeA, countA, nodeB, countB) => {
+            return (countA - countB) * factor;
+        });
+        return this;
+    }
+
 
 
 
@@ -148,7 +154,7 @@ export class ImmutableTree{
                             }
                         }else{
                             const treeString = token.substring(token.indexOf("("));
-                            if(tipMap.size>0) {
+                            if(Object.keys(tipMap).length>0) {
                                 const thisTree = ImmutableTree.parseNewick(treeString, {...options, tipMap,tipNames});
                                 trees.push(thisTree);
                             }else{
@@ -181,7 +187,6 @@ export class ImmutableTree{
             internalNodes:[],
             postOrder:[],
             root:""}
-
 
         function newickSubstringParser(newickString){
             // check for semicolon
@@ -217,7 +222,7 @@ export class ImmutableTree{
             }
 
             if(name){
-                name = options.tipNames?options.tipNames[name]:stripQuotes(name)
+                name = options.tipMap?options.tipMap[name]:stripQuotes(name)
             }
             if(label){
                 label = stripQuotes(label)
@@ -238,7 +243,7 @@ export class ImmutableTree{
             }
 
             node.clade= node.children? node.children.reduce((acc,child)=>acc.or(new BitSet(`0x${treeData.nodesById[child].clade}`)),new BitSet()).toString(16):
-                    new BitSet([(options.tipMap?options.tipMap[name]:(tipCount+=1))]).toString(16);
+                    new BitSet([(options.tipNames?options.tipNames[name]:(tipCount+=1))]).toString(16);
 
             const annotations = annotationsString!==undefined? parseAnnotation(annotationsString):{};
             if(options.labelName!=="label"){
@@ -536,13 +541,15 @@ function getDate(name,datePrefix,dateFormat){
             return date
         }
 }
-
+//TODO speed up - it's slow to do this everytime essentially nested looping
 export function splitAtExposedCommas(string){
     const open=["(","[","{"];
     const close=[")","]","}"];
     let count=0;
     const commas=[-1];
-    for(let i=0;i<string.length;i++){
+
+    const stringLength= string.length;
+    for(let i=0;i<stringLength;i++){
         if(open.includes(string[i])){
             count+=1;
         }else if(close.includes(string[i])){
@@ -554,10 +561,69 @@ export function splitAtExposedCommas(string){
     commas.push(string.length);
 
     const splits = [];
-
-    for(let i=1;i<commas.length;i++){
+    const commaLength = commas.length;
+    for(let i=1;i<commaLength;i++){
         splits.push(string.slice(commas[i-1]+1,commas[i]))
     }
     return splits;
 
+}
+
+function orderNodes(node, ordering) {
+    let count = 0;
+    if (this.getChildren(node)) {
+        // count the number of descendents for each child
+        const counts = new Map();
+        for (const child of this.getChildren(node)) {
+            const value = orderNodes.call(this,child, ordering);
+            counts.set(child, value);
+            count += value;
+        }
+
+        // sort the children using the provided function
+        this.getNode(node).children = this.getNode(node).children.sort((a, b) => {
+            return ordering(a, counts.get(a), b, counts.get(b),node)
+        });
+
+        const postOrder =[],
+            exetrnal=[],
+            internal=[];
+
+        for (const id of postorder(this.getRoot(),this)){
+            postOrder.push(id);
+            if(this.getChildren(id)){
+                internal.push(id)
+            }else{
+                exetrnal.push(id)
+            }
+        }
+
+
+        this.tree.postOrder = postOrder;
+        this.tree.externalNodes = exetrnal;
+        this.tree.internalNodes = internal;
+
+
+    } else {
+        count = 1
+    }
+    return count;
+}
+
+/**
+ * A generator function that returns the nodes in a post-order traversal
+ *
+ * @returns {IterableIterator<IterableIterator<*|*>>}
+ */
+function *postorder(startNode,tree) {
+    const traverse = function *(node) {
+            if (tree.getChildren(node)) {
+                for (const child of tree.getChildren(node)) {
+                    yield* traverse(child);
+                }
+            }
+            yield node;
+    };
+
+    yield* traverse(startNode);
 }

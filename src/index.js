@@ -7,5 +7,7 @@ import NodeShape from "./components/Baubles/Nodes/NodeShape";
 import Axis from "./components/decorations/Axis";
 import FigTree from "./components/FigTree";
 import {rectangularVertex,makeEdge} from "./utils/layouts";
+import {customDateFormater,dateToDecimal,decimalToDate} from "./utils/utilities";
+import AxisBars from "./components/decorations/AxisBars";
 
-export {Branches,BranchPath,Nodes,NodeShape,Axis,FigTree,ImmutableTree,ImmutableCladeCollection,rectangularVertex,makeEdge}
+export {Branches,BranchPath,Nodes,NodeShape,customDateFormater,dateToDecimal,decimalToDate,Axis,AxisBars,FigTree,ImmutableTree,ImmutableCladeCollection,rectangularVertex,makeEdge}

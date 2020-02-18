@@ -3,14 +3,14 @@ import {mean} from "d3-array";
 
 export function rectangularVertex(id,tree){
     let cache={};
-    return (function f(id,tree){
+    return (function rectangularVertexHelper(id,tree){
         if(id in cache){
             return cache[id];
         }else{
             const vertex = makeVertexFromNode(id,tree);
             vertex.x = tree.getDivergence(id);
             if(tree.getChildren(id)){
-                vertex.y = mean(tree.getChildren(id).map(child=>f(child,tree).y));
+                vertex.y = mean(tree.getChildren(id).map(child=>rectangularVertexHelper(child,tree).y));
             }else{
                 vertex.y = tree.getExternalNodes().indexOf(id);
             }

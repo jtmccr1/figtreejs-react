@@ -14,9 +14,7 @@ export default function FigTree(props){
 
     const {layout,margins,width,height,tree,} = props;
 
-    console.time("vertices");
     const vertices = tree.getPostOder().map(id=>layout(id,tree));
-    console.timeEnd("vertices");
 
     // console.time("vertLoop");
     // let i=0;
@@ -46,7 +44,10 @@ export default function FigTree(props){
                             });
                         case "Axis":
                             return React.cloneElement(child, {
-                                scales
+                                scales,
+                                width,
+                                height,
+                                margins,
                             });
                         default:
                             throw new Error(`FigTree component ${child.type.name} not recognized.`)

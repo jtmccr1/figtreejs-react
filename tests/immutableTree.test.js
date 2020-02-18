@@ -107,12 +107,25 @@ describe("Tree Tests",()=>{
 
         expect(tree.getDivergence("A|2020-01")).toEqual(4)
     });
-    it("Should calculate hieght",()=>{
+    it("Should calculate height",()=>{
         const tree = new ImmutableTree(ImmutableTree.parseNewick(treeString));
 
         expect(tree.getHeight("A|2020-01")).toEqual(1)
 
     })
+    it("Should order nodes",()=>{
+        const tree = new ImmutableTree(ImmutableTree.parseNewick(treeString));
+
+        tree.orderByNodeDensity();
+
+        expect(tree.getExternalNodes()).toEqual(["C|1960","A|2020-01","B|1980-01-11"]);
+        tree.orderByNodeDensity(false);
+        expect(tree.getExternalNodes()).toEqual(["A|2020-01","B|1980-01-11","C|1960"]);
+
+
+
+    })
+
     it("Should split string at exposed commas",()=>{
         const s = "('A|2020-01':1,B|1980-01-11[&length_range={1,1.5},location=\"Janesburgh\",location.prob={0.8,0.2},location.set={\"Janesburgh\",\"JanosAires\"}]:2):3,C|1960[&length_range={2,4},location=\"Mabalako\",location.prob=1.0,location.set={\"Mabalako\"}]:4";
         expect(splitAtExposedCommas(s)).toEqual(["('A|2020-01':1,B|1980-01-11[&length_range={1,1.5},location=\"Janesburgh\",location.prob={0.8,0.2},location.set={\"Janesburgh\",\"JanosAires\"}]:2):3","C|1960[&length_range={2,4},location=\"Mabalako\",location.prob=1.0,location.set={\"Mabalako\"}]:4"])
