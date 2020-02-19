@@ -3,7 +3,8 @@ module.exports = {
   sections:[
     {
       name:"FigTree",
-      components: "src/components/*.js"
+      components: "src/components/*.js",
+      ignore:"src/components/Figure.js"
     },
 
     {
@@ -12,7 +13,17 @@ module.exports = {
     },
     {
       name:"Decorations",
-      components: "src/components/decorations/*.js"
+      components: "src/components/decorations/*.js",
+      sections:[
+        {
+          name:"Legends",
+          components: "src/components/decorations/Legend/*.js",
+        },
+        {
+          name:"Axis",
+          components: "src/components/decorations/Axis/*.js",
+        }
+      ]
     },
 
     ],

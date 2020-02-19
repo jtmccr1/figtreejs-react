@@ -1,12 +1,27 @@
 import React from 'react'
 import {line} from "d3-shape"
-import {mean} from "d3-array"
+import {mean,quantile} from "d3-array"
 import {format} from "d3-format"
+
+
+
 export  default function Axis(props) {
 
     const {scales,direction,title,tick,width,height,margins} = props;
-    let scale =  props.scale === undefined?(direction==="horizontal"?scales.x:scales.y):props.scale;
-    const ticks = scale.ticks(tick.number);
+
+    const scale = props.scale === undefined?(direction==="horizontal"?scales.x:scales.y):props.scale;
+
+    // scaleSequentialQuantile doesn’t implement tickValues or tickFormat.
+    let tickValues;
+    if (!scale.ticks) {
+            tickValues = range(tick.number).map(i => quantile(scale.domain(), i / (tick.number - 1)));
+
+    }else{
+        tickValues = scale.ticks(tick.number);
+    }
+
+
+
 
 //TODO break this into parts as in the markdown
     return(
@@ -17,12 +32,12 @@ export  default function Axis(props) {
                     width,
                     height,
                     margins,
-                    ticks,
+                    tickValues,
                 });
             })}
             <path d={getPath(scale,direction)} stroke={"black"}/>
             <g>
-                {ticks.map((t,i)=>{
+                {tickValues.map((t, i)=>{
                    return(
                        <g key={i} transform={`translate(${(direction==="horizontal"?scale(t):0)},${(direction==="horizontal"?0:scale(t))})`}>
                         <line {...getTickLine(tick.length,direction)} stroke={"black"}/>
@@ -35,8 +50,6 @@ export  default function Axis(props) {
                 </g>
             </g>
 
-
-
         </g>
 
     )
@@ -44,6 +57,7 @@ export  default function Axis(props) {
 
 Axis.defaultProps= {
     scale: undefined,
+    scales:{x:undefined,y:undefined},
     title: {text: "", padding: 40, style: {}},
     tick: {number: 5, format: format(".1f"), padding: 20, style: {}, length: 6},
     direction: "horizontal",

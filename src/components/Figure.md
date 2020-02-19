@@ -10,8 +10,8 @@ const newickString =
 
 const treeData = ImmutableTree.parseNewick(newickString,{labelName:"support"});	
 const tree = new ImmutableTree(treeData);	
-const vertices = tree.getPostOder().map(id=>rectangularVertex(id,tree));	
-const edges =   tree.getPostOder().filter(id=>id!==tree.getRoot()).map(id=>makeEdge(rectangularVertex)(id,tree));	
+const vertices = tree.getPostOrder().map(id=>rectangularVertex(id,tree));	
+const edges =   tree.getPostOrder().filter(id=>id!==tree.getRoot()).map(id=>makeEdge(rectangularVertex)(id,tree));	
 
 
 

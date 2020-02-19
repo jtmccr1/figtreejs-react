@@ -66,7 +66,7 @@ export class ImmutableTree{
     getInternalNodes(){
         return this.tree.internalNodes;
     }
-    getPostOder(){
+    getPostOrder(){
         return this.tree.postOrder;
     }
 

@@ -14,17 +14,17 @@ export default function FigTree(props){
 
     const {layout,margins,width,height,tree,} = props;
 
-    const vertices = tree.getPostOder().map(id=>layout(id,tree));
+    const vertices = tree.getPostOrder().map(id=>layout(id,tree));
 
     // console.time("vertLoop");
     // let i=0;
-    // for(const v of tree.getPostOder()){
+    // for(const v of tree.getPostOrder()){
     //     i+=tree.getDivergence(v.id);
     // }
     // console.timeEnd("vertLoop");
 
 
-    const edges =   tree.getPostOder().filter(id=>id!==tree.getRoot()).map(id=>makeEdge(layout)(id,tree));
+    const edges =   tree.getPostOrder().filter(id=>id!==tree.getRoot()).map(id=>makeEdge(layout)(id,tree));
     const scales=useMemo(()=>{console.log("setting up scales");return setUpScales({width,height},margins,vertices)},[tree]);
 
      //TODO scales in state so can be updated by legends
@@ -50,7 +50,7 @@ export default function FigTree(props){
                                 margins,
                             });
                         default:
-                            throw new Error(`FigTree component ${child.type.name} not recognized.`)
+                           return child;
                     }
                 }).reverse()}
             </g>
