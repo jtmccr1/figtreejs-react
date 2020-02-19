@@ -13,6 +13,7 @@ export default function Legend(props){
 
     return(
         <g className={"legend"} transform={`translate(${pos.x},${pos.y})`}>
+            <text transform={`translate(0,-6)`}>{title}</text>
             <ColorRamp {...{scale,width,height}}/>
             <Axis transform={`translate(${0},${height})`} {...props} scale={axisScale}/>
         </g>
@@ -27,4 +28,5 @@ Legend.defaultProps={
     height:50,
     direction:"horizontal",
     tick: {number: 5, format: format(".1f"), padding: 20, style: {}, length: 6},
+    title:"",
 }

@@ -11,7 +11,7 @@ export  default function AxisBars(props) {
                 {tickValues.reduce((acc,curr,i)=>{
                     const width=i===tickValues.length-1?scale.range()[1]-scale(tickValues[i]):scale(tickValues[i+1]) - scale(tickValues[i]);
                             if(i%2===remainder){
-                                acc.push(<rect key={i} transform={`translate(${scale(tickValues[i])},${-1*(height-margins.top-margins.bottom)})`} width={width}  height ={(height-margins.top-margins.bottom)} {...{...{rx:2,ry:2},...attrs}} />);
+                                acc.push(<rect key={i} transform={`translate(${scale(tickValues[i])},${-1*(height-margins.bottom)})`} width={width}  height ={(height-margins.bottom)} {...{...{rx:2,ry:2},...attrs}} />);
                             }
                         return acc;
                 },[])}

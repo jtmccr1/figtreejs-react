@@ -21,9 +21,7 @@ export  default function Axis(props) {
     }
 
 
-
-
-//TODO break this into parts as in the markdown
+//TODO break this into parts
     return(
         <g className={"axis"} transform={props.transform}>
             {React.Children.toArray(props.children).map((child, index) => {
@@ -45,6 +43,7 @@ export  default function Axis(props) {
                     </g>
                    )
                 })}
+                {/*TODO sometimes scale doesn't have a range*/}
                 <g transform={`translate(${(direction==="horizontal"?mean(scale.range()):title.padding)},${(direction==="horizontal"?title.padding:mean(scale.range()))})`}>
                     <text textAnchor={"middle"}>{title.text}</text>
                 </g>
