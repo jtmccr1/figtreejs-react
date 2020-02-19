@@ -1,13 +1,7 @@
 import React from "react";
-import {scaleLinear} from "d3-scale";
-import {quantile} from "d3-array";
+import {range} from "d3-array";
 export default function ColorRamp({scale,n,width,height}){
-    const updatedScale = scale.copy().domain([0,n]);
-
-
-    //TODO fix so it can handel quantile scale.
-
-
+    const updatedScale = scale.domain().length===2?scale.copy().domain([0,n]):scale.copy().domain(range(n));
 
     const colorStops = [];
     for( let i=0;i<n;i++){

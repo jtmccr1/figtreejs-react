@@ -2,7 +2,7 @@ import React from "react"
 import ColorRamp from "./ColorRamp";
 import Axis from "../Axis/Axis";
 import {format} from "d3-format";
-import {scaleLinear, scaleQuantile, scaleSequential, scaleSequentialQuantile} from "d3-scale";
+import {scaleLinear } from "d3-scale";
 
 export default function Legend(props){
 
