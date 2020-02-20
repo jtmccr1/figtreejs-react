@@ -9,6 +9,7 @@ import FigTree from "./components/FigTree";
 import {rectangularVertex,makeEdge} from "./utils/layouts";
 import {customDateFormater,dateToDecimal,decimalToDate} from "./utils/utilities";
 import AxisBars from "./components/decorations/Axis/AxisBars";
-import Legend from "../src/components/decorations/Legend/Legend"
+import Legend from "../src/components/decorations/Legend/Legend";
+import KDE from "./components/decorations/Plots/KDE";
 export {Branches,BranchPath,Nodes,NodeShape,customDateFormater,dateToDecimal,decimalToDate,Axis,AxisBars,Legend,
-    FigTree,ImmutableTree,ImmutableCladeCollection,rectangularVertex,makeEdge}
+    FigTree,ImmutableTree,ImmutableCladeCollection,rectangularVertex,makeEdge,KDE}

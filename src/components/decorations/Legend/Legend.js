@@ -4,6 +4,8 @@ import Axis from "../Axis/Axis";
 import {format} from "d3-format";
 import {quantize, interpolate, interpolateRound} from "d3-interpolate";
 
+
+
 /**
  * Legend
  *
@@ -22,7 +24,7 @@ import {quantize, interpolate, interpolateRound} from "d3-interpolate";
  * @return {(number|*)[]|*}
  * @constructor
  */
-export default function Legend({scale,pos,width,height,direction,title,ticks,tickFormat} ){
+export default function Legend({scale,pos,width,height,direction,title,ticks} ){
 
     let x;
     let ramper;
@@ -42,7 +44,7 @@ export default function Legend({scale,pos,width,height,direction,title,ticks,tic
         <g className={"legend"} transform={`translate(${pos.x},${pos.y})`}>
             <text transform={`translate(0,-6)`}>{title}</text>
             <ColorRamp {...{ramper,width,height}}/>
-            <Axis transform={`translate(${0},${height})`} {...{width,height,direction,ticks,tickFormat}} scale={x} />
+            <Axis transform={`translate(${0},${height})`} {...{width,height,direction,ticks}} scale={x} />
         </g>
     )
 
@@ -53,6 +55,6 @@ Legend.defaultProps={
     width:200,
     height:50,
     direction:"horizontal",
-    tick: {number: 5, format: format(".1f"), padding: 20, style: {}, length: 6},
+    ticks: {number: 5, format: format(".1f"), padding: 20, style: {}, length: 6},
     title:"",
 }

@@ -6,7 +6,7 @@ import {format} from "d3-format"
 
 export  default function Axis(props) {
 
-    const {scales,direction,title,tick,width,height,margins} = props;
+    const {scales,direction,title,ticks,width,height,margins} = props;
 
     let scale = props.scale === undefined?(direction==="horizontal"?scales.x:scales.y):props.scale;
 
@@ -15,9 +15,9 @@ export  default function Axis(props) {
     let tickValues;
     if (!scale.ticks) {
         console.log("quantile")
-            tickValues = range(tick.number).map(i => quantile(scale.domain(), i / (tick.number - 1)));
+            tickValues = range(ticks.number).map(i => quantile(scale.domain(), i / (ticks.number - 1)));
     }else{
-        tickValues = scale.ticks(tick.number);
+        tickValues = scale.ticks(ticks.number);
     }
 
 
@@ -38,8 +38,8 @@ export  default function Axis(props) {
                 {tickValues.map((t, i)=>{
                    return(
                        <g key={i} transform={`translate(${(direction==="horizontal"?scale(t):0)},${(direction==="horizontal"?0:scale(t))})`}>
-                        <line {...getTickLine(tick.length,direction)} stroke={"black"}/>
-                        <text transform={`translate(${(direction==="horizontal"?0:tick.padding)},${(direction==="horizontal"?tick.padding:0)})`} textAnchor={"middle"}>{props.tick.format(t)}</text>
+                        <line {...getTickLine(ticks.length,direction)} stroke={"black"}/>
+                        <text transform={`translate(${(direction==="horizontal"?0:ticks.padding)},${(direction==="horizontal"?ticks.padding:0)})`} textAnchor={"middle"}>{ticks.format(t)}</text>
                     </g>
                    )
                 })}
@@ -58,7 +58,7 @@ Axis.defaultProps= {
     scale: undefined,
     scales:{x:undefined,y:undefined},
     title: {text: "", padding: 40, style: {}},
-    tick: {number: 5, format: format(".1f"), padding: 20, style: {}, length: 6},
+    ticks: {number: 5, format: format(".1f"), padding: 20, style: {}, length: 6},
     direction: "horizontal",
 };
 

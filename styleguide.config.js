@@ -22,6 +22,10 @@ module.exports = {
         {
           name:"Axis",
           components: "src/components/decorations/Axis/*.js",
+        },
+        {
+          name:"Plots",
+          components: "src/components/decorations/Plots/*.js",
         }
       ]
     },

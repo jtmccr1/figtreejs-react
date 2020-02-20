@@ -1,5 +1,11 @@
 import React from "react";
+import withLinearGradient from "../../HOC/WithLinearGradient";
 
+
+//TODO move to bauble
+function Rect({width,height,attrs}){
+    return  <rect width={width} height={height} {...attrs}/>
+}
 /** Color ramp
  *
  * This color ramp is inspired by the ramp used in https://observablehq.com/@d3/color-legend.
@@ -12,27 +18,7 @@ import React from "react";
  * @return {*}
  * @constructor
  */
+//TODO move to Legend
+const ColorRamp = withLinearGradient(Rect);
 
-export default function ColorRamp({ramper,n,width,height}){
-
-    const colorStops = [];
-    for( let i=0;i<n;i++){
-        colorStops.push( <stop key={i} offset={`${i/(n-1)}`} stopColor={ramper(i/(n-1))}/>)
-    }
-    return (<g className={"colorRamp"}>
-    <defs>
-        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
-            {colorStops}
-        </linearGradient>
-    </defs>
-        <rect width={width} height={height} fill="url(#grad1)"/>
-    </g>)
-
-}
-
-
-ColorRamp.defaultProps = {
-    n:10,
-    width:200,
-    height:50
-};
+export default ColorRamp;

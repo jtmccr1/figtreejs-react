@@ -1,5 +1,6 @@
 //https://stackoverflow.com/questions/27936772/how-to-deep-merge-instead-of-shallow-merge
 import {timeParse,timeFormat} from "d3-time-format"
+import {mean} from "d3-array"
 
 export function isObject(item) {
     return (item && typeof item === 'object' && !Array.isArray(item));
@@ -92,3 +93,11 @@ export const customDateFormater=(formatString) => (d) => {
     const dateFormat = timeFormat(formatString);
     return `${dateFormat(decimalToDate(d))}`;
 };
+
+export const kdeFactory=kernel=>thresholds=>(data)=>{
+    return thresholds.map(t=>[t,mean(data,d=>kernel(t-d))]);
+
+}
+export function epanechnikov(bandwidth){
+    return x=>Math.abs(x /= bandwidth) <= 1 ? 0.75 * (1 - x * x) / bandwidth : 0;
+}
