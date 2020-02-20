@@ -1,21 +1,21 @@
 import React from 'react'
 import {line} from "d3-shape"
-import {mean,quantile} from "d3-array"
+import {mean,quantile,range} from "d3-array"
 import {format} from "d3-format"
-
 
 
 export  default function Axis(props) {
 
     const {scales,direction,title,tick,width,height,margins} = props;
 
-    const scale = props.scale === undefined?(direction==="horizontal"?scales.x:scales.y):props.scale;
+    let scale = props.scale === undefined?(direction==="horizontal"?scales.x:scales.y):props.scale;
+
 
     // scaleSequentialQuantile doesn’t implement tickValues or tickFormat.
     let tickValues;
     if (!scale.ticks) {
+        console.log("quantile")
             tickValues = range(tick.number).map(i => quantile(scale.domain(), i / (tick.number - 1)));
-
     }else{
         tickValues = scale.ticks(tick.number);
     }

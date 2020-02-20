@@ -2,23 +2,49 @@ import React from "react"
 import ColorRamp from "./ColorRamp";
 import Axis from "../Axis/Axis";
 import {format} from "d3-format";
-import {scaleLinear } from "d3-scale";
+import {quantize, interpolate, interpolateRound} from "d3-interpolate";
 
-export default function Legend(props){
+/**
+ * Legend
+ *
+ * A color legend that accept continuous and sequential color scales. It is modeled after the color legends
+ * at https://observablehq.com/@d3/color-legend
+ *
+ * @param props
+ * @param scale
+ * @param pos
+ * @param width
+ * @param height
+ * @param direction
+ * @param title
+ * @param ticks
+ * @param tickFormat
+ * @return {(number|*)[]|*}
+ * @constructor
+ */
+export default function Legend({scale,pos,width,height,direction,title,ticks,tickFormat} ){
 
-    const {scale,pos,width,height,direction,title,ticks,tickFormat} = props;
-
-    //Check if quantile scale.
-    const axisScale = !scale.ticks?scaleLinear().domain(scale.quantiles(1)).range([0,width]):scale.copy().range([0,width])// this assumes is a quantile may not be
+    let x;
+    let ramper;
+    //Continuous
+    if(scale.interpolate){
+        const n = Math.min(scale.domain().length,scale.range().length);
+        x = scale.copy().rangeRound(quantize(interpolate(0, width), n)); // for numbers
+        ramper = scale.copy().domain(quantize(interpolate(0, 1), n)) // for colors
+    }  // Sequential
+    else if (scale.interpolator) {
+        x= Object.assign(scale.copy().interpolator(interpolateRound(0,width)), // update interpolator to work on x scale
+            {range(){return[0,width]}}) //vc assigns range function so we can use it later!
+        ramper=scale.interpolator();
+    }
 
     return(
         <g className={"legend"} transform={`translate(${pos.x},${pos.y})`}>
             <text transform={`translate(0,-6)`}>{title}</text>
-            <ColorRamp {...{scale,width,height}}/>
-            <Axis transform={`translate(${0},${height})`} {...props} scale={axisScale}/>
+            <ColorRamp {...{ramper,width,height}}/>
+            <Axis transform={`translate(${0},${height})`} {...{width,height,direction,ticks,tickFormat}} scale={x} />
         </g>
     )
-
 
 }
 

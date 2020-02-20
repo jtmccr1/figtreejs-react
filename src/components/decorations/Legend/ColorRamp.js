@@ -1,11 +1,23 @@
 import React from "react";
-import {range} from "d3-array";
-export default function ColorRamp({scale,n,width,height}){
-    const updatedScale = scale.domain().length===2?scale.copy().domain([0,n]):scale.copy().domain(range(n));
+
+/** Color ramp
+ *
+ * This color ramp is inspired by the ramp used in https://observablehq.com/@d3/color-legend.
+ * It takes a function whose input is between 0,1 and outputs a color. It uses this interpolator
+ * to map the progress along a rectangle to a color gradient.
+ * @param ramper
+ * @param n
+ * @param width
+ * @param height
+ * @return {*}
+ * @constructor
+ */
+
+export default function ColorRamp({ramper,n,width,height}){
 
     const colorStops = [];
     for( let i=0;i<n;i++){
-        colorStops.push( <stop key={i} offset={`${i/(n-1)}`} stopColor={updatedScale(i)}/>)
+        colorStops.push( <stop key={i} offset={`${i/(n-1)}`} stopColor={ramper(i/(n-1))}/>)
     }
     return (<g className={"colorRamp"}>
     <defs>
