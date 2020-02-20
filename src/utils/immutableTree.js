@@ -222,7 +222,7 @@ export class ImmutableTree{
             }
 
             if(name){
-                name = options.tipMap?options.tipMap[name]:stripQuotes(name)
+                name = options.tipMap?stripQuotes(options.tipMap[name]):stripQuotes(name)
             }
             if(label){
                 label = stripQuotes(label)
@@ -500,14 +500,14 @@ function stripQuotes(string){
     return removeEndQuotes(removeFrontQuotes(string))
 }
 function removeFrontQuotes(s){
-    if (s.startsWith("\"") || s.startsWith("'")) {
+    if (s.startsWith("\"") || s.startsWith("\'")) {
          return s.slice(1);
     }
     return s;
 }
 
 function removeEndQuotes(s){
-    if (s.endsWith("\"") || s.endsWith("'")) {
+    if (s.endsWith("\"") || s.endsWith("\'")) {
         return s.slice(0, s.length - 1);
     }
     return s;
