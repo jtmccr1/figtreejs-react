@@ -2,6 +2,9 @@ import {extent,max} from "d3-array";
 import {timeParse} from "d3-time-format";
 import {decimalToDate} from "./utilities";
 import BitSet from "bitset/bitset";
+import {fromJS} from "immutable"
+
+
 
 export const Type = {
     DISCRETE : Symbol("DISCRETE"),
@@ -13,8 +16,8 @@ export const Type = {
 };
 //TODO use immutable.js to really make immutable
 export class ImmutableTree{
-    constructor(tree){
-        this.tree=tree;
+    constructor(treeData){
+        this.tree=treeData;
         this.getDivergence=this.getDivergence();
     }
     getRoot(){
@@ -116,6 +119,15 @@ export class ImmutableTree{
             return (countA - countB) * factor;
         });
         return this;
+    }
+
+    collapseUnsupportedNodes(){
+
+    }
+
+    setLength(id,length){
+        this.tree.nodesById[id].length=length;
+        return new ImmutableTree(this.tree);
     }
 
 
@@ -276,7 +288,7 @@ export class ImmutableTree{
         }
         newickSubstringParser(newickString);
 
-        return treeData;
+        return fromJS(treeData);
     }
 
 }
