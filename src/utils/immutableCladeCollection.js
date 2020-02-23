@@ -1,4 +1,4 @@
-import {ImmutableTree, reconcileAnnotations} from "./immutableTree";
+import {ImmutableTree, reconcileAnnotations} from "./Tree/immutableTree";
 
 export default class ImmutableCladeCollection {
     constructor(collection) {

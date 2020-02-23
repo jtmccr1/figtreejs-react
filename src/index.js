@@ -1,4 +1,4 @@
-import {ImmutableTree} from "./utils/immutableTree";
+import {ImmutableTree} from "./utils/Tree/immutableTree";
 import ImmutableCladeCollection from "./utils/immutableCladeCollection";
 import Branches from "./components/Baubles/Branches/Branches";
 import BranchPath from "./components/Baubles/Branches/BranchPath";

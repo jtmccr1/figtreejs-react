@@ -1,4 +1,4 @@
-import {ImmutableTree} from "../src/utils/immutableTree";
+import {ImmutableTree} from "../src/utils/Tree/immutableTree";
 import {getVertexClassesFromNode, makeVertexFromNode} from "../src/utils/layouts/layoutHelpers";
 import {makeEdge, rectangularVertex} from "../src/utils/layouts/"
 import {mean} from "d3-array";

@@ -1,6 +1,6 @@
 import {extent,max} from "d3-array";
 import {timeParse} from "d3-time-format";
-import {decimalToDate} from "./utilities";
+import {decimalToDate} from "../utilities";
 import BitSet from "bitset/bitset";
 import {fromJS} from "immutable"
 
@@ -14,7 +14,7 @@ export const Type = {
     PROBABILITIES: Symbol("PROBABILITIES"),
     DATE:Symbol("DATE")
 };
-//TODO use immutable.js to really make immutable
+
 export class ImmutableTree{
     constructor(treeData){
         this.tree=treeData;

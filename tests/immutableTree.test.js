@@ -1,8 +1,8 @@
-import {splitAtExposedCommas, ImmutableTree} from "../src/utils/immutableTree";
-import {Type} from "../src/utils/immutableTree";
+import {splitAtExposedCommas, ImmutableTree} from "../src/utils/Tree/immutableTree";
+import {Type} from "../src/utils/Tree/immutableTree";
 import {timeParse} from "d3-time-format";
 import * as matchers from 'jest-immutable-matchers';
-import {fromJS} from "immutable";
+import {fromJS,Map} from "immutable";
 
 const treeString="(('A|2020-01':1,B|1980-01-11[&length_range={1,1.5},location=\"Janesburgh\",location.prob=0.8,location.set.prob={0.8,0.2},location.set={\"Janesburgh\",\"JanosAires\"}]:2):3,C|1960[&length_range={2,4},location=\"Mabalako\",location.prob=1.0,location.set.prob={1.0},location.set={\"Mabalako\"}]:4);"
 const expectedTree = {
@@ -109,6 +109,14 @@ describe("Tree Tests",()=>{
         expect(tree.get("annotationsById")).toEqualImmutable(fromJS(expectedTree.annotationsById));
         // expect(tree.get("annotationTypes")).toEqualImmutable(fromJS(expectedTree.annotationTypes));
         // expect(tree).toEqualImmutable(fromJS(expectedTree))
+    });
+
+    it("checks equality",()=>{
+        const a = Map({length:2,"child":Map({length:1,child:Map({"id":"A"})})})
+        const b = a.setIn(["child","child","l"],2);
+
+        expect(b).toEqualImmutable(a);
+        expect(b.get("child")).toEqual(a.get("child"))
     });
     it("Handle exponential terms in branch lengths",()=>{
         const treeString= "((a:1e-4,B:1)internal:4E-5,c:3);"

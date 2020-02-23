@@ -1,5 +1,5 @@
 import {mean} from "d3-array";
-import {Type} from "../immutableTree";
+import {Type} from "../Tree/immutableTree";
 
 export function getVertexClassesFromNode(id,tree){
     let classes = [(!tree.getChildren(id) ? "external-node" : "internal-node")];
