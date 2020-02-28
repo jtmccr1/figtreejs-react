@@ -3,6 +3,8 @@ import {Type} from "../src/utils/Tree/immutableTree";
 import {timeParse} from "d3-time-format";
 import * as matchers from 'jest-immutable-matchers';
 import {fromJS,Map} from "immutable";
+import {getDivergence, parseNewick} from "../src/utils/Tree/treeOperations";
+import {getTips} from "../src/utils/Tree/treeSettersandGetters";
 
 const treeString="(('A|2020-01':1,B|1980-01-11[&length_range={1,1.5},location=\"Janesburgh\",location.prob=0.8,location.set.prob={0.8,0.2},location.set={\"Janesburgh\",\"JanosAires\"}]:2):3,C|1960[&length_range={2,4},location=\"Mabalako\",location.prob=1.0,location.set.prob={1.0},location.set={\"Mabalako\"}]:4);"
 const expectedTree = {
@@ -98,54 +100,47 @@ describe("Tree Tests",()=>{
         jest.addMatchers(matchers);
     });
     it("parse newick tree parse, type and reconcile annotations",()=>{
-        const tree = ImmutableTree.parseNewick(treeString,{datePrefix:"|"});
+        const tree = parseNewick(treeString,{datePrefix:"|"});
 
         expect(tree.get("root")).toEqual("node2");
-        expect(tree.get("nodesById")).toEqualImmutable(fromJS(expectedTree.nodesById));
-        expect(tree.get("clades")).toEqualImmutable(fromJS(expectedTree.clades));
-        expect(tree.get("externalNodes")).toEqualImmutable(fromJS(expectedTree.externalNodes));
-        expect(tree.get("postOrder")).toEqualImmutable(fromJS(expectedTree.postOrder));
-        expect(tree.get("internalNodes")).toEqualImmutable(fromJS(expectedTree.internalNodes));
-        expect(tree.get("annotationsById")).toEqualImmutable(fromJS(expectedTree.annotationsById));
-        // expect(tree.get("annotationTypes")).toEqualImmutable(fromJS(expectedTree.annotationTypes));
-        // expect(tree).toEqualImmutable(fromJS(expectedTree))
-    });
-
-    it("checks equality",()=>{
-        const a = Map({length:2,"child":Map({length:1,child:Map({"id":"A"})})})
-        const b = a.setIn(["child","child","l"],2);
-
-        expect(b).toEqualImmutable(a);
-        expect(b.get("child")).toEqual(a.get("child"))
+        expect(tree.get("nodesById")).toEqual(fromJS(expectedTree.nodesById));
+        expect(tree.get("clades")).toEqual(fromJS(expectedTree.clades));
+        expect(tree.get("externalNodes")).toEqual(fromJS(expectedTree.externalNodes));
+        expect(tree.get("postOrder")).toEqual(fromJS(expectedTree.postOrder));
+        expect(tree.get("internalNodes")).toEqual(fromJS(expectedTree.internalNodes));
+        expect(tree.get("annotationsById")).toEqual(fromJS(expectedTree.annotationsById));
+        expect(tree.get("annotationTypes")).toEqual(fromJS(expectedTree.annotationTypes));
+        expect(tree).toEqual(fromJS(expectedTree))
     });
     it("Handle exponential terms in branch lengths",()=>{
         const treeString= "((a:1e-4,B:1)internal:4E-5,c:3);"
-        const tree = new ImmutableTree(ImmutableTree.parseNewick(treeString));
+        const tree = parseNewick(treeString);
 
-        expect(tree.getDivergence("a")).toBeCloseTo(0.00014, 7);
+        expect(getDivergence(tree,"a")).toBeCloseTo(0.00014, 7);
     });
 
     it("Should calculate divergence",()=>{
-        const tree = new ImmutableTree(ImmutableTree.parseNewick(treeString));
+        const tree = parseNewick(treeString);
 
-        expect(tree.getDivergence("A|2020-01")).toEqual(4)
+        expect(getDivergence(tree,"A|2020-01")).toEqual(4)
     });
+    it("Should get tips",()=>{
+        const tree = parseNewick(treeString);
+        expect(getTips(tree,"node1")).toEqual(fromJS(["A|2020-01","B|1980-01-11"]))
+
+    })
+
     it("Should calculate height",()=>{
         const tree = new ImmutableTree(ImmutableTree.parseNewick(treeString));
-
         expect(tree.getHeight("A|2020-01")).toEqual(1)
-
     });
     it("Should order nodes",()=>{
-        const tree = new ImmutableTree(ImmutableTree.parseNewick(treeString));
-
-        tree.orderByNodeDensity();
+        const tree = parseNewick(treeString);
+        orderByNodeDensity(tree);
 
         expect(tree.getExternalNodes()).toEqual(["C|1960","A|2020-01","B|1980-01-11"]);
         tree.orderByNodeDensity(false);
         expect(tree.getExternalNodes()).toEqual(["A|2020-01","B|1980-01-11","C|1960"]);
-
-
 
     });
 

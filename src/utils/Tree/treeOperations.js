@@ -1,4 +1,126 @@
-import {getRoot, getLength, getChildren, getParent} from "./treeSettersandGetters";
+import {getRoot, getLength, getChildren, getParent, getNode} from "./treeSettersandGetters";
+import {fromJS} from "immutable";
+
+import {
+    getDate,
+    parseAnnotation, reconcileAnnotations,
+    splitAtExposedCommas,
+    stripQuotes, typeAnnotations,
+    verifyNewickString
+} from "./treeParsingFunctions";
+import BitSet from "bitset/bitset";
+
+
+export function parseNewick(newickString, options={}) {
+    options ={...{labelName: "label",datePrefix:undefined,dateFormat:"%Y-%m-%d"},...options};
+
+    verifyNewickString(newickString);
+    let nodeCount=0;
+    let tipCount=-1;
+    let postOrderTally=-1;
+
+    const treeData = {
+        nodesById:{},
+        annotationsById:{},
+        annotationTypes:{},
+        cladeMap:{},
+        clades:[],
+        externalNodes:[],
+        internalNodes:[],
+        postOrder:[],
+        root:""}
+    function newickSubstringParser(newickString){
+        // check for semicolon
+        //strip first and last parenthesis and annotations ect. call again on children.
+//https://www.regextester.com/103043
+        //                      [children]data - name, label, branch length ect.
+        const internalNode =/\((.*)\)(.*)/;
+        // identify commas not included in (),[],or {}
+        const nodeData = /(?:(.*)(?=\[&))?(?:\[&(.+)])?(?:(.+)(?=:))?:(\d+\.?\d*(?:[eE]-?\d+)?)/g;
+        const isInternalNode = internalNode.test(newickString);
+        let nodeString,
+            childrenString,
+            childNodes=[];
+        if(isInternalNode){
+            [childrenString,nodeString] = newickString.split(internalNode).filter(s=>s);
+            const children = splitAtExposedCommas(childrenString);
+
+            for(const child of children){
+                childNodes.push(newickSubstringParser(child))
+            }
+        }else{
+            nodeString = newickString;
+        }
+        //TODO get rid of leading and trailing empty matches
+        let [emptyMatch,name,annotationsString,label,length,emptyMatch2]=nodeString.split(nodeData);
+
+        if(!isInternalNode&&!annotationsString){
+            name=label;
+            label=null;
+        }else if(isInternalNode&&name){
+            label=name;
+            name=null;
+        }
+
+        if(name){
+            name = options.tipMap?stripQuotes(options.tipMap[name]):stripQuotes(name)
+        }
+        if(label){
+            label = stripQuotes(label)
+        }
+
+        const node = {
+            id:name?name:label?(options.labelName==="label"?label:(`node${(nodeCount+=1)}`)): (`node${(nodeCount+=1)}`),
+            name:name?name:null,
+            length:length!==undefined?parseFloat(length):null,
+            children:childNodes.length>0?childNodes:null,
+            postOrder:(postOrderTally+=1),
+        };
+
+        if(node.children){
+            for(const childId of node.children){
+                treeData.nodesById[childId].parent = node.id;
+            }
+        }
+
+        node.clade= node.children? node.children.reduce((acc,child)=>acc.or(new BitSet(`0x${treeData.nodesById[child].clade}`)),new BitSet()).toString(16):
+            new BitSet([(options.tipNames?options.tipNames[name]:(tipCount+=1))]).toString(16);
+
+        const annotations = annotationsString!==undefined? parseAnnotation(annotationsString):{};
+        if(options.labelName!=="label"){
+            if(label){
+                annotations[options.labelName]=label;
+            }
+        }
+
+        let date;
+        if(options.datePrefix && name){
+            date =getDate(name,options.datePrefix,options.dateFormat);
+            annotations.date = date;
+        }
+
+        const typedAnnotations = typeAnnotations(annotations);
+        treeData.nodesById[node.id] = node;
+        treeData.annotationsById[node.id] = annotations;
+        treeData.annotationTypes=reconcileAnnotations(typedAnnotations,treeData.annotationTypes);
+        treeData.cladeMap[node.clade] = node.id;
+        if(!isInternalNode){
+            treeData.externalNodes.push(node.id);
+        }else{
+            treeData.internalNodes.unshift(node.id);
+        }
+        treeData.postOrder.push(node.id);
+        treeData.clades.push(node.clade);
+        treeData.root=node.id;
+
+        return node.id;
+    }
+
+    newickSubstringParser(newickString);
+
+    return fromJS(treeData);
+}
+
 
 
 //Note to self!  tree data is the output from all these. Tree data is immutable and goes into the f
@@ -12,8 +134,6 @@ import {getRoot, getLength, getChildren, getParent} from "./treeSettersandGetter
  * @param {object} nodId - The node to be rooted on.
  * @param proportion - proportion along the branch to place the root (default 0.5)
  */
-
-const getChildLength=compose(get)
 
 function reroot(tree, nodeId, proportion = 0.5) {
     if (nodeId === getRoot(tree)) {
@@ -87,3 +207,30 @@ function reroot(tree, nodeId, proportion = 0.5) {
         this.getSibling(nodeId)._length = rootLength - l;
     }
 };
+
+export const  getDivergence = (function(){
+    const cache = new Map();
+   function divergenceHelper(tree,nodeId) {
+
+        const node = getNode(tree,nodeId);
+        let value;
+        if (cache.has(node)) {
+            value = cache.get(node);
+        } else {
+            value = nodeId!==getRoot(tree)? divergenceHelper(tree,getParent(tree,nodeId))+getLength(tree,nodeId):0;
+            cache.set(node,value);
+        }
+        return value;
+    }
+    return divergenceHelper;
+}());
+
+
+function orderByNodeDensity(tree,increasing = true, node =null) {
+    const factor = increasing ? 1 : -1;
+    orderNodes(tree, node, (nodeA, countA, nodeB, countB) => {
+        return (countA - countB) * factor;
+    });
+    return this;
+}
+

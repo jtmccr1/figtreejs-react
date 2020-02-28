@@ -1,3 +1,6 @@
+// Todo think about how everthing changes with these commands clases ect.
+import BitSet from "bitset/bitset";
+
 export function getRoot(tree){
     return tree.get("root");
 }
@@ -52,11 +55,11 @@ export function getSummary(tree,annotation){
     return tree.getIn(["AnnotationSymmary",annotation]);
 }
 export function getExternalNodes(tree){
-    return tree.get("ExternalNodes");
+    return tree.get("externalNodes");
 }
 
 export function getInternalNodes(tree){
-    return tree.get("InternalNodes");
+    return tree.get("internalNodes");
 }
 export function getPostOrder(tree){
     return tree.get("postOrder");
@@ -70,4 +73,8 @@ export function getNodeAttribute(tree,id,attr){
 
 export function setNodeAttribute(tree,id,attr,value){
     return tree.setIn(['nodesById',id,attr],value)
+}
+export function getTips(tree,nodeId){
+    const tips =new BitSet(`0x${tree.getIn(["nodesById",nodeId,"clade"])}`);
+   return getExternalNodes(tree).filter(tip=> !(tips.and(new BitSet(`0x${tree.getIn(["nodesById",tip,"clade"])}`)).isEmpty()))
 }
