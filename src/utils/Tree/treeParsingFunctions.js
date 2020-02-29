@@ -59,7 +59,7 @@ export function reconcileAnnotations(incomingAnnotations,currentAnnotations={}){
     for (let [key, types] of Object.entries(incomingAnnotations)) {
         let annotation = currentAnnotations[key];
         if (!annotation) {
-            currentAnnotations[key] = types;
+            currentAnnotations[key] = {...types};
         } else {
             const type = types.type;
             if (annotation.type !== type) {
@@ -70,7 +70,7 @@ export function reconcileAnnotations(incomingAnnotations,currentAnnotations={}){
                     if (annotation.values) {
                         delete annotation.values;
                     }
-                    annotation.extent = annotation.extent ? extent(annotation.extent.concat(types.extent)) : types.extent
+                    annotation.extent = annotation.extent ? extent(annotation.extent.concat(types.extent)) : [...types.extent]
                 } else {
                     throw Error(`existing values of the annotation, ${key}, in the tree is not of the same type`);
                 }
@@ -81,9 +81,9 @@ export function reconcileAnnotations(incomingAnnotations,currentAnnotations={}){
                     }
                     annotation.values = new Set([...annotation.values, ...types.values])
                 } else if (annotation.values || types.values) {
-                    annotation.values = annotation.values ? annotation.values.concat(types.values) : types.values
+                    annotation.values = annotation.values ? annotation.values.concat(types.values) : [...types.values]
                 } else if (annotation.extent || types.extent) {
-                    annotation.extent = annotation.extent ? extent(annotation.extent.concat(types.extent)) : types.extent
+                    annotation.extent = annotation.extent ? extent(annotation.extent.concat(types.extent)) : [...types.extent]
                 }
             }
         }

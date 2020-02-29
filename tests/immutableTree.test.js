@@ -73,7 +73,7 @@ const expectedTree = {
             annotationTypes: {
                 length_range: {type: Type.INTEGER, extent: [2, 4]},
                 location: {type: Type.DISCRETE, values: new Set(["Mabalako"])},
-                location_prob: {type: Type.INTEGER, extent: [1]},
+                location_prob: {type: Type.INTEGER, extent: [1,1]},
                 location_probSet: {type: Type.PROBABILITIES, values: [{"Mabalako": 1}]},
                 date: {type: Type.DATE, extent: [timeParse("%Y-%m-%d")("1960-06-15"), timeParse("%Y-%m-%d")("1960-06-15")]}
             }
@@ -82,7 +82,7 @@ const expectedTree = {
         length_range: {type: Type.FLOAT, extent: [1, 4]},
         location: {type: Type.DISCRETE, values: new Set(["Janesburgh", "Mabalako"])},
         location_prob: {type: Type.FLOAT, extent: [0.8, 1]},
-        location_probSet: {type: Type.PROBABILITIES, values: [ {"Mabalako": 1},{"Janesburgh": 0.8, "JanosAires": 0.2},]},
+        location_probSet: {type: Type.PROBABILITIES, values: [ {"Janesburgh": 0.8, "JanosAires": 0.2},{"Mabalako": 1}]},
         date: {type: Type.DATE, extent: [timeParse("%Y-%m-%d")("1960-06-15"), timeParse("%Y-%m-%d")("2020-01-15")]}
     }
 };
