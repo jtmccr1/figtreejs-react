@@ -1,5 +1,5 @@
 import {getRoot, getLength, getChildren, getParent, getNode} from "./treeSettersandGetters";
-import {fromJS} from "immutable";
+import {fromJS,Map} from "immutable";
 
 import {
     getDate,
@@ -8,27 +8,13 @@ import {
     stripQuotes, typeAnnotations,
     verifyNewickString
 } from "./treeParsingFunctions";
-import BitSet from "bitset/bitset";
 
 
 export function parseNewick(newickString, options={}) {
     options ={...{labelName: "label",datePrefix:undefined,dateFormat:"%Y-%m-%d"},...options};
+    let nodeCount=0;
 
     verifyNewickString(newickString);
-    let nodeCount=0;
-    let tipCount=-1;
-    let postOrderTally=-1;
-
-    const treeData = {
-        nodesById:{},
-        annotationsById:{},
-        annotationTypes:{},
-        cladeMap:{},
-        clades:[],
-        externalNodes:[],
-        internalNodes:[],
-        postOrder:[],
-        root:""}
     function newickSubstringParser(newickString){
         // check for semicolon
         //strip first and last parenthesis and annotations ect. call again on children.
@@ -68,57 +54,31 @@ export function parseNewick(newickString, options={}) {
         if(label){
             label = stripQuotes(label)
         }
-
         const node = {
             id:name?name:label?(options.labelName==="label"?label:(`node${(nodeCount+=1)}`)): (`node${(nodeCount+=1)}`),
             name:name?name:null,
             length:length!==undefined?parseFloat(length):null,
             children:childNodes.length>0?childNodes:null,
-            postOrder:(postOrderTally+=1),
         };
-
-        if(node.children){
-            for(const childId of node.children){
-                treeData.nodesById[childId].parent = node.id;
-            }
-        }
-
-        node.clade= node.children? node.children.reduce((acc,child)=>acc.or(new BitSet(`0x${treeData.nodesById[child].clade}`)),new BitSet()).toString(16):
-            new BitSet([(options.tipNames?options.tipNames[name]:(tipCount+=1))]).toString(16);
-
         const annotations = annotationsString!==undefined? parseAnnotation(annotationsString):{};
         if(options.labelName!=="label"){
             if(label){
                 annotations[options.labelName]=label;
             }
         }
-
         let date;
         if(options.datePrefix && name){
             date =getDate(name,options.datePrefix,options.dateFormat);
             annotations.date = date;
         }
-
         const typedAnnotations = typeAnnotations(annotations);
-        treeData.nodesById[node.id] = node;
-        treeData.annotationsById[node.id] = annotations;
-        treeData.annotationTypes=reconcileAnnotations(typedAnnotations,treeData.annotationTypes);
-        treeData.cladeMap[node.clade] = node.id;
-        if(!isInternalNode){
-            treeData.externalNodes.push(node.id);
-        }else{
-            treeData.internalNodes.unshift(node.id);
-        }
-        treeData.postOrder.push(node.id);
-        treeData.clades.push(node.clade);
-        treeData.root=node.id;
-
-        return node.id;
+        node.annotations= annotations;
+        //TODO this is where it's broke
+        node.annotationTypes=childNodes?[typedAnnotations,...childNodes.map(c=>c.annotationTypes)].reduce((acc,curr)=>reconcileAnnotations(curr,acc),{}):typedAnnotations;
+        return node;
     }
-
-    newickSubstringParser(newickString);
-
-    return fromJS(treeData);
+    const root = newickSubstringParser(newickString);
+    return fromJS(root);
 }
 
 
