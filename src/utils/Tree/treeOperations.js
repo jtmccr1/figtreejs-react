@@ -73,7 +73,6 @@ export function parseNewick(newickString, options={}) {
         }
         const typedAnnotations = typeAnnotations(annotations);
         node.annotations= annotations;
-        //TODO this is where it's broke
         node.annotationTypes=childNodes?[typedAnnotations,...childNodes.map(c=>c.annotationTypes)].reduce((acc,curr)=>reconcileAnnotations(curr,acc),{}):typedAnnotations;
         return node;
     }

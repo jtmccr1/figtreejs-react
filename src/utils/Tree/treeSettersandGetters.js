@@ -1,4 +1,5 @@
 import {max} from "d3-array";
+import {List} from "immutable";
 export function getRoot(tree){
     return tree.get("root");
 }
@@ -32,67 +33,47 @@ export function getNode(tree,nodeId){
     return treeFactory(node);
 }
 
-//this for cacheing when tree context needed
-const getImmutableNode = (function(){
+function getImmutableNode(tree,nodeId){
+    return tree.getIn(getPathToNode(tree,nodeId));
+}
+
+//TODO think about caching all the way there.
+const getPathToNode=(function() {
     const cache = new Map();
-    return function getNode(tree,nodeId){
-        if(!cache.has(tree)){
-            cache.set(tree,new Map())
+    return function getPathToNode(tree, nodeId) {
+        if (!cache.has(tree)) {
+            cache.set(tree, new Map())
         }
-        if(cache.has(tree) && cache.get(tree).has(nodeId)){
+        if (cache.has(tree) && cache.get(tree).has(nodeId)) {
             return cache.get(tree).get(nodeId)
-        }else{
-            if(tree.get("id")===nodeId){
-                cache.get(tree).set(nodeId,tree);
-                return tree;
-            }else if(tree.get("children")!==null){
-                for (const child of tree.get("children")){
-                    const result = getNode(child,nodeId);
-                    if(result){
-                        cache.get(tree).set(nodeId,result);
-                        return result;
+        } else {
+            if (tree.get("id") === nodeId) {
+                return new List([]);
+            } else if (tree.get("children") !== null) {
+                let i=0;
+                for (const child of tree.get("children")) {
+                    const result = getPathToNode(child, nodeId);
+                    if (result) {
+                       const fullPath=new List(["children",i]).concat(result);
+                        cache.get(tree).set(nodeId, fullPath);
+                        return fullPath;
                     }
+                    i+=1;
                 }
             }
         }
-    };
+    }
+}());
 
     //
     //
     // //(if tree.id === nodeId return)
     // //at every step set cache.tree.nodeid===node;
     // return traverseAndGet(tree,(node)=>node.get("id")===nodeId);
-}());
 
 export function getParent(tree,nodeId) {
-    return traverseAndGet(tree,(node)=>node.get("children").map(child=>child.get("id")).includes(nodeId)).get("id");
+    return tree.getIn(getPathToNode(tree,nodeId).pop().pop().push("id"));
 }
-
-const getImmutableParent=(function(){
-    const cache=new Map();
-    return function getParent(tree,node){
-        if(cache.has(tree) && cache.has(tree).has(node)){
-            return cache.get(tree).get(node);
-        }else{
-            let result;
-            const children =tree.get("children");
-            if(children!==null){
-               for(const child of children){
-                   if(!cache.has(child)){
-                       cache.put(child,tree);
-                   }
-                   if(child===node){
-                       return child
-                   }
-                }
-                getParent(tree,child)
-            }
-
-        }
-
-    };
-}())
-
 
 
 export function getDivergence(tree,nodeId){
@@ -119,7 +100,7 @@ const getExternalNodes = (function(){
                 result =  tree.get("children")
                     .reduce((acc,curr)=>acc.concat(getExternalNodes(curr)),[]);
             }
-            cache.put(tree,result);
+            cache.set(tree,result);
             return result;
         }
     }

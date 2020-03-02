@@ -92,7 +92,6 @@ describe("Tree Tests",()=>{
     });
     it("parse newick tree parse, type and reconcile annotations",()=>{
         const tree = parseNewick(treeString,{datePrefix:"|"});
-
         expect(tree.toJS()).toEqual(expectedTree)
     });
 
@@ -122,12 +121,8 @@ describe("Tree Tests",()=>{
 
     it("Should get tips",()=>{
         const tree = parseNewick(treeString);
-        expect(getTipId(tree,"node1")).toEqual(["A|2020-01","B|1980-01-11"])
+        expect(getTips(tree,"node1")).toEqual(["A|2020-01","B|1980-01-11"])
 
-    })
-    it("Should calculate height",()=>{
-        const tree = new ImmutableTree(ImmutableTree.parseNewick(treeString));
-        expect(tree.getHeight("A|2020-01")).toEqual(1)
     });
     it("Should order nodes",()=>{
         const tree = parseNewick(treeString);
