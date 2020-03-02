@@ -3,8 +3,8 @@ import {Type} from "../src/utils/Tree/immutableTree";
 import {timeParse} from "d3-time-format";
 import * as matchers from 'jest-immutable-matchers';
 import {fromJS,Map} from "immutable";
-import {getDivergence, parseNewick} from "../src/utils/Tree/treeOperations";
-import {getTips} from "../src/utils/Tree/treeSettersandGetters";
+import {parseNewick} from "../src/utils/Tree/treeOperations";
+import {getDivergence, getNode, getParent, getTipId, getTips} from "../src/utils/Tree/treeSettersandGetters";
 
 const treeString="(('A|2020-01':1,B|1980-01-11[&length_range={1,1.5},location=\"Janesburgh\",location.prob=0.8,location.set.prob={0.8,0.2},location.set={\"Janesburgh\",\"JanosAires\"}]:2):3,C|1960[&length_range={2,4},location=\"Mabalako\",location.prob=1.0,location.set.prob={1.0},location.set={\"Mabalako\"}]:4);"
 const expectedTree = {
@@ -95,24 +95,36 @@ describe("Tree Tests",()=>{
 
         expect(tree.toJS()).toEqual(expectedTree)
     });
-    it("Handle exponential terms in branch lengths",()=>{
+
+    it("Should get node",()=>{
+       const tree = parseNewick("((a:1,B:1)internal:4E-5,c:3);");
+
+        const expectedNode = { id: 'B',
+            name: 'B',
+            length: 1,
+            children: null,
+            annotations: {},
+            annotationTypes: {} }
+
+        expect(getNode(tree,"B")).toEqual(expectedNode);
+    });
+
+    it("Should get Parent id",()=>{
+        const tree = parseNewick("((a:1,B:1)internal:4E-5,c:3);");
+        expect(getParent(tree,"a")).toEqual("internal")
+    })
+    it("Handle exponential terms in branch lengths and calc divergence",()=>{
         const treeString= "((a:1e-4,B:1)internal:4E-5,c:3);"
         const tree = parseNewick(treeString);
 
         expect(getDivergence(tree,"a")).toBeCloseTo(0.00014, 7);
     });
 
-    it("Should calculate divergence",()=>{
-        const tree = parseNewick(treeString);
-
-        expect(getDivergence(tree,"A|2020-01")).toEqual(4)
-    });
     it("Should get tips",()=>{
         const tree = parseNewick(treeString);
-        expect(getTips(tree,"node1")).toEqual(fromJS(["A|2020-01","B|1980-01-11"]))
+        expect(getTipId(tree,"node1")).toEqual(["A|2020-01","B|1980-01-11"])
 
     })
-
     it("Should calculate height",()=>{
         const tree = new ImmutableTree(ImmutableTree.parseNewick(treeString));
         expect(tree.getHeight("A|2020-01")).toEqual(1)

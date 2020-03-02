@@ -168,23 +168,6 @@ function reroot(tree, nodeId, proportion = 0.5) {
     }
 };
 
-export const  getDivergence = (function(){
-    const cache = new Map();
-   function divergenceHelper(tree,nodeId) {
-
-        const node = getNode(tree,nodeId);
-        let value;
-        if (cache.has(node)) {
-            value = cache.get(node);
-        } else {
-            value = nodeId!==getRoot(tree)? divergenceHelper(tree,getParent(tree,nodeId))+getLength(tree,nodeId):0;
-            cache.set(node,value);
-        }
-        return value;
-    }
-    return divergenceHelper;
-}());
-
 
 function orderByNodeDensity(tree,increasing = true, node =null) {
     const factor = increasing ? 1 : -1;
@@ -194,3 +177,21 @@ function orderByNodeDensity(tree,increasing = true, node =null) {
     return this;
 }
 
+function orderNodes(node, ordering) {
+    let count = 0;
+    if (this.getChildren(node)) {
+        // count the number of descendents for each child
+        const counts = new Map();
+        for (const child of this.getChildren(node)) {
+            counts.set(child, getTips(child));
+        }
+
+        // sort the children using the provided function
+        this.getNode(node).children = this.getNode(node).children.sort((a, b) => {
+            return ordering(a, counts.get(a), b, counts.get(b),node)
+        });
+    } else {
+        count = 1
+    }
+    return count;
+}

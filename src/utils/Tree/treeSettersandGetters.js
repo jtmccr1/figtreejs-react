@@ -1,80 +1,173 @@
-// Todo think about how everthing changes with these commands clases ect.
-import BitSet from "bitset/bitset";
-
+import {max} from "d3-array";
 export function getRoot(tree){
     return tree.get("root");
 }
-export function getNode(tree,id){
-    return tree.getIn(["nodesById",id]);
-}
-export function getParent(tree,id) {
-    return getNodeAttribute(tree,id,"parent")
+
+
+export const treeFactory=(function() {
+    const cache=new Map();
+
+
+    return function treeFactory(tree) {
+
+        if(cache.has(tree)){
+            return cache.get(tree);
+        }else {
+            const node = tree.toObject();
+            if (node.children) {
+                node.children = node.children.map(child => treeFactory(child))
+            }
+            node.annotations=node.annotations.toObject();
+            node.annotationTypes=node.annotationTypes.toObject();
+            Object.freeze(node);
+            cache.set(tree,node);
+            return node;
+        }
+    }
+}());
+
+export function getNode(tree,nodeId){
+    //TODO cache by tree and nodeId
+    const node = getImmutableNode(tree,nodeId);
+    return treeFactory(node);
 }
 
-export function setParent(tree,nodeId,parent){
-    return tree.setIn(["nodesById",nodeId,parent],parent)
+//this for cacheing when tree context needed
+const getImmutableNode = (function(){
+    const cache = new Map();
+    return function getNode(tree,nodeId){
+        if(!cache.has(tree)){
+            cache.set(tree,new Map())
+        }
+        if(cache.has(tree) && cache.get(tree).has(nodeId)){
+            return cache.get(tree).get(nodeId)
+        }else{
+            if(tree.get("id")===nodeId){
+                cache.get(tree).set(nodeId,tree);
+                return tree;
+            }else if(tree.get("children")!==null){
+                for (const child of tree.get("children")){
+                    const result = getNode(child,nodeId);
+                    if(result){
+                        cache.get(tree).set(nodeId,result);
+                        return result;
+                    }
+                }
+            }
+        }
+    };
+
+    //
+    //
+    // //(if tree.id === nodeId return)
+    // //at every step set cache.tree.nodeid===node;
+    // return traverseAndGet(tree,(node)=>node.get("id")===nodeId);
+}());
+
+export function getParent(tree,nodeId) {
+    return traverseAndGet(tree,(node)=>node.get("children").map(child=>child.get("id")).includes(nodeId)).get("id");
 }
 
-export function getChildren(tree,id){
-    return getNodeAttribute(tree,id,"children")
+const getImmutableParent=(function(){
+    const cache=new Map();
+    return function getParent(tree,node){
+        if(cache.has(tree) && cache.has(tree).has(node)){
+            return cache.get(tree).get(node);
+        }else{
+            let result;
+            const children =tree.get("children");
+            if(children!==null){
+               for(const child of children){
+                   if(!cache.has(child)){
+                       cache.put(child,tree);
+                   }
+                   if(child===node){
+                       return child
+                   }
+                }
+                getParent(tree,child)
+            }
+
+        }
+
+    };
+}())
+
+
+
+export function getDivergence(tree,nodeId){
+    const node = getImmutableNode(tree,nodeId);
+    if(node===tree){
+        return 0;
+    }
+    else{
+        return node.get("length")+getDivergence(tree,getParent(tree,nodeId));
+    }
 }
 
-export function addChild(tree,nodeId,child){
-    return tree.updateIn(["nodesById",nodeId,"children"],(children)=>children.push(child))
-}
 
-export function removeChild(tree,nodeId,child){
-    return tree.updateIn(["nodesById",nodeId,"children"],(children)=>children.filter(c=>c!==child))
-}
-export function setChildren(tree,nodeId,children){
-    return tree.setIn(["nodesById",nodeId,"children"],children);
-}
-export function getLength(tree,id){
-    return getNodeAttribute(tree,id,"length")
-}
+const getExternalNodes = (function(){
+    const cache=new Map();
+    return function getExternalNodes(tree){
+        if(cache.has(tree)){
+            return cache.get(tree);
+        }else{
+            let result;
+            if(tree.get("children")===null){
+                result = [tree.get("id")];
+            }else{
+                result =  tree.get("children")
+                    .reduce((acc,curr)=>acc.concat(getExternalNodes(curr)),[]);
+            }
+            cache.put(tree,result);
+            return result;
+        }
+    }
+}());
 
-export function setLength(tree,id,length){
-    return setNodeAttribute(tree,id,"length",length);
-}
 
-export function getClade(id){
-    return getNodeAttribute(tree,id,"clade")
-}
-export function getClades(tree){
-    return tree.get("clades");
-}
-export function getNodeAnnotations(tree,id){
-    return tree.getIn(["AnnotationsById",id]);
-}
 
-export function getAnnotationSummary(tree){
-    return tree.get("AnnotationSymmary");
-}
 
-export function getSummary(tree,annotation){
-    return tree.getIn(["AnnotationSymmary",annotation]);
-}
-export function getExternalNodes(tree){
-    return tree.get("externalNodes");
-}
-
-export function getInternalNodes(tree){
-    return tree.get("internalNodes");
-}
-export function getPostOrder(tree){
-    return tree.get("postOrder");
-}
-export function getPreOrder(tree){
-    return tree.get("postOrder").reverse();
-}
-export function getNodeAttribute(tree,id,attr){
-    return tree.getIn(['nodesById',id,attr])
-}
-
-export function setNodeAttribute(tree,id,attr,value){
-    return tree.setIn(['nodesById',id,attr],value)
-}
 export function getTips(tree,nodeId){
-    const tips =new BitSet(`0x${tree.getIn(["nodesById",nodeId,"clade"])}`);
-   return getExternalNodes(tree).filter(tip=> !(tips.and(new BitSet(`0x${tree.getIn(["nodesById",tip,"clade"])}`)).isEmpty()))
+   return getExternalNodes(getImmutableNode(tree,nodeId))
+}
+
+
+
+
+function getRootHeight(tree){
+    if(tree.get("children")===null){
+        return 0;
+    }
+    else{
+        return max(tree.get("children").map(child=>getRootHeight(child)+child.get("length")));
+    }
+}
+
+function memoize(fn){
+    const cache=new Map();
+    return function(arg){
+        if(cache.has(arg)){
+            return cache.get(arg);
+        }else{
+            const result = fn(arg);
+            cache.set(arg,result);
+            return result;
+        }
+    }
+}
+
+
+
+function traverseAndGet(tree,predicate){
+    if(predicate(tree)){
+        return tree;
+    }else if(tree.get("children")){
+        for(const child of tree.get("children")){
+            const output= traverseAndGet(child,predicate);
+            if(output){
+                return output
+            }
+        }
+    }
 }
