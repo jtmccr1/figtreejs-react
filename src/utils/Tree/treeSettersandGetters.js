@@ -26,36 +26,32 @@ const nodeGetter=(function(){
         } else if (call === nodeCalls.parent && parentCache.has(tree) && parentCache.get(tree).has(nodeId)) {
             return parentCache.get(tree).get(nodeId)
         } else {
-
+            // traverse tee and set up maps as far as needed
+            //TODO don't get and set everytime
+            nodeCache.get(tree).set(nodeId,tree);
             if (call === nodeCalls.self) {
                 if (tree.id === nodeId) {
                     return tree;
-                } else if (tree.children !== null) {
+                }
+            }else if (tree.children !== null) {
                     for (const child of tree.children) {
+                        parentCache.get(tree).set(child.id,node);
+                        if(call===nodeCalls.parent){
+                            if(child.id===nodeId){
+                                return tree;
+                            }
+                        }
                         const result = nodeGetter(child, nodeId, call);
+                        const thisCache=nodeCache.get(tree);
+                        const thisParentCache=parentCache.get(tree);
+                        nodeCache.get(child).forEach((v,k)=>thisCache.set(k,v));
+                        parentCache.get(child).forEach((v,k)=>thisParentCache.set(k,v));
                         if (result) {
-                            nodeCache.get(tree).set(nodeId, result);
                             return result;
                         }
                     }
                 }
-            } else if (call === nodeCalls.parent) {
-                if (tree.children !== null) {
-                    if (tree.children.map(child => child.id).includes(nodeId)) {
-                        parentCache.get(tree).set(nodeId, tree);
-                        return tree;
-                    } else {
-                        for (const child of tree.children) {
-                            const result = nodeGetter(child, nodeId, call);
-                            if (result) {
-                                nodeCache.get(tree).set(nodeId, result);
-                                return result;
-                            }
-                        }
-                    }
-                }
             }
-        }
         return null;
     }
 }());
