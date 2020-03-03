@@ -26,7 +26,7 @@ export const rectangularLayout=(function() {
             const childVertices = tree.children.map((child, i) => rectangularLayout(child, i));
             let i = 0;
             for (const childV of childVertices) {
-                childV[childV.length - 1].x = tree.children[i].length;
+                childV.forEach(v=>v.x+=tree.children[i].length);
                 if (i > 0) {
                     const maxY = max(childVertices[i - 1], v => v.y) + 1;
                     childV.forEach(vertex => vertex.y += maxY);
@@ -70,6 +70,7 @@ export function edgeFactory(vertexLayout) {
             if(childrenMap.get(currentTarget.id)){
                 deque.push(currentSource);
                 currentSource=currentTarget;
+                currentTarget=vertices.pop();
             }else if(childrenMap.get(currentSource.id)){
                 currentTarget=vertices.pop();
             }else{

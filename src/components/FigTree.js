@@ -2,8 +2,8 @@ import React,{useState,useMemo,useCallback} from 'react';
 
 import {scaleLinear} from "d3-scale";
 import {extent} from "d3-array";
-import {makeEdge,rectangularVertex} from "../utils/layouts/index";
 import Branches from "./Baubles/Branches/Branches";
+import {edgeFactory,rectangularLayout} from "../utils/layouts";
 
 /**
  * The FigTree component
@@ -14,20 +14,11 @@ export default function FigTree(props){
 
     const {layout,margins,width,height,tree,} = props;
 
-    const vertices = tree.getPostOrder().map(id=>layout(id,tree));
+    const vertices = layout(tree);
 
-    // console.time("vertLoop");
-    // let i=0;
-    // for(const v of tree.getPostOrder()){
-    //     i+=tree.getDivergence(v.id);
-    // }
-    // console.timeEnd("vertLoop");
-
-
-    const edges =   tree.getPostOrder().filter(id=>id!==tree.getRoot()).map(id=>makeEdge(layout)(id,tree));
+    const edges =  edgeFactory(layout)(tree);
     const scales=useMemo(()=>{console.log("setting up scales");return setUpScales({width,height},margins,vertices)},[tree]);
 
-     //TODO scales in state so can be updated by legends
     return(
             <g transform={`translate(${margins.left},${margins.top})`}>
                 {React.Children.map(props.children, (child, index) => {
@@ -73,7 +64,7 @@ function setUpScales(size,margins,vertices){
 FigTree.defaultProps= {
     width: undefined, /** Width of svg */
     height: undefined,
-    layout: rectangularVertex,
+    layout: rectangularLayout,
     children: [<Branches/>],
     margins:{top:10,bottom:10,left:10,right:10}
 }

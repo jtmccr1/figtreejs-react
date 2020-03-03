@@ -1,4 +1,4 @@
-import {getChildren, getLength, getNode, getParent, getRoot, getTips} from "./treeSettersandGetters";
+import { getNode, getParent, getTips} from "./treeSettersandGetters";
 
 import {
     getDate,
@@ -79,7 +79,56 @@ export function parseNewick(newickString, options={}) {
         return node;
     }
     const root = newickSubstringParser(newickString);
+    root.id="root";
     return root;
+}
+
+
+export function   parseNexus(nexus,options={}){
+
+        const trees=[];
+
+        // odd parts ensure we're not in a taxon label
+        //TODO make this parsing more robust
+        const nexusTokens = nexus.split(/\s*(?:^|[^\w\d])Begin(?:^|[^\w\d])|(?:^|[^\w\d])begin(?:^|[^\w\d])|(?:^|[^\w\d])end(?:^|[^\w\d])|(?:^|[^\w\d])End(?:^|[^\w\d])|(?:^|[^\w\d])BEGIN(?:^|[^\w\d])|(?:^|[^\w\d])END(?:^|[^\w\d])\s*/)
+        const firstToken = nexusTokens.shift().trim();
+        if(firstToken.toLowerCase()!=='#nexus'){
+            throw Error("File does not begin with #NEXUS is it a nexus file?")
+        }
+        for(const section of nexusTokens){
+            const workingSection = section.replace(/^\s+|\s+$/g, '').split(/\n/);
+            const sectionTitle = workingSection.shift();
+            if(sectionTitle.toLowerCase().trim() ==="trees;"){
+                let inTaxaMap=false;
+                const tipMap ={};
+                const tipNames={};
+                for(const token of workingSection){
+                    if(token.trim().toLowerCase()==="translate"){
+                        inTaxaMap=true;
+                    }else{
+                        if(inTaxaMap){
+                            if(token.trim()===";"){
+                                inTaxaMap=false;
+                            }else{
+                                const taxaData = token.trim().replace(",","").split(/\s*\s\s*/);
+                                tipMap[taxaData[0]]=taxaData[1];
+                                tipNames[taxaData[1]]=taxaData[0];
+                            }
+                        }else{
+                            const treeString = token.substring(token.indexOf("("));
+                            if(Object.keys(tipMap).length>0) {
+                                const thisTree = parseNewick(treeString, {...options, tipMap,tipNames});
+                                trees.push(thisTree);
+                            }else{
+                                const thisTree = parseNewick(treeString, {...options});
+                                trees.push(thisTree);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return trees;
 }
 
 
@@ -170,11 +219,12 @@ function reroot(tree, nodeId, proportion = 0.5) {
 };
 
 
-export function orderByNodeDensity(tree,nodeId,increasing = true) {
+export function orderByNodeDensity(tree,nodeId="root",increasing = true) {
     const factor = increasing ? 1 : -1;
 
     return produce(tree, draft => {
         const node = getNode(draft, nodeId);
+
         orderNodes(node, (nodeA, countA, nodeB, countB) => {
             return (countA - countB) * factor;
         });

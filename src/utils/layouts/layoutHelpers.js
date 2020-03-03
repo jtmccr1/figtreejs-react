@@ -39,28 +39,3 @@ export function makeVertexFromNode(node,labelBelow){
 }
 
 
-export function makeEdges(vertices,tree){
-    return vertices.filter(v=>tree.getParent(v.id)).map(v=>{
-        const parentVertex=vertices.find(vert=>vert.id===tree.getParent(v.id));
-        return {
-            v0: parentVertex,
-            v1: v,
-            id:v.id,
-            classes:v.classes,
-            x:parentVertex,
-            y:v.y,
-            textLabel:{
-                x:mean([v.x,parentVertex.x]),
-                y: -6,
-                alignmentBaseline: "bottom",
-                textAnchor:"middle",
-            },
-        }
-    })
-}
-
-export const layoutFactory=makeVertices=>tree=>{
-    const vertices = makeVertices(tree);
-    const edges = makeEdges(vertices,tree);
-    return {vertices,edges}
-};

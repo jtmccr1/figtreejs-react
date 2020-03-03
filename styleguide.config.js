@@ -18,6 +18,7 @@ module.exports = {
         {
           name:"Legends",
           components: "src/components/decorations/Legend/*.js",
+          ignore:"src/components/decorations/Legend/ColorRamp.js"
         },
         {
           name:"Axis",

@@ -8,9 +8,9 @@ const tree = parseNewick("((A[&rate=0.9,host=\"bat\"]:2.1,B[&rate=1.1]:3)[&rate=
 
 describe("Testing layout helper functions",()=> {
     it("Should get classes", () => {
-
         expect(getVertexClassesFromNode(getNode(tree, "A"))).toEqual(["external-node", "host-bat"])
     });
+
     it("Should make vertex", () => {
         expect(makeVertexFromNode(getNode(tree, "A"), false).textLabel).toEqual({
             labelBelow: false,
@@ -20,36 +20,27 @@ describe("Testing layout helper functions",()=> {
             textAnchor: "start",
         })
     });
+
     it("Should make rectangular vertex", () => {
-        expect(rectangularLayout(tree)[2]).toEqual({
-            "classes": ["internal-node", "host-undefined"],
-            "id": "node1",
-            "textLabel": {"alignmentBaseline": "hanging", "labelBelow": 0, "textAnchor": "end", "x": "-6", "y": "8"},
-            "x": 5,
-            "y": 0.5
+        expect(rectangularLayout(tree)[0]).toEqual({
+            "classes": ["external-node", "host-bat"],
+            "id": "A",
+            "textLabel": {"alignmentBaseline": "middle", "labelBelow": 0, "textAnchor": "start", "x": "12", "y": "0"},
+            "x": 7.1,
+            "y": 0
         })
     });
 
 
     it("Should make an edge", () => {
-        const vertices = rectangularLayout(getNode(tree, "node1"));
-        const source = vertices.slice(-1)[0];
-        const target = vertices[0];
+        const newickString =
+            '((((((virus1:0.1,virus2:0.12)0.95:0.08,(virus3:0.011,virus4:0.0087)1.0:0.15)0.65:0.03,virus5:0.21)1.0:0.2,(virus6:0.45,virus7:0.4)0.51:0.02)1.0:0.1,virus8:0.4)1.0:0.1,(virus9:0.04,virus10:0.03)1.0:0.6);';
 
-        expect(edgeFactory(rectangularLayout)(getNode(tree, "node1"))[1]).toEqual({
-            v0: source,
-            v1: target,
-            id: "A",
-            classes: target.classes,
-            x: source.x,
-            y: target.y,
-            textLabel: {
-                x: mean([target.x, source.x]),
-                y: -6,
-                alignmentBaseline: "bottom",
-                textAnchor: "middle",
-            }
-        })
+        const tree = parseNewick(newickString,{labelName:"support"});
+        const expected = [{"classes": ["internal-node", "support-1.0"], "id": "node8", "textLabel": {"alignmentBaseline": "bottom", "textAnchor": "middle", "x": 0.3, "y": -6}, "v0": {"classes": ["internal-node"], "id": "node9", "textLabel": {"alignmentBaseline": "hanging", "labelBelow": false, "textAnchor": "end", "x": "-6", "y": "8"}, "x": 0, "y": 7.03125}, "v1": {"classes": ["internal-node", "support-1.0"], "id": "node8", "textLabel": {"alignmentBaseline": "bottom", "labelBelow": 1, "textAnchor": "end", "x": "-6", "y": "-8"}, "x": 0.6, "y": 8.5}, "x": 0, "y": 8.5}, {"classes": ["external-node"], "id": "virus10", "textLabel": {"alignmentBaseline": "bottom", "textAnchor": "middle", "x": 0.615, "y": -6}, "v0": {"classes": ["internal-node", "support-1.0"], "id": "node8", "textLabel": {"alignmentBaseline": "bottom", "labelBelow": 1, "textAnchor": "end", "x": "-6", "y": "-8"}, "x": 0.6, "y": 8.5}, "v1": {"classes": ["external-node"], "id": "virus10", "textLabel": {"alignmentBaseline": "middle", "labelBelow": 1, "textAnchor": "start", "x": "12", "y": "0"}, "x": 0.63, "y": 9}, "x": 0.6, "y": 9}, {"classes": ["external-node"], "id": "virus9", "textLabel": {"alignmentBaseline": "bottom", "textAnchor": "middle", "x": 0.62, "y": -6}, "v0": {"classes": ["internal-node", "support-1.0"], "id": "node8", "textLabel": {"alignmentBaseline": "bottom", "labelBelow": 1, "textAnchor": "end", "x": "-6", "y": "-8"}, "x": 0.6, "y": 8.5}, "v1": {"classes": ["external-node"], "id": "virus9", "textLabel": {"alignmentBaseline": "middle", "labelBelow": 0, "textAnchor": "start", "x": "12", "y": "0"}, "x": 0.64, "y": 8}, "x": 0.6, "y": 8}, {"classes": ["internal-node"], "id": "node7", "textLabel": {"alignmentBaseline": "bottom", "textAnchor": "middle", "x": 0.05, "y": -6}, "v0": {"classes": ["internal-node"], "id": "node9", "textLabel": {"alignmentBaseline": "hanging", "labelBelow": false, "textAnchor": "end", "x": "-6", "y": "8"}, "x": 0, "y": 7.03125}, "v1": {"classes": ["internal-node"], "id": "node7", "textLabel": {"alignmentBaseline": "hanging", "labelBelow": 0, "textAnchor": "end", "x": "-6", "y": "8"}, "x": 0.1, "y": 5.5625}, "x": 0, "y": 5.5625}, {"classes": ["external-node"], "id": "virus8", "textLabel": {"alignmentBaseline": "bottom", "textAnchor": "middle", "x": 0.3, "y": -6}, "v0": {"classes": ["internal-node"], "id": "node7", "textLabel": {"alignmentBaseline": "hanging", "labelBelow": 0, "textAnchor": "end", "x": "-6", "y": "8"}, "x": 0.1, "y": 5.5625}, "v1": {"classes": ["external-node"], "id": "virus8", "textLabel": {"alignmentBaseline": "middle", "labelBelow": 1, "textAnchor": "start", "x": "12", "y": "0"}, "x": 0.5, "y": 7}, "x": 0.1, "y": 7}, {"classes": ["internal-node"], "id": "node6", "textLabel": {"alignmentBaseline": "bottom", "textAnchor": "middle", "x": 0.15000000000000002, "y": -6}, "v0": {"classes": ["internal-node"], "id": "node7", "textLabel": {"alignmentBaseline": "hanging", "labelBelow": 0, "textAnchor": "end", "x": "-6", "y": "8"}, "x": 0.1, "y": 5.5625}, "v1": {"classes": ["internal-node"], "id": "node6", "textLabel": {"alignmentBaseline": "hanging", "labelBelow": 0, "textAnchor": "end", "x": "-6", "y": "8"}, "x": 0.2, "y": 4.125}, "x": 0.1, "y": 4.125}, {"classes": ["internal-node"], "id": "node5", "textLabel": {"alignmentBaseline": "bottom", "textAnchor": "middle", "x": 0.21000000000000002, "y": -6}, "v0": {"classes": ["internal-node"], "id": "node6", "textLabel": {"alignmentBaseline": "hanging", "labelBelow": 0, "textAnchor": "end", "x": "-6", "y": "8"}, "x": 0.2, "y": 4.125}, "v1": {"classes": ["internal-node"], "id": "node5", "textLabel": {"alignmentBaseline": "bottom", "labelBelow": 1, "textAnchor": "end", "x": "-6", "y": "-8"}, "x": 0.22000000000000003, "y": 5.5}, "x": 0.2, "y": 5.5}, {"classes": ["external-node"], "id": "virus7", "textLabel": {"alignmentBaseline": "bottom", "textAnchor": "middle", "x": 0.42000000000000004, "y": -6}, "v0": {"classes": ["internal-node"], "id": "node5", "textLabel": {"alignmentBaseline": "bottom", "labelBelow": 1, "textAnchor": "end", "x": "-6", "y": "-8"}, "x": 0.22000000000000003, "y": 5.5}, "v1": {"classes": ["external-node"], "id": "virus7", "textLabel": {"alignmentBaseline": "middle", "labelBelow": 1, "textAnchor": "start", "x": "12", "y": "0"}, "x": 0.62, "y": 6}, "x": 0.22000000000000003, "y": 6}, {"classes": ["external-node"], "id": "virus6", "textLabel": {"alignmentBaseline": "bottom", "textAnchor": "middle", "x": 0.44500000000000006, "y": -6}, "v0": {"classes": ["internal-node"], "id": "node5", "textLabel": {"alignmentBaseline": "bottom", "labelBelow": 1, "textAnchor": "end", "x": "-6", "y": "-8"}, "x": 0.22000000000000003, "y": 5.5}, "v1": {"classes": ["external-node"], "id": "virus6", "textLabel": {"alignmentBaseline": "middle", "labelBelow": 0, "textAnchor": "start", "x": "12", "y": "0"}, "x": 0.67, "y": 5}, "x": 0.22000000000000003, "y": 5}, {"classes": ["internal-node"], "id": "node4", "textLabel": {"alignmentBaseline": "bottom", "textAnchor": "middle", "x": 0.30000000000000004, "y": -6}, "v0": {"classes": ["internal-node"], "id": "node6", "textLabel": {"alignmentBaseline": "hanging", "labelBelow": 0, "textAnchor": "end", "x": "-6", "y": "8"}, "x": 0.2, "y": 4.125}, "v1": {"classes": ["internal-node"], "id": "node4", "textLabel": {"alignmentBaseline": "hanging", "labelBelow": 0, "textAnchor": "end", "x": "-6", "y": "8"}, "x": 0.4, "y": 2.75}, "x": 0.2, "y": 2.75}, {"classes": ["external-node"], "id": "virus5", "textLabel": {"alignmentBaseline": "bottom", "textAnchor": "middle", "x": 0.505, "y": -6}, "v0": {"classes": ["internal-node"], "id": "node4", "textLabel": {"alignmentBaseline": "hanging", "labelBelow": 0, "textAnchor": "end", "x": "-6", "y": "8"}, "x": 0.4, "y": 2.75}, "v1": {"classes": ["external-node"], "id": "virus5", "textLabel": {"alignmentBaseline": "middle", "labelBelow": 1, "textAnchor": "start", "x": "12", "y": "0"}, "x": 0.61, "y": 4}, "x": 0.4, "y": 4}, {"classes": ["internal-node"], "id": "node3", "textLabel": {"alignmentBaseline": "bottom", "textAnchor": "middle", "x": 0.41500000000000004, "y": -6}, "v0": {"classes": ["internal-node"], "id": "node4", "textLabel": {"alignmentBaseline": "hanging", "labelBelow": 0, "textAnchor": "end", "x": "-6", "y": "8"}, "x": 0.4, "y": 2.75}, "v1": {"classes": ["internal-node"], "id": "node3", "textLabel": {"alignmentBaseline": "hanging", "labelBelow": 0, "textAnchor": "end", "x": "-6", "y": "8"}, "x": 0.43000000000000005, "y": 1.5}, "x": 0.4, "y": 1.5}, {"classes": ["internal-node", "support-1.0"], "id": "node2", "textLabel": {"alignmentBaseline": "bottom", "textAnchor": "middle", "x": 0.505, "y": -6}, "v0": {"classes": ["internal-node"], "id": "node3", "textLabel": {"alignmentBaseline": "hanging", "labelBelow": 0, "textAnchor": "end", "x": "-6", "y": "8"}, "x": 0.43000000000000005, "y": 1.5}, "v1": {"classes": ["internal-node", "support-1.0"], "id": "node2", "textLabel": {"alignmentBaseline": "bottom", "labelBelow": 1, "textAnchor": "end", "x": "-6", "y": "-8"}, "x": 0.58, "y": 2.5}, "x": 0.43000000000000005, "y": 2.5}, {"classes": ["external-node"], "id": "virus4", "textLabel": {"alignmentBaseline": "bottom", "textAnchor": "middle", "x": 0.5843499999999999, "y": -6}, "v0": {"classes": ["internal-node", "support-1.0"], "id": "node2", "textLabel": {"alignmentBaseline": "bottom", "labelBelow": 1, "textAnchor": "end", "x": "-6", "y": "-8"}, "x": 0.58, "y": 2.5}, "v1": {"classes": ["external-node"], "id": "virus4", "textLabel": {"alignmentBaseline": "middle", "labelBelow": 1, "textAnchor": "start", "x": "12", "y": "0"}, "x": 0.5887, "y": 3}, "x": 0.58, "y": 3}, {"classes": ["external-node"], "id": "virus3", "textLabel": {"alignmentBaseline": "bottom", "textAnchor": "middle", "x": 0.5854999999999999, "y": -6}, "v0": {"classes": ["internal-node", "support-1.0"], "id": "node2", "textLabel": {"alignmentBaseline": "bottom", "labelBelow": 1, "textAnchor": "end", "x": "-6", "y": "-8"}, "x": 0.58, "y": 2.5}, "v1": {"classes": ["external-node"], "id": "virus3", "textLabel": {"alignmentBaseline": "middle", "labelBelow": 0, "textAnchor": "start", "x": "12", "y": "0"}, "x": 0.591, "y": 2}, "x": 0.58, "y": 2}, {"classes": ["internal-node"], "id": "node1", "textLabel": {"alignmentBaseline": "bottom", "textAnchor": "middle", "x": 0.47000000000000003, "y": -6}, "v0": {"classes": ["internal-node"], "id": "node3", "textLabel": {"alignmentBaseline": "hanging", "labelBelow": 0, "textAnchor": "end", "x": "-6", "y": "8"}, "x": 0.43000000000000005, "y": 1.5}, "v1": {"classes": ["internal-node"], "id": "node1", "textLabel": {"alignmentBaseline": "hanging", "labelBelow": 0, "textAnchor": "end", "x": "-6", "y": "8"}, "x": 0.51, "y": 0.5}, "x": 0.43000000000000005, "y": 0.5}, {"classes": ["external-node"], "id": "virus2", "textLabel": {"alignmentBaseline": "bottom", "textAnchor": "middle", "x": 0.5700000000000001, "y": -6}, "v0": {"classes": ["internal-node"], "id": "node1", "textLabel": {"alignmentBaseline": "hanging", "labelBelow": 0, "textAnchor": "end", "x": "-6", "y": "8"}, "x": 0.51, "y": 0.5}, "v1": {"classes": ["external-node"], "id": "virus2", "textLabel": {"alignmentBaseline": "middle", "labelBelow": 1, "textAnchor": "start", "x": "12", "y": "0"}, "x": 0.63, "y": 1}, "x": 0.51, "y": 1}, {"classes": ["external-node"], "id": "virus1", "textLabel": {"alignmentBaseline": "bottom", "textAnchor": "middle", "x": 0.56, "y": -6}, "v0": {"classes": ["internal-node"], "id": "node1", "textLabel": {"alignmentBaseline": "hanging", "labelBelow": 0, "textAnchor": "end", "x": "-6", "y": "8"}, "x": 0.51, "y": 0.5}, "v1": {"classes": ["external-node"], "id": "virus1", "textLabel": {"alignmentBaseline": "middle", "labelBelow": 0, "textAnchor": "start", "x": "12", "y": "0"}, "x": 0.61, "y": 0}, "x": 0.51, "y": 0}]
+
+
+        expect(edgeFactory(rectangularLayout)(tree)).toEqual(expected)
 
     })
 })
