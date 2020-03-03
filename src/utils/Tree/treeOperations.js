@@ -1,13 +1,15 @@
-import {getRoot, getLength, getChildren, getParent, getNode} from "./treeSettersandGetters";
-import {fromJS,Map} from "immutable";
+import {getChildren, getLength, getNode, getParent, getRoot, getTips} from "./treeSettersandGetters";
 
 import {
     getDate,
-    parseAnnotation, reconcileAnnotations,
+    parseAnnotation,
+    reconcileAnnotations,
     splitAtExposedCommas,
-    stripQuotes, typeAnnotations,
+    stripQuotes,
+    typeAnnotations,
     verifyNewickString
 } from "./treeParsingFunctions";
+import {produce} from "immer";
 
 
 export function parseNewick(newickString, options={}) {
@@ -77,7 +79,7 @@ export function parseNewick(newickString, options={}) {
         return node;
     }
     const root = newickSubstringParser(newickString);
-    return fromJS(root);
+    return root;
 }
 
 
@@ -168,25 +170,28 @@ function reroot(tree, nodeId, proportion = 0.5) {
 };
 
 
-function orderByNodeDensity(tree,increasing = true, node =null) {
+export function orderByNodeDensity(tree,nodeId,increasing = true) {
     const factor = increasing ? 1 : -1;
-    orderNodes(tree, node, (nodeA, countA, nodeB, countB) => {
-        return (countA - countB) * factor;
+
+    return produce(tree, draft => {
+        const node = getNode(draft, nodeId);
+        orderNodes(node, (nodeA, countA, nodeB, countB) => {
+            return (countA - countB) * factor;
+        });
     });
-    return this;
 }
 
 function orderNodes(node, ordering) {
     let count = 0;
-    if (this.getChildren(node)) {
+    if (node.children!==null) {
         // count the number of descendents for each child
         const counts = new Map();
-        for (const child of this.getChildren(node)) {
-            counts.set(child, getTips(child));
+        for (const child of node.children) {
+            counts.set(child, getTips(child).length);
         }
 
         // sort the children using the provided function
-        this.getNode(node).children = this.getNode(node).children.sort((a, b) => {
+        node.children = node.children.sort((a, b) => {
             return ordering(a, counts.get(a), b, counts.get(b),node)
         });
     } else {

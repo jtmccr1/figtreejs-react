@@ -2,7 +2,6 @@ import {extent,max} from "d3-array";
 import {timeParse} from "d3-time-format";
 import {decimalToDate} from "../utilities";
 import BitSet from "bitset/bitset";
-import {fromJS} from "immutable"
 
 
 

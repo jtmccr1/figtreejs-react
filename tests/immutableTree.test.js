@@ -1,10 +1,16 @@
 import {splitAtExposedCommas, ImmutableTree} from "../src/utils/Tree/immutableTree";
 import {Type} from "../src/utils/Tree/immutableTree";
 import {timeParse} from "d3-time-format";
-import * as matchers from 'jest-immutable-matchers';
-import {fromJS,Map} from "immutable";
-import {parseNewick} from "../src/utils/Tree/treeOperations";
-import {getDivergence, getNode, getParent, getTipId, getTips} from "../src/utils/Tree/treeSettersandGetters";
+
+import {parseNewick,orderByNodeDensity} from "../src/utils/Tree/treeOperations";
+import {
+    getDivergence,
+    getNode,
+    getParent,
+    getRootToTipLengths,
+    getTipId,
+    getTips
+} from "../src/utils/Tree/treeSettersandGetters";
 
 const treeString="(('A|2020-01':1,B|1980-01-11[&length_range={1,1.5},location=\"Janesburgh\",location.prob=0.8,location.set.prob={0.8,0.2},location.set={\"Janesburgh\",\"JanosAires\"}]:2):3,C|1960[&length_range={2,4},location=\"Mabalako\",location.prob=1.0,location.set.prob={1.0},location.set={\"Mabalako\"}]:4);"
 const expectedTree = {
@@ -87,12 +93,9 @@ const expectedTree = {
     }
 };
 describe("Tree Tests",()=>{
-    beforeEach(function () {
-        jest.addMatchers(matchers);
-    });
     it("parse newick tree parse, type and reconcile annotations",()=>{
         const tree = parseNewick(treeString,{datePrefix:"|"});
-        expect(tree.toJS()).toEqual(expectedTree)
+        expect(tree).toEqual(expectedTree)
     });
 
     it("Should get node",()=>{
@@ -103,34 +106,32 @@ describe("Tree Tests",()=>{
             length: 1,
             children: null,
             annotations: {},
-            annotationTypes: {} }
+            annotationTypes: {} };
 
         expect(getNode(tree,"B")).toEqual(expectedNode);
     });
 
-    it("Should get Parent id",()=>{
+    it("Should get Parent",()=>{
         const tree = parseNewick("((a:1,B:1)internal:4E-5,c:3);");
-        expect(getParent(tree,"a")).toEqual("internal")
-    })
+        expect(getParent(tree,"a").id).toEqual("internal")
+    });
     it("Handle exponential terms in branch lengths and calc divergence",()=>{
         const treeString= "((a:1e-4,B:1)internal:4E-5,c:3);"
         const tree = parseNewick(treeString);
 
-        expect(getDivergence(tree,"a")).toBeCloseTo(0.00014, 7);
+        expect(getDivergence(tree,getNode(tree,"a"))).toBeCloseTo(0.00014, 7);
     });
 
     it("Should get tips",()=>{
         const tree = parseNewick(treeString);
-        expect(getTips(tree,"node1")).toEqual(["A|2020-01","B|1980-01-11"])
+        expect(getTips(getNode(tree,"node1"))).toEqual(["A|2020-01","B|1980-01-11"].map(id=>getNode(tree,id)))
 
     });
     it("Should order nodes",()=>{
         const tree = parseNewick(treeString);
-        orderByNodeDensity(tree);
+        const orderedTree= orderByNodeDensity(tree,"node2",false);
 
-        expect(tree.getExternalNodes()).toEqual(["C|1960","A|2020-01","B|1980-01-11"]);
-        tree.orderByNodeDensity(false);
-        expect(tree.getExternalNodes()).toEqual(["A|2020-01","B|1980-01-11","C|1960"]);
+        expect(getTips(orderedTree).map(tip=>tip.id)).toEqual(["C|1960","A|2020-01","B|1980-01-11"]);
 
     });
 
@@ -139,13 +140,11 @@ describe("Tree Tests",()=>{
         expect(splitAtExposedCommas(s)).toEqual(["('A|2020-01':1,B|1980-01-11[&length_range={1,1.5},location=\"Janesburgh\",location.prob={0.8,0.2},location.set={\"Janesburgh\",\"JanosAires\"}]:2):3","C|1960[&length_range={2,4},location=\"Mabalako\",location.prob=1.0,location.set={\"Mabalako\"}]:4"])
     });
 
-/*    it("Should calculate root to tip lengths",()=>{
-        const newickString =
-            '((((((virus1:0.1,virus2:0.12)0.95:0.08,(virus3:0.011,virus4:0.0087)1.0:0.15)0.65:0.03,virus5:0.21)1.0:0.2,(virus6:0.45,virus7:0.4)0.51:0.02)1.0:0.1,virus8:0.4)1.0:0.1,(virus9:0.04,virus10:0.03)1.0:0.6);';
-        const treeData = ImmutableTree.parseNewick(newickString);
-        const tree = new ImmutableTree(treeData);
+    it("Should calculate root to tip lengths",()=>{
+        const treeString= "((a:2,B:1)internal:0.5,c:3);"
+        const tree = parseNewick(treeString);
 
-        expect(tree.getRootToTipLengths()).toEqual()
-    })*/
+        expect(getRootToTipLengths(tree)).toEqual([3,2.5,1.5,0.5,0])
+    })
 });
 
