@@ -1,4 +1,4 @@
-import {splitAtExposedCommas, ImmutableTree} from "../src/utils/Tree/immutableTree";
+import {splitAtExposedCommas} from "../src/utils/Tree/immutableTree";
 import {Type} from "../src/utils/Tree/immutableTree";
 import {timeParse} from "d3-time-format";
 
@@ -8,7 +8,6 @@ import {
     getNode,
     getParent,
     getRootToTipLengths,
-    getTipId,
     getTips
 } from "../src/utils/Tree/treeSettersandGetters";
 

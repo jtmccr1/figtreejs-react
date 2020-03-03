@@ -1,20 +1,20 @@
 import {mean} from "d3-array";
 import {Type} from "../Tree/immutableTree";
 
-export function getVertexClassesFromNode(id,tree){
-    let classes = [(!tree.getChildren(id) ? "external-node" : "internal-node")];
-    if (tree.tree.annotationTypes) {
-        classes=classes.concat(Object.entries(tree.getNodeAnnotations(id))
+export function getVertexClassesFromNode(tree){
+    let classes = [(!tree.children ? "external-node" : "internal-node")];
+    if (tree.annotationTypes) {
+        classes=classes.concat(Object.entries(tree.annotationTypes)
                 .filter(([key]) => {
-                    return tree.getAnnotation(key) &&
-                        (tree.getAnnotation(key).type === Type.DISCRETE ||
-                            tree.getAnnotation(key).type === Type.BOOLEAN ||
-                            tree.getAnnotation(key).type === Type.INTEGER);
+                    return tree.annotationTypes[key] &&
+                        (tree.annotationTypes[key].type === Type.DISCRETE ||
+                            tree.annotationTypes[key].type === Type.BOOLEAN ||
+                            tree.annotationTypes[key].type === Type.INTEGER);
                 })
                 .map(([key, value]) =>{
-                    if(tree.getAnnotation(key).type===Type.DISCRETE || tree.getAnnotation(key).type === Type.INTEGER){
-                        return `${key}-${value}`;
-                    }else if(tree.getAnnotation(key).type === Type.BOOLEAN && value ){
+                    if(tree.annotationTypes[key].type===Type.DISCRETE || tree.annotationTypes[key].type === Type.INTEGER){
+                        return `${key}-${tree.annotations[key]}`;
+                    }else if(tree.annotationTypes[key].type === Type.BOOLEAN && tree.annotations[key] ){
                         return `${key}`
                     }
                 }));
@@ -22,12 +22,11 @@ export function getVertexClassesFromNode(id,tree){
     return classes;
 }
 
-export function makeVertexFromNode(id,tree){
-    const leftLabel= !!tree.getChildren(id);
-    const labelBelow= (!!tree.getChildren(id) && (!tree.getParent(id) || tree.getChildren(tree.getParent(id))[0] !== id));
+export function makeVertexFromNode(node,labelBelow){
+    const leftLabel= !!node.children;
 
     return {
-        id:id,
+        id:node.id,
         textLabel:{
             labelBelow:labelBelow,
             x:leftLabel?"-6":"12",
@@ -35,7 +34,7 @@ export function makeVertexFromNode(id,tree){
             alignmentBaseline: leftLabel?(labelBelow ? "bottom": "hanging" ):"middle",
             textAnchor:leftLabel?"end":"start",
         },
-        classes: getVertexClassesFromNode(id,tree)
+        classes: getVertexClassesFromNode(node)
     };
 }
 

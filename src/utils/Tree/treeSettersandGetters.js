@@ -1,5 +1,6 @@
 import {max,sum} from "d3-array";
 import {produce} from "immer";
+import {memoize} from "../utilities";
 
 
 const nodeCalls ={self:Symbol("self"),parent:Symbol("parent")}
@@ -116,18 +117,7 @@ function getTipsSimple(tree){
 }
 export const getTips = memoize(getTipsSimple);
 
-function memoize(fn){
-    const cache=new Map();
-    return function(arg){
-        if(cache.has(arg)){
-            return cache.get(arg);
-        }else{
-            const result = fn(arg);
-            cache.set(arg,result);
-            return result;
-        }
-    }
-}
+
 
 
 

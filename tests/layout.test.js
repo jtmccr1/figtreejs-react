@@ -1,57 +1,55 @@
-import {ImmutableTree} from "../src/utils/Tree/immutableTree";
 import {getVertexClassesFromNode, makeVertexFromNode} from "../src/utils/layouts/layoutHelpers";
-import {makeEdge, rectangularVertex} from "../src/utils/layouts/"
+import {edgeFactory, makeEdge, rectangularVertex} from "../src/utils/layouts/"
 import {mean} from "d3-array";
-const treeData = ImmutableTree.parseNewick("((A[&rate=1,host=\"bat\"]:2.1,B[&rate=1.1]:3)[&rate=1.5]:5,C[&rate=4]:1);");
-const tree = new ImmutableTree(treeData);
-describe("Testing layout helper functions",()=>{
-    it("Should get classes",()=>{
+import {parseNewick} from "../src/utils/Tree/treeOperations";
+import {getNode} from "../src/utils/Tree/treeSettersandGetters";
+import {rectangularLayout} from "../src/utils/layouts/index";
+const tree = parseNewick("((A[&rate=0.9,host=\"bat\"]:2.1,B[&rate=1.1]:3)[&rate=1.5]:5,C[&rate=4]:1);");
 
-        expect(getVertexClassesFromNode("A",tree)).toEqual(["external-node","host-bat"])
+describe("Testing layout helper functions",()=> {
+    it("Should get classes", () => {
+
+        expect(getVertexClassesFromNode(getNode(tree, "A"))).toEqual(["external-node", "host-bat"])
     });
-    it("Should make vertex",()=>{
-        expect(makeVertexFromNode("A",tree).textLabel).toEqual({
-            labelBelow:false,
-                x:"12",
-                y:"0",
-                alignmentBaseline: "middle",
-                textAnchor:"start",
+    it("Should make vertex", () => {
+        expect(makeVertexFromNode(getNode(tree, "A"), false).textLabel).toEqual({
+            labelBelow: false,
+            x: "12",
+            y: "0",
+            alignmentBaseline: "middle",
+            textAnchor: "start",
         })
     });
-    it("Should make rectangular vertex",()=>{
-        expect(rectangularVertex("node1",tree)).toEqual({
-            id:"node1",
-            x:5,
-            y:0.5,
-            classes:["internal-node"],
-            textLabel: {
-                labelBelow:false,
-                x:"-6",
-                y:"8",
-                alignmentBaseline:"hanging",
-                textAnchor:"end"
-            }
-            })
-    })
-    it("Should make an edge",()=>{
-        const vertex = rectangularVertex("A",tree);
-        const parent = rectangularVertex("node1",tree);
+    it("Should make rectangular vertex", () => {
+        expect(rectangularLayout(tree)[2]).toEqual({
+            "classes": ["internal-node", "host-undefined"],
+            "id": "node1",
+            "textLabel": {"alignmentBaseline": "hanging", "labelBelow": 0, "textAnchor": "end", "x": "-6", "y": "8"},
+            "x": 5,
+            "y": 0.5
+        })
+    });
 
-        expect(makeEdge(rectangularVertex)("A",tree)).toEqual({
-            v0: parent,
-            v1: vertex,
+
+    it("Should make an edge", () => {
+        const vertices = rectangularLayout(getNode(tree, "node1"));
+        const source = vertices.slice(-1)[0];
+        const target = vertices[0];
+
+        expect(edgeFactory(rectangularLayout)(getNode(tree, "node1"))[1]).toEqual({
+            v0: source,
+            v1: target,
             id: "A",
-            classes: vertex.classes,
-            x: parent.x,
-            y: vertex.y,
+            classes: target.classes,
+            x: source.x,
+            y: target.y,
             textLabel: {
-                x: mean([vertex.x, parent.x]),
+                x: mean([target.x, source.x]),
                 y: -6,
                 alignmentBaseline: "bottom",
                 textAnchor: "middle",
             }
         })
 
-
-    });
+    })
 })

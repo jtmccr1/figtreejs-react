@@ -101,3 +101,16 @@ export const kdeFactory=kernel=>thresholds=>(data)=>{
 export function epanechnikov(bandwidth){
     return x=>Math.abs(x /= bandwidth) <= 1 ? 0.75 * (1 - x * x) / bandwidth : 0;
 }
+
+export function memoize(fn){
+    const cache=new Map();
+    return function(arg){
+        if(cache.has(arg)){
+            return cache.get(arg);
+        }else{
+            const result = fn(arg);
+            cache.set(arg,result);
+            return result;
+        }
+    }
+}
