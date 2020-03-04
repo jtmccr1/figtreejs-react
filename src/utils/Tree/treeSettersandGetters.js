@@ -1,7 +1,5 @@
-import {max,sum} from "d3-array";
 import {produce} from "immer";
-import {memoize} from "../utilities";
-
+import {memoize, mergeMaps, setParentMap} from "../utilities";
 
 const nodeCalls ={self:Symbol("self"),parent:Symbol("parent")}
 /**
@@ -10,59 +8,50 @@ const nodeCalls ={self:Symbol("self"),parent:Symbol("parent")}
  * to reduce overall tree traversal.
  * @type {nodeGetter}
  */
-const nodeGetter=(function(){
-    const nodeCache = new Map();
-    const parentCache = new Map();
-    return function nodeGetter(tree,nodeId,call=nodeCalls.self) {
-        if (!nodeCache.has(tree)) {
-            nodeCache.set(tree, new Map())
-        }
-        if (!parentCache.has(tree)) {
-            parentCache.set(tree, new Map())
-        }
-        // return cached if present
-        if (call === nodeCalls.self && nodeCache.has(tree) && nodeCache.get(tree).has(nodeId)) {
-            return nodeCache.get(tree).get(nodeId)
-        } else if (call === nodeCalls.parent && parentCache.has(tree) && parentCache.get(tree).has(nodeId)) {
-            return parentCache.get(tree).get(nodeId)
-        } else {
-            // traverse tee and set up maps as far as needed
-            //TODO don't get and set everytime
-            nodeCache.get(tree).set(nodeId,tree);
-            if (call === nodeCalls.self) {
-                if (tree.id === nodeId) {
-                    return tree;
-                }
-            }else if (tree.children !== null) {
-                    for (const child of tree.children) {
-                        parentCache.get(tree).set(child.id,node);
-                        if(call===nodeCalls.parent){
-                            if(child.id===nodeId){
-                                return tree;
-                            }
-                        }
-                        const result = nodeGetter(child, nodeId, call);
-                        const thisCache=nodeCache.get(tree);
-                        const thisParentCache=parentCache.get(tree);
-                        nodeCache.get(child).forEach((v,k)=>thisCache.set(k,v));
-                        parentCache.get(child).forEach((v,k)=>thisParentCache.set(k,v));
-                        if (result) {
-                            return result;
-                        }
-                    }
-                }
-            }
-        return null;
-    }
-}());
+
 
 export function getParent(tree,nodeId) {
             return nodeGetter(tree,nodeId,nodeCalls.parent)
 }
+const nodeGetter=(function(){
+        const cache=new Map();
+        return function nodeGetter(tree,nodeId,call){
+            if (!cache.has(tree)) {
+                // This is the first time looking for nodes in this tree
+                cache.set(tree, new Map([[tree.id,{node:tree}]]));
+                if(tree.children===null){
+                    if(call===nodeCalls.self && tree.id===nodeId){
+                        return tree;
+                    }
+                    return null;
+                }else{
+                    // we are here do we need to update downstream?
+                    let result= call===nodeCalls.self?(tree.id===nodeId?tree:null):tree.children.map(c=>c.id).includes(nodeId)?tree:null;
+                    for(const child of tree.children){
+                        if(cache.has(child)){
+
+                                result=result?result:(cache.get(child).has(nodeId)?(call===nodeCalls.self?cache.get(child).get(nodeId).node:cache.get(child).get(nodeId).parent):null) ;
+
+                        }else{
+                            const downStreamSearch =nodeGetter(child,nodeId,call);
+                            result=result?result:downStreamSearch;
+                        }
+                        const updatedTreeMap=setParentMap(mergeMaps(cache.get(tree),cache.get(child)),child,tree);
+                        cache.set(tree,updatedTreeMap)
+                    }
+                    return result;
+                }
+            }else{
+               return call===nodeCalls.self?cache.get(tree).get(nodeId).node:cache.get(tree).get(nodeId).parent;
+            }
+        }
+
+}());
+
 export function getNode(tree,nodeId){
     return nodeGetter(tree,nodeId,nodeCalls.self)
-
 }
+
 
 export function getDivergence(tree,node){
     const cache = new Map();
@@ -83,22 +72,23 @@ export function getDivergence(tree,node){
     }
 }
 
-function getNodesSimple(tree){
-    if(tree.children===null){
-        return [tree];
-    }
-    const childrenOutput = tree.children.map(child=>getNodesSimple(child)).sort();
 
-    return produce(childrenOutput[0],draft=>{
-        for(const node of childrenOutput[1]){
-            draft.push(node)
-        }
-        draft.push(tree);
-    })
+export function *getNodesIterator(tree){
+    const traverse = function *(tree) {
+            if (tree.children) {
+                for (const child of tree.children) {
+                    yield* traverse(child);
+                }
+            }
+            yield tree;
+    };
+
+    yield* traverse(tree);
 }
 
-export const getNodes=memoize(getNodesSimple);
-
+export function getNodes(tree){
+    return [...getNodesIterator(tree)];
+}
 export function getRootToTipLengths(tree){
    return getNodes(tree).map(node=>getDivergence(tree,node))
 }

@@ -14,9 +14,8 @@ export default function FigTree(props){
 
     const {layout,margins,width,height,tree,} = props;
 
-    const vertices = layout(tree);
+    const {vertices,edges} = layout(tree);
 
-    const edges =  edgeFactory(layout)(tree);
     const scales=useMemo(()=>{console.log("setting up scales");return setUpScales({width,height},margins,vertices)},[tree]);
 
     return(

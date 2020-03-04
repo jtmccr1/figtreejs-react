@@ -20,28 +20,35 @@ export const rectangularLayout=(function() {
             const vertex = makeVertexFromNode(tree, labelBelow);
             vertex.x = 0;
             vertex.y = 0;
-            cache.get(tree).set(labelBelow,[vertex]);
-            return [vertex];
+            const output = {vertices:[vertex],edges:[]};
+            cache.get(tree).set(labelBelow,output);
+            return output;
         } else {
-            const childVertices = tree.children.map((child, i) => rectangularLayout(child, i));
+            const childrenLayouts = tree.children.map((child, i) => rectangularLayout(child, i));
             let i = 0;
-            for (const childV of childVertices) {
-                childV.forEach(v=>v.x+=tree.children[i].length);
+            for (const childLayout of childrenLayouts) {
+                childLayout.vertices.forEach(v=>v.x+=tree.children[i].length);
+                childLayout.edges.forEach(e=>e.x+=tree.children[i].length);
                 if (i > 0) {
-                    const maxY = max(childVertices[i - 1], v => v.y) + 1;
-                    childV.forEach(vertex => vertex.y += maxY);
+                    const maxY = max(childrenLayouts[i-1].vertices, v => v.y) + 1;
+                    childLayout.vertices.forEach(vertex => vertex.y += maxY);
+                    childLayout.edges.forEach(e=>e.y+=maxY);
                 }
                 i += 1;
             }
-            const y = mean(childVertices, d => d[d.length - 1].y);
+
+            const y = mean(childrenLayouts.map(l=>l.vertices), d => d.slice(-1)[0].y);
             const vertex = makeVertexFromNode(tree, labelBelow);
             vertex.y = y;
             vertex.x = 0;
+            const newEdges = childrenLayouts.map(l=>makeEdge(vertex,l.vertices.slice(-1)[0]))
 
-            const vertices = childVertices.reduce((acc, curr) => acc.concat(curr), []);
+            const vertices = childrenLayouts.reduce((acc, curr) => acc.concat(curr.vertices), []);
             vertices.push(vertex);
-            cache.get(tree).set(labelBelow,vertices);
-            return vertices
+            const edges =childrenLayouts.reduce((acc, curr) => acc.concat(curr.edges), newEdges);
+            const output = {vertices,edges};
+            cache.get(tree).set(labelBelow,output);
+            return output
         }
     }
 }());
@@ -81,7 +88,7 @@ export function edgeFactory(vertexLayout) {
         return edges;
 
     };
-    return memoize(makeEdges)
+    return makeEdges
 };
 
 function  makeEdge(source,target){

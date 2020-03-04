@@ -128,10 +128,15 @@ describe("Tree Tests",()=>{
     });
     it("Should order nodes",()=>{
         const tree = parseNewick(treeString);
-        const orderedTree= orderByNodeDensity(tree,"node2",false);
+        const orderedTree= orderByNodeDensity(tree);
+        const n=getNode(orderedTree,"node1")
+
+        expect(tree).not.toBe(orderedTree);
+        expect(getNode(tree,"node1")).toBe(getNode(orderedTree,"node1"))
+        expect(getParent(tree,"A|2020-01")).toBe(getParent(orderedTree,"A|2020-01"));
+        expect(getParent(tree,"node1")).not.toBe(getParent(orderedTree,"node1"))
 
         expect(getTips(orderedTree).map(tip=>tip.id)).toEqual(["C|1960","A|2020-01","B|1980-01-11"]);
-
     });
 
     it("Should split string at exposed commas",()=>{
@@ -142,8 +147,7 @@ describe("Tree Tests",()=>{
     it("Should calculate root to tip lengths",()=>{
         const treeString= "((a:2,B:1)internal:0.5,c:3);"
         const tree = parseNewick(treeString);
-
-        expect(getRootToTipLengths(tree)).toEqual([3,2.5,1.5,0.5,0])
+        expect(getRootToTipLengths(tree)).toEqual([2.5,1.5,0.5,3,0])
     })
 });
 
