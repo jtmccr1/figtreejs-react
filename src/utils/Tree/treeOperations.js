@@ -133,11 +133,26 @@ export function   parseNexus(nexus,options={}){
 
 export function orderByNodeDensity(tree,increasing = true) {
     const factor = increasing ? -1 : 1;
-    return produce(tree, draft => {
-        if(draft.children){
-            draft.children.forEach(child=> orderByNodeDensity(child,increasing));
-           draft.children.sort((a,b)=>factor*(getTips(a).length-getTips(b).length))
+    const flipper = produce((draft)=>{
+        if(draft.children) {
+            draft.children.forEach((child,i)=>draft.children[i]=flipper(child));
+            // let i = 0;
+            // for (const child of draft.children) {
+            //     draft.children[i] = flipper(child);
+            //     i++;
+            // }
+            draft.children.sort((a, b) => factor * (getTips(a).length - getTips(b).length));
         }
     });
+    return flipper(tree)
 }
-
+//
+//
+// function orderChildren(tree,increasing){
+//     const factor = increasing ? -1 : 1;
+//     return produce(tree, draft => {
+//         if(draft.children){
+//             draft.children.sort((a,b)=>factor*(getTips(a).length-getTips(b).length))
+//         }
+//     });
+// }

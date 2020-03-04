@@ -1,21 +1,18 @@
 import {makeVertexFromNode} from "./layoutHelpers";
 import {mean,max} from "d3-array";
-import {memoize} from "../utilities";
-import {getNode, getNodes} from "../Tree/treeSettersandGetters";
+import { getNodes} from "../Tree/treeSettersandGetters";
 
 
 export const rectangularLayout=(function() {
     const cache = new Map();
 
     return function rectangularLayout(tree, labelBelow = false) {
-
         if (!cache.has(tree)) {
             cache.set(tree, new Map())
         }
         if (cache.has(tree) && cache.get(tree).has(labelBelow)) {
             return cache.get(tree).get(labelBelow)
         }
-
         if (tree.children === null) {
             const vertex = makeVertexFromNode(tree, labelBelow);
             vertex.x = 0;
@@ -36,7 +33,6 @@ export const rectangularLayout=(function() {
                 }
                 i += 1;
             }
-
             const y = mean(childrenLayouts.map(l=>l.vertices), d => d.slice(-1)[0].y);
             const vertex = makeVertexFromNode(tree, labelBelow);
             vertex.y = y;

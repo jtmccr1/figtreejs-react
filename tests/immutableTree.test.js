@@ -127,16 +127,22 @@ describe("Tree Tests",()=>{
 
     });
     it("Should order nodes",()=>{
-        const tree = parseNewick(treeString);
-        const orderedTree= orderByNodeDensity(tree);
-        const n=getNode(orderedTree,"node1")
+        const s="(d:1,(c:1,(((b1:1,b2:1):1,(b3:1,b4:1):1):1,(a3:1,(a1:1,a2:1):1):1):1):1);"
+
+        const tree = parseNewick(s);
+        const orderedTree= orderByNodeDensity(tree,false);
 
         expect(tree).not.toBe(orderedTree);
-        expect(getNode(tree,"node1")).toBe(getNode(orderedTree,"node1"))
-        expect(getParent(tree,"A|2020-01")).toBe(getParent(orderedTree,"A|2020-01"));
-        expect(getParent(tree,"node1")).not.toBe(getParent(orderedTree,"node1"))
+        expect(getParent(tree,"node7")).not.toBe(getParent(orderedTree,"node7"));
+        expect(getParent(tree,"node6")).not.toBe(getParent(orderedTree,"node6"));
+        expect(getParent(tree,"node5")).not.toBe(getParent(orderedTree,"node5"));
 
-        expect(getTips(orderedTree).map(tip=>tip.id)).toEqual(["C|1960","A|2020-01","B|1980-01-11"]);
+        expect(getNode(tree,"node3")).toBe(getNode(orderedTree,"node3"));
+        expect(getNode(tree,"node2")).toBe(getNode(orderedTree,"node2"));
+        expect(getNode(tree,"node1")).toBe(getNode(orderedTree,"node1"));
+
+
+        expect(getTips(orderedTree).map(tip=>tip.id)).toEqual(["d","c","a3","a1","a2","b1","b2","b3","b4"]);
     });
 
     it("Should split string at exposed commas",()=>{
