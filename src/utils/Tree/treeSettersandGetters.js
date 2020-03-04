@@ -94,15 +94,17 @@ export function getRootToTipLengths(tree){
 }
 
 
-function getTipsSimple(tree){
-   if(tree.children===null){
-       return tree;
-   }else{
-       return tree.children.reduce((list,child)=>list.concat(getTipsSimple(child)),[]);
-   }
+// function getTipsSimple(tree){
+//    if(tree.children===null){
+//        return tree;
+//    }else{
+//        return tree.children.reduce((list,child)=>list.concat(getTipsSimple(child)),[]);
+//    }
+// }
+// export const getTips = memoize(getTipsSimple);
+export function getTips(tree){
+    return [...getNodesIterator(tree)].filter(n=>!n.children);
 }
-export const getTips = memoize(getTipsSimple);
-
 
 
 

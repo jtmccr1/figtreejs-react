@@ -56,7 +56,7 @@ function setUpScales(size,margins,vertices){
 
     const y = scaleLinear()
         .domain(ydomain)
-        .range([size.height -margins.bottom-margins.top,0]);
+        .range([0,size.height -margins.bottom-margins.top]);
     return {x,y};
 }
 

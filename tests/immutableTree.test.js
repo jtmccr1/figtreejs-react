@@ -115,7 +115,7 @@ describe("Tree Tests",()=>{
         expect(getParent(tree,"a").id).toEqual("internal")
     });
     it("Handle exponential terms in branch lengths and calc divergence",()=>{
-        const treeString= "((a:1e-4,B:1)internal:4E-5,c:3);"
+        const treeString= "((a:1e-4,B:1)internal:4E-5,c:3);";
         const tree = parseNewick(treeString);
 
         expect(getDivergence(tree,getNode(tree,"a"))).toBeCloseTo(0.00014, 7);
@@ -130,13 +130,19 @@ describe("Tree Tests",()=>{
         const s="((D:1,(B:1,C:1):1):1,A:1);";
 
         const tree = parseNewick(s);
-        const orderedTree= orderByNodeDensity(tree,false);
+        const orderedTree= orderByNodeDensity(tree,);
 
 
         expect(tree).not.toBe(orderedTree);
-        expect(getTips(tree).map(tip=>tip.id)).toEqual(["A","B","C","D"]);
 
-        expect(getTips(orderedTree).map(tip=>tip.id)).toEqual(["A","D","B","C"]);
+        expect(getNode(tree,"node2")).not.toBe(getNode(orderedTree,"node2"));
+        expect(getParent(tree,"D")).not.toBe(getParent(orderedTree,"D"));
+
+        expect(getNode(tree,"node3")).not.toBe(getNode(orderedTree,"node3"));
+        expect(getNode(tree,"node1")).toBe(getNode(tree,"node1"));
+
+        expect(getTips(tree).map(tip=>tip.id)).toEqual(["D","B","C","A"]);
+        expect(getTips(orderedTree).map(tip=>tip.id)).toEqual(["B","C","D","A"]);
     });
 
     it("Should split string at exposed commas",()=>{
