@@ -127,22 +127,16 @@ describe("Tree Tests",()=>{
 
     });
     it("Should order nodes",()=>{
-        const s="(d:1,(c:1,(((b1:1,b2:1):1,(b3:1,b4:1):1):1,(a3:1,(a1:1,a2:1):1):1):1):1);"
+        const s="((D:1,(B:1,C:1):1):1,A:1);";
 
         const tree = parseNewick(s);
         const orderedTree= orderByNodeDensity(tree,false);
 
+
         expect(tree).not.toBe(orderedTree);
-        expect(getParent(tree,"node7")).not.toBe(getParent(orderedTree,"node7"));
-        expect(getParent(tree,"node6")).not.toBe(getParent(orderedTree,"node6"));
-        expect(getParent(tree,"node5")).not.toBe(getParent(orderedTree,"node5"));
+        expect(getTips(tree).map(tip=>tip.id)).toEqual(["A","B","C","D"]);
 
-        expect(getNode(tree,"node3")).toBe(getNode(orderedTree,"node3"));
-        expect(getNode(tree,"node2")).toBe(getNode(orderedTree,"node2"));
-        expect(getNode(tree,"node1")).toBe(getNode(orderedTree,"node1"));
-
-
-        expect(getTips(orderedTree).map(tip=>tip.id)).toEqual(["d","c","a3","a1","a2","b1","b2","b3","b4"]);
+        expect(getTips(orderedTree).map(tip=>tip.id)).toEqual(["A","D","B","C"]);
     });
 
     it("Should split string at exposed commas",()=>{
