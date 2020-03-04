@@ -8,7 +8,7 @@ import {
     getNode,
     getParent,
     getRootToTipLengths,
-    getTips
+    getTips, setLength
 } from "../src/utils/Tree/treeSettersandGetters";
 
 const treeString="(('A|2020-01':1,B|1980-01-11[&length_range={1,1.5},location=\"Janesburgh\",location.prob=0.8,location.set.prob={0.8,0.2},location.set={\"Janesburgh\",\"JanosAires\"}]:2):3,C|1960[&length_range={2,4},location=\"Mabalako\",location.prob=1.0,location.set.prob={1.0},location.set={\"Mabalako\"}]:4);"
@@ -151,9 +151,23 @@ describe("Tree Tests",()=>{
     });
 
     it("Should calculate root to tip lengths",()=>{
-        const treeString= "((a:2,B:1)internal:0.5,c:3);"
+        const treeString= "((a:2,B:1)internal:0.5,c:3);";
         const tree = parseNewick(treeString);
         expect(getRootToTipLengths(tree)).toEqual([2.5,1.5,0.5,3,0])
+    });
+
+    test("test updating function",()=>{
+        const s="((D:1,(B:1,C:1):1):1,A:1);";
+        const tree = parseNewick(s);
+        const newT = setLength(tree,"D",2);
+
+        expect(getNode(newT,'D').length).toEqual(2);
+        expect(newT).not.toBe(tree);
+        expect(getParent(newT,"D")).not.toBe(getParent(tree,"D"));
+        expect(getNode(newT,"D")).not.toBe(getNode(tree,"D"))
+        expect(getNode(newT,"node2")).toBe(getParent(newT,"D"))
+        expect(getNode(newT,"node1")).toBe(getNode(tree,"node1"))
+
     })
 });
 

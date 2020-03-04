@@ -108,4 +108,9 @@ export function getTips(tree){
 
 
 
-
+export function setLength(tree,nodeid,length){
+    return produce(tree,draft=>{
+      const node = getNode(draft,nodeid);
+      node.length=length;
+    })
+}
