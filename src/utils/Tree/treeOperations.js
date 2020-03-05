@@ -136,15 +136,18 @@ export function orderByNodeDensity(tree,increasing = true) {
     const flipper = produce((draft)=>{
         if(draft.children) {
             draft.children.forEach((child,i)=>draft.children[i]=flipper(child));
-            // let i = 0;
-            // for (const child of draft.children) {
-            //     draft.children[i] = flipper(child);
-            //     i++;
-            // }
             draft.children.sort((a, b) => factor * (getTips(a).length - getTips(b).length));
         }
     });
     return flipper(tree)
+}
+
+
+export function rotate(tree,nodeId) {
+    return produce(tree,draft=>{
+        const node= getNode(draft,nodeId)
+        node.children.reverse();
+    })
 }
 //
 //

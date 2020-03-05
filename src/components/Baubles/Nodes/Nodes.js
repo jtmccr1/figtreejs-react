@@ -33,6 +33,8 @@ export default function Nodes(props){
              if(filter(v)){
                  all.push( <Node key={`node-${v.id}`} classes={v.classes.concat((v.id===hoveredNode?"hovered":[]))} x={scales.x(v.x)} y={scales.y(v.y)}  interactions={{...hoverer(v.id),...appliedInteractions(v)}} >
                      <NodeShape {...attrMapper(v)} {...((highlightOnHover&&v.id===hoveredNode)&&hoverAttrMapper(v))} />
+                     //TODO make this a render prop for different bauble types
+                     //TODO add lable render prop for node lable
                  </Node>)
              }
              return all;

@@ -12,11 +12,15 @@ import {edgeFactory,rectangularLayout} from "../utils/layouts";
  */
 export default function FigTree(props){
 
-    const {layout,margins,width,height,tree,} = props;
+    const {layout,margins,width,height,tree} = props;
 
-    const {vertices,edges} = layout(tree);
 
-    const scales=useMemo(()=>{console.log("setting up scales");return setUpScales({width,height},margins,vertices)},[tree]);
+    //TODO conditional state management for tree;
+
+    const [Tree,updateTree]=useState(tree);
+    const {vertices,edges} = layout(Tree);
+
+    const scales=useMemo(()=>{console.log("setting up scales");return setUpScales({width,height},margins,vertices)},[Tree]);
 
     return(
             <g transform={`translate(${margins.left},${margins.top})`}>
@@ -26,6 +30,7 @@ export default function FigTree(props){
                         return React.cloneElement(child, {
                             vertices,
                             scales,
+                            updateTree
                         });
                         case "Branches":
                             return React.cloneElement(child, {
