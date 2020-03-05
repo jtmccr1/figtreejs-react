@@ -1,45 +1,49 @@
-import React,{useState,useMemo,useCallback} from 'react';
+import React,{useMemo,useReducer} from 'react';
 
 import {scaleLinear} from "d3-scale";
 import {extent} from "d3-array";
 import Branches from "./Baubles/Branches/Branches";
 import {edgeFactory,rectangularLayout} from "../utils/layouts";
+import {nodeReducer} from "../reducers/interactionReducer";
 
 /**
  * The FigTree component
  * This takes a tree and layout options. It calls the layout and handles state for this figure.
  * It also passes it's scales to it's children props as well as the edges to the branches and the nodes to the nodes.
  */
+const  initialState ={hovered:null,selected:[]};
+
+export const ScaleContext = React.createContext({x:(x)=>x});
+export const NodeContext = React.createContext("a");
 export default function FigTree(props){
 
     const {layout,margins,width,height,tree} = props;
 
-
     //TODO conditional state management for tree;
 
-    const [Tree,updateTree]=useState(tree);
-    const {vertices,edges} = layout(Tree);
+    const [NodeState,nodeDispatch]=useReducer(nodeReducer,initialState);
+    const {vertices,edges} = layout(tree);
 
-    const scales=useMemo(()=>{console.log("setting up scales");return setUpScales({width,height},margins,vertices)},[Tree]);
+    const scales=useMemo(()=>{console.log("setting up scales");return setUpScales({width,height},margins,vertices)},[tree]);
 
-    return(
+    return (
+        <ScaleContext.Provider value={scales}>
+            <NodeContext.Provider value={{state:NodeState,dispatch:nodeDispatch}}>
+
+            <rect x="0" y="0" width="100%" height="100%" fill="none" pointerEvents={"visible"} onClick={()=>nodeDispatch({type:"clearSelection"})}/>
             <g transform={`translate(${margins.left},${margins.top})`}>
                 {React.Children.map(props.children, (child, index) => {
                     switch(child.type.name){
                         case "Nodes":
                         return React.cloneElement(child, {
                             vertices,
-                            scales,
-                            updateTree
                         });
                         case "Branches":
                             return React.cloneElement(child, {
                                 edges,
-                                scales,
                             });
                         case "Axis":
                             return React.cloneElement(child, {
-                                scales,
                                 width,
                                 height,
                                 margins,
@@ -49,7 +53,10 @@ export default function FigTree(props){
                     }
                 }).reverse()}
             </g>
-    )
+            </NodeContext.Provider>
+            </ScaleContext.Provider>
+
+            )
 }
 function setUpScales(size,margins,vertices){
     const xdomain = extent(vertices.map(d=>d.x));

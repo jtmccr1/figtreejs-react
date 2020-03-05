@@ -1,3 +1,4 @@
+/*
 import ImmutableCladeCollection, {mergeClade, treeReducer} from "../src/utils/immutableCladeCollection"
 import {ImmutableTree,Type} from "../src/utils/Tree/immutableTree";
 
@@ -88,4 +89,4 @@ describe("Testing tree collection",()=>{
 
         expect(collection).toEqual(expectedOutput);
     })
-})
+})*/

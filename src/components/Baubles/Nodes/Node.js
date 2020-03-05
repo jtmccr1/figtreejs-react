@@ -1,6 +1,5 @@
 import React from "react"
 import {animated, useSpring} from "react-spring";
-import NodeShape from "./NodeShape";
 import {areEqualShallow} from "../../../utils/utilities";
 
 /**
@@ -9,11 +8,10 @@ import {areEqualShallow} from "../../../utils/utilities";
  * @return {*}
  */
 const basicNode =(props)=>{
-    const {x,y,classes,interactions} = props;
+    const {x,y,classes} = props;
     const position = useSpring({transform:`translate(${x},${y})`});
-
     return(
-        <animated.g className={`node ${classes.join(" ")} `} {...position} {...interactions} >
+        <animated.g className={`node ${classes.join(" ")} `} {...position} >
             {props.children}
         </animated.g>
     )
@@ -41,6 +39,6 @@ function samesies(prev,curr){
     }
 
 const Node = React.memo(basicNode,samesies);
-
+// const Node=basicNode;
 export default Node;
 
