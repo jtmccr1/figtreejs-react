@@ -15,6 +15,7 @@ const  initialState ={hovered:null,selected:[]};
 
 export const ScaleContext = React.createContext({x:(x)=>x});
 export const NodeContext = React.createContext("a");
+export const TreeContext = React.createContext("a");
 export default function FigTree(props){
 
     const {layout,margins,width,height,tree} = props;
@@ -29,6 +30,7 @@ export default function FigTree(props){
     return (
         <ScaleContext.Provider value={scales}>
             <NodeContext.Provider value={{state:NodeState,dispatch:nodeDispatch}}>
+                <TreeContext.Provider value={tree}>
 
             <rect x="0" y="0" width="100%" height="100%" fill="none" pointerEvents={"visible"} onClick={()=>nodeDispatch({type:"clearSelection"})}/>
             <g transform={`translate(${margins.left},${margins.top})`}>
@@ -53,6 +55,7 @@ export default function FigTree(props){
                     }
                 }).reverse()}
             </g>
+                </TreeContext.Provider>
             </NodeContext.Provider>
             </ScaleContext.Provider>
 

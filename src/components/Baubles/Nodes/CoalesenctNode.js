@@ -2,10 +2,16 @@ import React, {useContext,useMemo} from "react"
 import {useSpring,animated} from "react-spring";
 import {mapAttrsToProps} from "../../../utils/baubleHelpers";
 import {NodeContext} from "../../FigTree";
+import {TreeContext} from "../../FigTree";
+import {getNode} from "../../..";
+import {extent} from "d3-array";
 
-const NodeShape =(props)=>{
+export const CoalesenctNode =(props)=>{
+    //HOC for node logic
+    const tree = useContext(TreeContext);
     const {state,dispatch}=useContext(NodeContext);
-    const { vertex,attrs,selectedAttrs,hoveredAttrs} =props;
+
+    const { vertex,attrs,selectedAttrs,hoveredAttrs,layout} =props;
     const baseAttrMapper = useMemo(()=>mapAttrsToProps(attrs),[attrs]);
     const selectedAttrMapper = useMemo(()=>mapAttrsToProps(selectedAttrs),[selectedAttrs]);
     const hoveredAttrMapper = useMemo(()=>mapAttrsToProps(hoveredAttrs),[hoveredAttrs]);
@@ -20,11 +26,32 @@ const NodeShape =(props)=>{
         }
         return attrs;
     };
+
+    // needs tree
+    //TODO does this need to happen here? can I have a layout function that precalculates this inforamation.
+
+    const node = getNode(tree,vertex.id);
+    const vertices = layout(node).filter(v=>node.children.map(c=>c.id).includes(v.id));
+
+    const extentY=extent(vertices,v=>v.y);
+    const extentX=extent(vertices,v=>v.x);
+
+
+
+    // needs layout function
+
+    // coalescent Vertices have info about children
+    // x,y x1,y1
+    // x,y,x2,y2
+
+    // get children vertices
+    // make path
+
     let visibleProperties=attrMapper(vertex);
     visibleProperties= useSpring(visibleProperties);
 
 
-    return (<animated.circle className={"node-shape"} {...visibleProperties}
+    return (<animated.path className={"node-shape"} {...visibleProperties}
                              onMouseEnter={()=>dispatch({type:"hover",payload:vertex.id})}
                              onMouseLeave={()=>dispatch({type:"unhover"})}
                              onClick={()=>selectorLogic(state.selected,dispatch,vertex.id)}/>);
@@ -32,14 +59,15 @@ const NodeShape =(props)=>{
 };
 
 
-NodeShape.defaultProps={
-	attrs:{r:4,
-		fill:"steelblue",
-		strokeWidth:0,
-		stroke:'black'},
-	selectedAttrs:{},
-	hoveredAttrs:{}
+CoalesenctNode.defaultProps={
+    attrs:{
+        fill:"steelblue",
+        strokeWidth:0,
+        stroke:'black'},
+    selectedAttrs:{},
+    hoveredAttrs:{}
 };
+
 function selectorLogic(selection,dispatcher,vertexId){
     if(selection.length===1&&selection[0]===vertexId){
 
@@ -50,4 +78,3 @@ function selectorLogic(selection,dispatcher,vertexId){
 }
 
 
-export default React.memo(NodeShape);

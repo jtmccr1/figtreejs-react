@@ -5,7 +5,6 @@ import { getNodes} from "../Tree/treeSettersandGetters";
 
 export const rectangularLayout=(function() {
     const cache = new Map();
-
     return function rectangularLayout(tree, labelBelow = false) {
         if (!cache.has(tree)) {
             cache.set(tree, new Map())
