@@ -1,6 +1,7 @@
 import {makeVertexFromNode} from "./layoutHelpers";
 import {mean,max} from "d3-array";
-import { getNodes} from "../Tree/treeSettersandGetters";
+import {getDivergence, getNodes} from "../Tree/treeSettersandGetters";
+import {reduceIterator} from "../utilities";
 
 
 export const rectangularLayout=(function() {
@@ -102,3 +103,38 @@ function  makeEdge(source,target){
         }
     }
 }
+export function rectangularVertices(tree){
+    let currentY=-1;
+    const helper =(function() {
+        const cache=new Map(); // remade every layout but that's ok for now
+
+        return function helper(node,labelBelow=0){
+            if(cache.has(node)){
+                return cache.get(node);
+            }else{
+                const vertex = makeVertexFromNode(node,labelBelow);
+                vertex.x=getDivergence(tree,node);
+                vertex.y=node.children?
+                    mean(node.children.map((child,i)=>helper(child,child.children===null?0:i).y)):
+                    (currentY+=1);
+                vertex.node=node;
+                cache.set(node,vertex);
+                return vertex;
+            }
+        }
+    }());
+
+    return new Map(getNodes(tree).map(node=>[node,helper(node)]));
+}
+
+export function makeEdges(vertices){
+    return reduceIterator(vertices.keys(),(edges,node)=> {
+        node.children &&
+        node.children.map(child => makeEdge(vertices.get(node), vertices.get(child))).forEach(edge => edges.push(edge));
+        return edges;
+    },[])
+}
+
+
+
+

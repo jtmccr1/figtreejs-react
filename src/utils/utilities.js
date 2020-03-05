@@ -1,7 +1,6 @@
 //https://stackoverflow.com/questions/27936772/how-to-deep-merge-instead-of-shallow-merge
 import {timeParse,timeFormat} from "d3-time-format"
 import {mean} from "d3-array"
-import {produce} from "immer";
 
 export function isObject(item) {
     return (item && typeof item === 'object' && !Array.isArray(item));
@@ -123,4 +122,29 @@ export function mergeMaps(target,source,){
 export function setParentMap(map,child,parent){
         map.set(child.id,{node:child,parent:parent});
         return map;
+}
+
+export function extent(iterator,accessor=x=>x){
+    return reduceIterator(iterator,(acc,curr)=>{
+        const value = accessor(curr);
+        if(value<acc[0]){
+            acc[0]=value;
+        }
+        if(value>acc[1]){
+            acc[1]=value;
+        }
+        return acc
+    },[Infinity,-Infinity])
+}
+//https://stackoverflow.com/questions/43885365/using-map-on-an-iterator
+export function reduceIterator(iterator, reducer,startingValue=[]) {
+    let accumulator=startingValue;
+    while (true) {
+        let current = iterator.next();
+        if (current.done) {
+            return accumulator
+        }
+        accumulator=reducer(accumulator,current.value);
+
+    }
 }

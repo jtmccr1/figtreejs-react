@@ -3,18 +3,17 @@ import NodeShape from "./NodeShape";
 import Node from "./Node";
 import {mapAttrsToProps} from "../../../utils/baubleHelpers";
 import {ScaleContext} from "../../FigTree";
-
+import {reduceIterator} from "../../../utils/utilities";
 
 
 export default function Nodes(props){
     const scales = useContext(ScaleContext);
 
-
     const { filter,vertices,className} =props;
 
  return(
      <g className={className}>
-         {vertices.reduce((all,v)=>{
+         {reduceIterator(vertices.values(),(all,v)=>{
              if(filter(v)){
                  all.push( <Node key={`node-${v.id}`} classes={v.classes} x={scales.x(v.x)} y={scales.y(v.y)}>
                      {/*<NodeShape vertex={v} />*/}

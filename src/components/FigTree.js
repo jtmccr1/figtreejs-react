@@ -1,9 +1,9 @@
 import React,{useMemo,useReducer} from 'react';
 
 import {scaleLinear} from "d3-scale";
-import {extent} from "d3-array";
+import {extent} from "../utils/utilities";
 import Branches from "./Baubles/Branches/Branches";
-import {edgeFactory,rectangularLayout} from "../utils/layouts";
+import {makeEdges, rectangularVertices} from "../utils/layouts";
 import {nodeReducer} from "../reducers/interactionReducer";
 
 /**
@@ -23,7 +23,8 @@ export default function FigTree(props){
     //TODO conditional state management for tree;
 
     const [NodeState,nodeDispatch]=useReducer(nodeReducer,initialState);
-    const {vertices,edges} = layout(tree);
+    const vertices = layout(tree);
+    const edges = makeEdges(vertices);
 
     const scales=useMemo(()=>{console.log("setting up scales");return setUpScales({width,height},margins,vertices)},[tree]);
 
@@ -62,8 +63,8 @@ export default function FigTree(props){
             )
 }
 function setUpScales(size,margins,vertices){
-    const xdomain = extent(vertices.map(d=>d.x));
-    const ydomain =  extent(vertices.map(d=>d.y));
+    const xdomain = extent(vertices.values(),d=>d.x);
+    const ydomain =  extent(vertices.values(),d=>d.y);
 
     const x = scaleLinear()
         .domain(xdomain)
@@ -78,7 +79,7 @@ function setUpScales(size,margins,vertices){
 FigTree.defaultProps= {
     width: undefined, /** Width of svg */
     height: undefined,
-    layout: rectangularLayout,
+    layout: rectangularVertices,
     children: [<Branches/>],
     margins:{top:10,bottom:10,left:10,right:10}
 }

@@ -2,16 +2,17 @@ import React, {useContext,useMemo} from "react"
 import {useSpring,animated} from "react-spring";
 import {mapAttrsToProps} from "../../../utils/baubleHelpers";
 import {NodeContext} from "../../FigTree";
-import {TreeContext} from "../../FigTree";
-import {getNode} from "../../..";
-import {extent} from "d3-array";
+import {linkHorizontal} from "d3-shape";
 
+const link = linkHorizontal()
+    .x(function(d) { return d.x; })
+    .y(function(d) { return d.y; });
+//link({source:{x:50,y:50},target:{x:90,y:10}})+"v80"+link({source:{x:90,y:90},target:{x:50,y:50}})
 export const CoalesenctNode =(props)=>{
     //HOC for node logic
-    const tree = useContext(TreeContext);
     const {state,dispatch}=useContext(NodeContext);
 
-    const { vertex,attrs,selectedAttrs,hoveredAttrs,layout} =props;
+    const {vertex,targets,attrs,selectedAttrs,hoveredAttrs} =props;
     const baseAttrMapper = useMemo(()=>mapAttrsToProps(attrs),[attrs]);
     const selectedAttrMapper = useMemo(()=>mapAttrsToProps(selectedAttrs),[selectedAttrs]);
     const hoveredAttrMapper = useMemo(()=>mapAttrsToProps(hoveredAttrs),[hoveredAttrs]);
@@ -27,25 +28,12 @@ export const CoalesenctNode =(props)=>{
         return attrs;
     };
 
-    // needs tree
-    //TODO does this need to happen here? can I have a layout function that precalculates this inforamation.
 
-    const node = getNode(tree,vertex.id);
-    const vertices = layout(node).filter(v=>node.children.map(c=>c.id).includes(v.id));
+    const xs=extent(targets,d=>d.x);
+    const ys=extent(targets,d=>d.y);
 
-    const extentY=extent(vertices,v=>v.y);
-    const extentX=extent(vertices,v=>v.x);
+    target
 
-
-
-    // needs layout function
-
-    // coalescent Vertices have info about children
-    // x,y x1,y1
-    // x,y,x2,y2
-
-    // get children vertices
-    // make path
 
     let visibleProperties=attrMapper(vertex);
     visibleProperties= useSpring(visibleProperties);

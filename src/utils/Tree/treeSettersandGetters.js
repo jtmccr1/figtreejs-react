@@ -89,6 +89,7 @@ export function *getNodesIterator(tree){
 export function getNodes(tree){
     return [...getNodesIterator(tree)];
 }
+
 export function getRootToTipLengths(tree){
    return getNodes(tree).map(node=>getDivergence(tree,node))
 }
