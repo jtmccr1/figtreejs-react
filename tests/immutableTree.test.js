@@ -6,7 +6,7 @@ import {
     parseNewick,
     orderByNodeDensity,
     rotate,
-    collapseUncertainNode,
+    collapseUnsupportedNodes,
     annotateNode
 } from "../src/utils/Tree/treeOperations";
 import {
@@ -181,7 +181,7 @@ describe("Tree Tests",()=>{
         const s="((D:1,(B:1,C:1)0.3:1):1,A:1);";
         const tree = parseNewick(s,{labelName:"posterior"});
 
-        const collapsedTree=collapseUncertainNode(tree,(node)=>node.annotations.posterior && node.annotations.posterior <0.5);
+        const collapsedTree=collapseUnsupportedNodes(tree,(node)=>node.annotations.posterior && node.annotations.posterior <0.5);
         expect(getParent(collapsedTree,"D")).toBe(getParent(collapsedTree,"B"));
         expect(getNode(collapsedTree,"B").length).toEqual(getNode(tree,"B").length+getParent(tree,"B").length)
     });

@@ -150,7 +150,7 @@ export function rotate(tree,nodeId) {
     })
 }
 
-export function collapseUncertainNode(tree,predicate){
+export function collapseUnsupportedNodes(tree, predicate){
     const collapser = produce(draft=>{
         if(draft.children) {
             draft.children = draft.children.reduce((acc, child) => {

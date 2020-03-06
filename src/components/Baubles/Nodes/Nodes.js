@@ -1,39 +1,61 @@
-import React, {useMemo, useState, useCallback, useContext} from "react"
-import NodeShape from "./NodeShape";
+import React, {useMemo, useContext} from "react"
+import Circle from "./Circle";
 import Node from "./Node";
 import {mapAttrsToProps} from "../../../utils/baubleHelpers";
-import {LayoutContext, ScaleContext} from "../../FigTree";
+import {LayoutContext, NodeContext, ScaleContext} from "../../FigTree";
 import {reduceIterator} from "../../../utils/utilities";
 
+function NodesHOC(ShapeComponent) {
+    return function BaseNodes(props) {
+        const {scales} = useContext(ScaleContext);
+        const {vertices} = useContext(LayoutContext);
+        const {state, dispatch} = useContext(NodeContext);
 
-export default function Nodes(props){
-    const {scales} = useContext(ScaleContext);
-    const {vertices} = useContext(LayoutContext);
-    const { filter,className} =props;
+        const {filter, className, attrs, selectedAttrs, hoveredAttrs} = props;
 
- return(
-     <g className={className}>
-         {reduceIterator(vertices.values(),(all,v)=>{
-             if(filter(v)){
-                 all.push( <Node key={`node-${v.id}`} classes={v.classes} x={scales.x(v.x)} y={scales.y(v.y)}>
-                     {/*<NodeShape vertex={v} />*/}
-                     {React.Children.map(props.children, child=>React.cloneElement(child,{vertex:v}))}
-                 </Node>)
-             }
-             return all;
-         },[])}
-     </g>
- )
+        const baseAttrMapper = useMemo(() => mapAttrsToProps(attrs), [attrs]);
+        const selectedAttrMapper = useMemo(() => mapAttrsToProps(selectedAttrs), [selectedAttrs]);
+        const hoveredAttrMapper = useMemo(() => mapAttrsToProps(hoveredAttrs), [hoveredAttrs]);
+
+        function attrMapper(v) {
+            let attrs = baseAttrMapper(v);
+            if (state.hovered === v.id) {
+                attrs = {...attrs, ...hoveredAttrMapper(v)};
+            }
+            if (state.selected.includes(v.id)) {
+                attrs = {...attrs, ...selectedAttrMapper(v)};
+            }
+            return attrs;
+        };
+
+        function interactionMapper(v) {
+            return {
+                onMouseEnter: () => dispatch({type: "hover", payload: v.id}),
+                onMouseLeave: () => dispatch({type: "unhover"}),
+                onClick: () => selectorLogic(state.selected, dispatch, v.id)
+            }
+        }
+
+        function shapeProps(v) {
+            return {attrs: attrMapper(v), interactions: interactionMapper(v)}
+        }
+
+//TODO add label as render prop?
+        return (
+            <g className={className}>
+                {reduceIterator(vertices.values(), (all, v) => {
+                    if (filter(v)) {
+                        all.push(
+                            <Node key={`node-${v.id}`} classes={v.classes} x={scales.x(v.x)} y={scales.y(v.y)}>
+                            <ShapeComponent {...shapeProps(v)}/>
+                        </Node>)
+                    }
+                    return all;
+                }, [])}
+            </g>
+        )
+    }
 }
-
-Nodes.defaultProps={
-    filter:(v)=>true,
-    vertices:[],
-    children:[<NodeShape/>],
-    className:"node-layer",
-};
-
-
 
 function selectorLogic(selection,dispatcher,vertexId){
     if(selection.length===1&&selection[0]===vertexId){
@@ -43,4 +65,14 @@ function selectorLogic(selection,dispatcher,vertexId){
         dispatcher({type:"select",payload:vertexId})
     }
 }
+
+const CircleNodes = NodesHOC(Circle);
+CircleNodes.defaultProps={
+    filter:(v)=>true,
+    attrs:{r:2},
+    selectedAttrs:{},
+    hoveredAttrs:{}
+}
+ const Nodes={Circle:CircleNodes};
+export default Nodes;
 // Nested renders for selected and hovered nodes
