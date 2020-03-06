@@ -27,23 +27,23 @@ import {quantize, interpolate, interpolateRound} from "d3-interpolate";
 export default function Legend({scale,pos,width,height,direction,title,ticks} ){
 
     let x;
-    let ramper;
+    let fillRamper;
     //Continuous
     if(scale.interpolate){
         const n = Math.min(scale.domain().length,scale.range().length);
         x = scale.copy().rangeRound(quantize(interpolate(0, width), n)); // for numbers
-        ramper = scale.copy().domain(quantize(interpolate(0, 1), n)) // for colors
+        fillRamper = scale.copy().domain(quantize(interpolate(0, 1), n)) // for colors
     }  // Sequential
     else if (scale.interpolator) {
         x= Object.assign(scale.copy().interpolator(interpolateRound(0,width)), // update interpolator to work on x scale
             {range(){return[0,width]}}) //vc assigns range function so we can use it later!
-        ramper=scale.interpolator();
+        fillRamper=scale.interpolator();
     }
 
     return(
         <g className={"legend"} transform={`translate(${pos.x},${pos.y})`}>
             <text transform={`translate(0,-6)`}>{title}</text>
-            <ColorRamp {...{ramper,width,height}}/>
+            <ColorRamp {...{fillRamper: fillRamper,width,height}}/>
             <Axis transform={`translate(${0},${height})`} {...{width,height,direction,ticks}} scale={x} />
         </g>
     )
