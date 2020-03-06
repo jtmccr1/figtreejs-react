@@ -2,14 +2,14 @@ import React, {useMemo, useState, useCallback, useContext} from "react"
 import NodeShape from "./NodeShape";
 import Node from "./Node";
 import {mapAttrsToProps} from "../../../utils/baubleHelpers";
-import {ScaleContext} from "../../FigTree";
+import {LayoutContext, ScaleContext} from "../../FigTree";
 import {reduceIterator} from "../../../utils/utilities";
 
 
 export default function Nodes(props){
     const scales = useContext(ScaleContext);
-
-    const { filter,vertices,className} =props;
+    const {vertices} = useContext(LayoutContext);
+    const { filter,className} =props;
 
  return(
      <g className={className}>

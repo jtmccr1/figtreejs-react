@@ -5,13 +5,13 @@ import BranchPath from "./BranchPath";
 import {mapAttrsToProps} from "../../../utils/baubleHelpers";
 
 import {ScaleContext} from "../../FigTree.js";
+import {LayoutContext} from "../../FigTree";
 
 export default function Branches(props){
 
     const scales = useContext(ScaleContext);
-
-
-    const {edges,attrs,shape,filter}=props;
+    const {edges} = useContext(LayoutContext);
+    const {attrs,shape,filter}=props;
     const attrMapper = useMemo (()=>mapAttrsToProps(attrs),[attrs]);
 
     return(<g className={"branch-layer"}>
