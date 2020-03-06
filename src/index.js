@@ -14,9 +14,9 @@ import Legend from "../src/components/decorations/Legend/Legend";
 import KDE from "./components/decorations/Plots/KDE";
 import {parseNewick,parseNexus} from "./utils/Tree/treeOperations";
 import{getParent,getNode,getDivergence,getNodes,getTips,getRootToTipLengths} from "./utils/Tree/treeSettersandGetters"
-import {orderByNodeDensity} from "./utils/Tree/treeOperations";
+import {orderByNodeDensity,annotateNode} from "./utils/Tree/treeOperations";
 
 export {Branches,BranchPath,Nodes,NodeShape,customDateFormater,dateToDecimal,decimalToDate,Axis,AxisBars,Legend,
     FigTree,ImmutableTree,ImmutableCladeCollection,rectangularLayout,edgeFactory,KDE,getParent,getNode,getDivergence,getNodes,getTips,
-    orderByNodeDensity,parseNewick,parseNexus,getRootToTipLengths,CoalescentNode,FadedCoalescentNode,FadeInBranchPath
+    orderByNodeDensity,parseNewick,parseNexus,getRootToTipLengths,CoalescentNode,FadedCoalescentNode,FadeInBranchPath,annotateNode
 }

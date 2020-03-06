@@ -17,13 +17,13 @@ export const ScaleContext = React.createContext({x:(x)=>x});
 export const NodeContext = React.createContext("a");
 export const TreeContext = React.createContext("a");
 export const LayoutContext = React.createContext({vertices:new Map(),edges:[]});
+
 export default function FigTree(props){
 
     const {layout,margins,width,height,tree} = props;
     const [NodeState,nodeDispatch]=useReducer(nodeReducer,initialState);
     const vertices = useMemo(()=>layout(tree),[tree]);
     const edges = makeEdges(vertices);
-    console.log(edges)
     const scales=useMemo(()=>{return setUpScales({width,height},margins,vertices)},[tree]);
 
     return (
@@ -31,7 +31,7 @@ export default function FigTree(props){
             <NodeContext.Provider value={{state:NodeState,dispatch:nodeDispatch}}>
                 <TreeContext.Provider value={tree}>
                     <LayoutContext.Provider value={{vertices:vertices,edges:edges}}>
-                        <rect x="0" y="0" width="100%" height="100%" fill="none" pointerEvents={"visible"} onClick={()=>nodeDispatch({type:"clearSelection"})}/>
+                        {/*<rect x="0" y="0" width="100%" height="100%" fill="none" pointerEvents={"visible"} onClick={()=>nodeDispatch({type:"clearSelection"})}/>*/}
                         <g transform={`translate(${margins.left},${margins.top})`}>
                             {React.Children.map(props.children, (child, index) => {
                                 switch(child.type.name) {
