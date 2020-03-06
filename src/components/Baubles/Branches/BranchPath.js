@@ -1,6 +1,7 @@
 import React from "react";
 import {curveStepBefore, line} from "d3-shape";
 import{useSpring,animated} from "react-spring";
+import withLinearGradient from "../../HOC/WithLinearGradient";
 
 const BranchPath=(props)=>{
 
@@ -33,12 +34,36 @@ function branchPathGenerator({x0,y0,x1,y1}) {
                 ]))
         // return (output)
 }
-export default React.memo(BranchPath)
+export default BranchPath
 
 BranchPath.defaultProps={
     strokeWidth:2,
     stroke:"#541753",
     strokeLinecap:"round",
     strokeLinejoin:"round"
-}
+};
 
+export const FadeInBranchPath=withLinearGradient((props)=>{
+    let {x0,y0,x1,y1,attrs} = props;
+    let path ={d:branchPathGenerator({x0,y0,x1,y1})};
+    console.log(attrs)
+    return(<path  {...attrs}  {...path} fill={"none"} />)
+});
+FadeInBranchPath.defaultProps={
+    x1:"0%",
+    x2:"100%",
+    y1:"0%",
+    y2:"0%",
+    n:10,
+    fillRamper:i=>"#541753",
+    opacityRamper:i=>i<0.5?i/2:i,
+    gradientAttribute: "stroke",
+    attrs:{
+        strokeWidth:2,
+        stroke:"#541753",
+        strokeLinecap:"round",
+        strokeLinejoin:"round"
+    }
+   //issure with attrss
+
+}

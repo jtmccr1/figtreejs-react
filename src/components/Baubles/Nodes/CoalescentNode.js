@@ -10,7 +10,7 @@ import withLinearGradient from "../../HOC/WithLinearGradient";
 const basicCalescentNode=(props)=>{
     //HOC for node logic
     const {vertices} =  useContext(LayoutContext);
-    const scales = useContext(ScaleContext);
+    const {scales} = useContext(ScaleContext);
 
     const {vertex,attrs} =props;
     const baseAttrMapper = useMemo(()=>mapAttrsToProps(attrs),[attrs]);
@@ -51,7 +51,8 @@ const link = linkHorizontal()
     .x(function(d) { return d.x; })
     .y(function(d) { return d.y; });
 //link({source:{x:50,y:50},target:{x:90,y:10}})+"v80"+link({source:{x:90,y:90},target:{x:50,y:50}})
-function makeCoalescent(vertex,targets,scales,slope=4){
+function makeCoalescent(vertex,targets,scales,slope=5){
+    //TODO slope based on min
     const x=scales.x(min(targets,d=>d.x)-vertex.x);
     const y1=-scales.y((0.4+vertex.y-min(targets,d=>d.y)));
     const y2 = scales.y(max(targets,d=>d.y)-vertex.y+0.4);

@@ -2,7 +2,13 @@ import {splitAtExposedCommas} from "../src/utils/Tree/immutableTree";
 import {Type} from "../src/utils/Tree/immutableTree";
 import {timeParse} from "d3-time-format";
 
-import {parseNewick,orderByNodeDensity,rotate} from "../src/utils/Tree/treeOperations";
+import {
+    parseNewick,
+    orderByNodeDensity,
+    rotate,
+    collapseUncertainNode,
+    annotateNode
+} from "../src/utils/Tree/treeOperations";
 import {
     getDivergence,
     getNode,
@@ -165,16 +171,39 @@ describe("Tree Tests",()=>{
         expect(newT).not.toBe(tree);
         expect(getParent(newT,"D")).not.toBe(getParent(tree,"D"));
         expect(getNode(newT,"D")).not.toBe(getNode(tree,"D"));
-        expect(getNode(newT,"node2")).toBe(getParent(newT,"D"))
+        expect(getNode(newT,"node2")).toBe(getParent(newT,"D"));
         expect(getNode(newT,"node1")).toBe(getNode(tree,"node1"))
 
-    })
+    });
 
-    test("roteNodes",()=>{
+
+    test("collapse node",()=>{
+        const s="((D:1,(B:1,C:1)0.3:1):1,A:1);";
+        const tree = parseNewick(s,{labelName:"posterior"});
+
+        const collapsedTree=collapseUncertainNode(tree,(node)=>node.annotations.posterior && node.annotations.posterior <0.5);
+        expect(getParent(collapsedTree,"D")).toBe(getParent(collapsedTree,"B"));
+        expect(getNode(collapsedTree,"B").length).toEqual(getNode(tree,"B").length+getParent(tree,"B").length)
+    });
+
+    test("rotate Nodes",()=>{
         const s="((D:1,(B:1,C:1):1):1,A:1);";
         const tree = parseNewick(s);
         const rotatedTree=rotate(tree,getParent(tree,"D").id);
         expect(getNode(rotatedTree,getParent(tree,"D").id).children).toEqual([...getNode(tree,getParent(tree,"D").id).children].reverse())
+    })
+
+    test("annotate nodes",()=>{
+        const s="((D:1,(B:1,C:1):1):1,A:1);";
+        const tree = parseNewick(s);
+
+        const annotatedTree= annotateNode(tree,"A",{"Host":"Bat"});
+
+        expect(tree).not.toBe(annotatedTree);
+        expect(getNode(tree,"B")).toBe(getNode(annotatedTree,"B"));
+        expect(getNode(annotatedTree,"A").annotations).toEqual({Host:"Bat"})
+        expect(getNode(annotatedTree,"A").annotationTypes).toEqual({Host:{type:Type.DISCRETE,values: new Set(["Bat"])}})
+        expect(annotatedTree.annotationTypes).toEqual({Host:{type:Type.DISCRETE,values: new Set(["Bat"])}})
     })
 });
 

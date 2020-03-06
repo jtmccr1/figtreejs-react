@@ -3,7 +3,7 @@ import {line} from "d3-shape"
 import {mean,quantile,range} from "d3-array"
 import {format} from "d3-format"
 
-
+//TODO update for context
 export  default function Axis(props) {
 
     const {scales,direction,title,ticks,width,height,margins} = props;

@@ -21,36 +21,36 @@ export default function FigTree(props){
 
     const {layout,margins,width,height,tree} = props;
     const [NodeState,nodeDispatch]=useReducer(nodeReducer,initialState);
-    const vertices = layout(tree);
+    const vertices = useMemo(()=>layout(tree),[tree]);
     const edges = makeEdges(vertices);
-
-    const scales=useMemo(()=>{console.log("setting up scales");return setUpScales({width,height},margins,vertices)},[tree]);
+    console.log(edges)
+    const scales=useMemo(()=>{return setUpScales({width,height},margins,vertices)},[tree]);
 
     return (
-        <ScaleContext.Provider value={scales}>
+        <ScaleContext.Provider value={{scales,width,height,margins}}>
             <NodeContext.Provider value={{state:NodeState,dispatch:nodeDispatch}}>
                 <TreeContext.Provider value={tree}>
                     <LayoutContext.Provider value={{vertices:vertices,edges:edges}}>
-
-            <rect x="0" y="0" width="100%" height="100%" fill="none" pointerEvents={"visible"} onClick={()=>nodeDispatch({type:"clearSelection"})}/>
-            <g transform={`translate(${margins.left},${margins.top})`}>
-                {React.Children.map(props.children, (child, index) => {
-                    switch(child.type.name){
-                        case "Axis":
-                            return React.cloneElement(child, {
-                                width,
-                                height,
-                                margins,
-                            });
-                        default:
-                           return child;
-                    }
-                }).reverse()}
-            </g>
-                </LayoutContext.Provider>
+                        <rect x="0" y="0" width="100%" height="100%" fill="none" pointerEvents={"visible"} onClick={()=>nodeDispatch({type:"clearSelection"})}/>
+                        <g transform={`translate(${margins.left},${margins.top})`}>
+                            {React.Children.map(props.children, (child, index) => {
+                                switch(child.type.name) {
+                                    //update this to use the data in the context
+                                    case "Axis":
+                                        return React.cloneElement(child, {
+                                            width,
+                                            height,
+                                            margins,
+                                        });
+                                    default:
+                                        return child;
+                                }
+                            }).reverse()}
+                        </g>
+                    </LayoutContext.Provider>
                 </TreeContext.Provider>
             </NodeContext.Provider>
-            </ScaleContext.Provider>
+        </ScaleContext.Provider>
 
             )
 }

@@ -1,7 +1,7 @@
 import {ImmutableTree} from "./utils/Tree/immutableTree";
 import ImmutableCladeCollection from "./utils/immutableCladeCollection";
 import Branches from "./components/Baubles/Branches/Branches";
-import BranchPath from "./components/Baubles/Branches/BranchPath";
+import BranchPath,{FadeInBranchPath} from "./components/Baubles/Branches/BranchPath";
 import Nodes from "./components/Baubles/Nodes/Nodes"
 import NodeShape from "./components/Baubles/Nodes/NodeShape";
 import CoalescentNode,{FadedCoalescentNode} from "./components/Baubles/Nodes/CoalescentNode"
@@ -18,5 +18,5 @@ import {orderByNodeDensity} from "./utils/Tree/treeOperations";
 
 export {Branches,BranchPath,Nodes,NodeShape,customDateFormater,dateToDecimal,decimalToDate,Axis,AxisBars,Legend,
     FigTree,ImmutableTree,ImmutableCladeCollection,rectangularLayout,edgeFactory,KDE,getParent,getNode,getDivergence,getNodes,getTips,
-    orderByNodeDensity,parseNewick,parseNexus,getRootToTipLengths,CoalescentNode,FadedCoalescentNode
+    orderByNodeDensity,parseNewick,parseNexus,getRootToTipLengths,CoalescentNode,FadedCoalescentNode,FadeInBranchPath
 }

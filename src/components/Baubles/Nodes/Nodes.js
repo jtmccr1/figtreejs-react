@@ -7,7 +7,7 @@ import {reduceIterator} from "../../../utils/utilities";
 
 
 export default function Nodes(props){
-    const scales = useContext(ScaleContext);
+    const {scales} = useContext(ScaleContext);
     const {vertices} = useContext(LayoutContext);
     const { filter,className} =props;
 
@@ -18,8 +18,6 @@ export default function Nodes(props){
                  all.push( <Node key={`node-${v.id}`} classes={v.classes} x={scales.x(v.x)} y={scales.y(v.y)}>
                      {/*<NodeShape vertex={v} />*/}
                      {React.Children.map(props.children, child=>React.cloneElement(child,{vertex:v}))}
-                     {/*//TODO make this a render prop for different bauble types*/}
-                     {/*//TODO add lable render prop for node lable*/}
                  </Node>)
              }
              return all;

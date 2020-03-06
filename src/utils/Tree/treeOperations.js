@@ -1,4 +1,4 @@
-import { getNode, getParent, getTips} from "./treeSettersandGetters";
+import {getNode, getParent, getTips} from "./treeSettersandGetters";
 
 import {
     getDate,
@@ -145,10 +145,46 @@ export function orderByNodeDensity(tree,increasing = true) {
 
 export function rotate(tree,nodeId) {
     return produce(tree,draft=>{
-        const node= getNode(draft,nodeId)
+        const node= getNode(draft,nodeId);
         node.children.reverse();
     })
 }
+
+export function collapseUncertainNode(tree,predicate){
+    const collapser = produce(draft=>{
+        if(draft.children) {
+            draft.children = draft.children.reduce((acc, child) => {
+                if (predicate(child)) {
+                    child.children.forEach(kid=>{kid.length+=child.length;acc.push(kid)});
+                }else{
+                    acc.push(child);
+                }
+                return acc;
+            },[]);
+            //TODO there could be a better way to pass the new children to the parent;
+            draft.children.forEach((child,i)=>draft.children[i]=collapser(child));
+        }
+    });
+    return collapser(tree);
+}
+
+
+export function annotateNode(tree,nodeId,annotation){
+    return produce(tree,draft=>{
+            let node=getNode(draft,nodeId);
+            for(const [key,value] of Object.entries(annotation)){
+                node.annotations[key]=value;
+            }
+            node.annotationTypes = typeAnnotations(node.annotations);
+            let parent = getParent(draft,node.id);
+            while(parent){
+                parent.annotationTypes=reconcileAnnotations(getNode(draft,node.id).annotationTypes,parent.annotationTypes)
+                node=parent;
+                parent = getParent(draft,node.id);
+            }
+    })
+}
+
 //
 //
 // function orderChildren(tree,increasing){
