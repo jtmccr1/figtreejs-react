@@ -5,7 +5,10 @@ import {LayoutContext, NodeContext, ScaleContext} from "../../FigTree";
 import {linkHorizontal} from "d3-shape";
 import {max, min} from "d3-array";
 import withLinearGradient from "../../HOC/WithLinearGradient";
-
+//TODO make edges from vertices
+/*
+TODO unify edge and vertex opacity edge gradients can get this from where the last point is
+ */
 
 const basicCalescentNode=(props)=>{
     //HOC for node logic

@@ -1,29 +1,30 @@
-import React from 'react'
+import React,{useContext} from 'react'
 import {line} from "d3-shape"
 import {mean,quantile,range} from "d3-array"
 import {format} from "d3-format"
-
+import {ScaleContext} from "../../FigTree";
 //TODO update for context
 export  default function Axis(props) {
 
-    const {scales,direction,title,ticks,width,height,margins} = props;
+    const {scales,width,height,margins}=useContext(ScaleContext);
+    const {direction,title,ticks,gap} = props;
 
-    let scale = props.scale === undefined?(direction==="horizontal"?scales.x:scales.y):props.scale;
-
-
+    const scale = makeAxisScale(props,scales);
     // scaleSequentialQuantile doesn’t implement tickValues or tickFormat.
     let tickValues;
     if (!scale.ticks) {
-        console.log("quantile")
             tickValues = range(ticks.number).map(i => quantile(scale.domain(), i / (ticks.number - 1)));
     }else{
         tickValues = scale.ticks(ticks.number);
     }
 
+    const transform=direction==="horizontal"? `translate(${0},${height-margins.bottom-margins.top+gap})`:`translate(${-1*gap},${0})`;
 
-//TODO break this into parts
+
+//TODO break this into parts HOC with logic horizontal/ vertical axis ect.
     return(
-        <g className={"axis"} transform={props.transform}>
+        <g className={"axis"} transform={transform}>
+            {/*This is for Bars*/}
             {React.Children.toArray(props.children).map((child, index) => {
                 return React.cloneElement(child, {
                     scale,
@@ -31,6 +32,7 @@ export  default function Axis(props) {
                     height,
                     margins,
                     tickValues,
+                    gap
                 });
             })}
             <path d={getPath(scale,direction)} stroke={"black"}/>
@@ -39,7 +41,8 @@ export  default function Axis(props) {
                    return(
                        <g key={i} transform={`translate(${(direction==="horizontal"?scale(t):0)},${(direction==="horizontal"?0:scale(t))})`}>
                         <line {...getTickLine(ticks.length,direction)} stroke={"black"}/>
-                        <text transform={`translate(${(direction==="horizontal"?0:ticks.padding)},${(direction==="horizontal"?ticks.padding:0)})`} textAnchor={"middle"}>{ticks.format(t)}</text>
+                        <text transform={`translate(${(direction==="horizontal"?0:ticks.padding)},${(direction==="horizontal"?ticks.padding:0)})`}
+                              textAnchor={"middle"} alignmentBaseline={"middle"}>{ticks.format(t)}</text>
                     </g>
                    )
                 })}
@@ -53,13 +56,16 @@ export  default function Axis(props) {
 
     )
 }
-
+//TODO merge these in instead of overwriting;
 Axis.defaultProps= {
-    scale: undefined,
-    scales:{x:undefined,y:undefined},
+    offsetBy:0,
+    scaleBy:1,
+    reverse:false,
+    gap:5,
     title: {text: "", padding: 40, style: {}},
     ticks: {number: 5, format: format(".1f"), padding: 20, style: {}, length: 6},
     direction: "horizontal",
+    scale:undefined,
 };
 
 function getPath(scale,direction){
@@ -78,4 +84,28 @@ function getTickLine(length,direction){
         return{x1:0,y1:0,y2:0,x2:-1*length}
 
     }
+}
+
+/**
+ * A helper function to make the scale used in the axis. if supplied by props then no modifications are
+ * applied.
+ * @param props
+ * @param contextScales
+ * @returns {*}
+ */
+function makeAxisScale(props,contextScales) {
+    const {reverse, offsetBy, scaleBy, scale, direction} = props;
+
+    const axisScale = (scale === undefined ? (direction === "horizontal" ? contextScales.x : contextScales.y) : scale).copy();
+    if(scale===undefined) {
+        if (reverse) {
+            axisScale.domain(axisScale.domain().reverse());
+        }
+        return axisScale.domain(axisScale.domain().map(d => (d + offsetBy) * scaleBy));
+    }else{
+        return axisScale
+    }
+
+
+
 }

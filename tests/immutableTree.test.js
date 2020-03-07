@@ -186,6 +186,15 @@ describe("Tree Tests",()=>{
         expect(getNode(collapsedTree,"B").length).toEqual(getNode(tree,"B").length+getParent(tree,"B").length)
     });
 
+    test("recursive collapse",()=>{
+        const t={id:"1",children:[
+                {id:2,length:1,p:0.1,children:[{id:"a",length:1},
+                        {id:3,length:1,p:0.1,children:[{id:"a2",length:1},{id:"b",length:1}]}
+                    ]},
+                {id:"c",length:1}
+            ]}
+            expect(collapseUnsupportedNodes(t,n=>n.p<0.5).children.length).toEqual(4)
+    });
     test("rotate Nodes",()=>{
         const s="((D:1,(B:1,C:1):1):1,A:1);";
         const tree = parseNewick(s);

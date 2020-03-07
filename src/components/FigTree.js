@@ -5,6 +5,7 @@ import {extent} from "../utils/utilities";
 import Branches from "./Baubles/Branches/Branches";
 import {makeEdges, rectangularVertices} from "../utils/layouts";
 import {nodeReducer} from "../reducers/interactionReducer";
+import {parseNewick} from "../utils/Tree/treeOperations";
 
 /**
  * The FigTree component
@@ -13,9 +14,12 @@ import {nodeReducer} from "../reducers/interactionReducer";
  */
 const  initialState ={hovered:null,selected:[]};
 
-export const ScaleContext = React.createContext({x:(x)=>x});
-export const NodeContext = React.createContext("a");
-export const TreeContext = React.createContext("a");
+export const ScaleContext = React.createContext(
+    {scales:{x:scaleLinear().domain([0,100]).range([0,230]),y:scaleLinear().domain([0,100]).range([0,240])},
+        width:300,height:300,margins:{top:10,bottom:50,left:60,right:20}
+    });
+export const NodeContext = React.createContext({nodeState:initialState,dispatch:nodeReducer});
+export const TreeContext = React.createContext(parseNewick(    '((((((virus1:0.1,virus2:0.12)0.95:0.08,(virus3:0.011,virus4:0.0087)1.0:0.15)0.65:0.03,virus5:0.21)1.0:0.2,(virus6:0.45,virus7:0.4)0.51:0.02)1.0:0.1,virus8:0.4)1.0:0.1,(virus9:0.04,virus10:0.03)1.0:0.6);'));
 export const LayoutContext = React.createContext({vertices:new Map(),edges:[]});
 
 export default function FigTree(props){
@@ -23,7 +27,7 @@ export default function FigTree(props){
     const {layout,margins,width,height,tree} = props;
     const [NodeState,nodeDispatch]=useReducer(nodeReducer,initialState);
     const vertices = useMemo(()=>layout(tree),[tree]);
-    const edges = makeEdges(vertices);
+    const edges = useMemo(()=>makeEdges(vertices),[vertices]);
     const scales=useMemo(()=>{return setUpScales({width,height},margins,vertices)},[tree]);
 
     return (

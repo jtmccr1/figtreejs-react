@@ -153,14 +153,23 @@ export function rotate(tree,nodeId) {
 export function collapseUnsupportedNodes(tree, predicate){
     const collapser = produce(draft=>{
         if(draft.children) {
-            draft.children = draft.children.reduce((acc, child) => {
-                if (predicate(child)) {
-                    child.children.forEach(kid=>{kid.length+=child.length;acc.push(kid)});
-                }else{
-                    acc.push(child);
-                }
-                return acc;
-            },[]);
+            let lookAgain=false;
+            do {
+                lookAgain=false;
+                draft.children = draft.children.reduce((acc, child) => {
+                    if (predicate(child)) {
+                        lookAgain=true; // collapsed node so need to see if this one is valid too. look again
+                        child.children.forEach(kid => {
+                            kid.length += child.length;
+                            acc.push(kid)
+                        });
+                    } else {
+                        acc.push(child);
+                    }
+                    return acc;
+                }, []);
+            }while(lookAgain);
+
             //TODO there could be a better way to pass the new children to the parent;
             draft.children.forEach((child,i)=>draft.children[i]=collapser(child));
         }
