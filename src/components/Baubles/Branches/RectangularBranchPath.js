@@ -6,8 +6,8 @@ import withLinearGradient from "../../HOC/WithLinearGradient";
 const RectangularBranchPath=(props)=>{
     let {x0,y0,x1,y1,edge,...attrs} = props;
     let path ={d:branchPathGenerator({x0,y0,x1,y1})};
-    const allAttrs= useSpring({...attrs});
-    return(<animated.path {...allAttrs}  {...path} fill={"none"} />)
+    // const allAttrs= useSpring({...attrs});
+    return(<animated.path {...attrs}  {...path} fill={"none"} />)
 };
 
 function branchPathGenerator({x0,y0,x1,y1}) {
@@ -31,26 +31,41 @@ export const FadeInBranchPath=withLinearGradient((props)=>{
     return(<path  {...attrs}  {...path} fill={"none"} />)
 });
 
+const logisticRamp=logisticGrowth(1,0.9,10);
 
 
 import {LayoutContext,ScaleContext} from "../../FigTree";
 import {coalescentPath, makeCoalescent} from "../Nodes/CoalescentShape";
-import {max, min} from "d3-array";
+import {extent, max, min} from "d3-array";
 
 function CoalescentBranchPathHOC(RegularPath){
-    // TODO memoize upto source and taget since its called for all sibling and is the same
+    // TODO memoize up to source and taget since its called for all sibling and is the same
     return function CoalescentBP(props){
         const {vertices} =  useContext(LayoutContext);
         const {scales} = useContext(ScaleContext);
-        const {edge,y1,y0} =props;
+        const {edge,y1,y0,...attrs} =props;
         const vertex = vertices.get(edge.v0.node);
         const targets = vertex.node.children.map(child=>vertices.get(child));
         const source = {x:0,y:y0-y1};
         const target = {x:scales.x(max(targets,d=>d.x)-vertex.x),
-                        y: scales.y((min(targets,d=>d.y)))-y1};
+                        y: scales.y((min(targets,d=>d.y))-0.4)-y1};
 
 
-        const clipPath=coalescentPath(source,target);
+        const targetRange = extent(targets,d=>d.x-vertex.x);
+        const thisTarget = vertices.get(edge.v1.node);
+        // get 1/2 xmin  in terms of total and 3/4 min
+    // TODO make functional this is repeated in coalescent shape and has too many magic numbers
+        const slope=targetRange[1]/(targetRange[0]/1);
+        const fadedIn = (targetRange[0]*15/16 / (thisTarget.x - vertex.x));
+
+
+        const {full:clipPath}=coalescentPath(source,target,slope);
+        const colorStops = [];
+
+        for( let i=0;i<11;i++){
+            const style={stopColor:attrs.stroke,stopOpacity:logisticRamp(i/10)};
+            colorStops.push( <stop key={i} offset={`${i/(10)}`} {...style}/>)
+        }
 
         return (
             <g>
@@ -58,10 +73,13 @@ function CoalescentBranchPathHOC(RegularPath){
                 <clipPath id={`clipPathEdge${edge.v1.id}`}>
                     <path d={clipPath}/>
                 </clipPath>
+                <linearGradient id={`gradCoal${edge.v1.id}`} x1={"0%"} y1={"0%"} x2={`${fadedIn*100}%`} y2={"0%"}>
+                    {colorStops}
+                </linearGradient>
             </defs>
                 <g clipPath={ `url(#clipPathEdge${edge.v1.id})`} >
                 {/*<g>*/}
-                <RectangularBranchPath {...props}/>
+                <RectangularBranchPath {...props} stroke={`url(#gradCoal${edge.v1.id})`}/>
                 </g>
         </g>
         )
@@ -71,6 +89,14 @@ function CoalescentBranchPathHOC(RegularPath){
 
 export const CoalescentBranch = CoalescentBranchPathHOC(RectangularBranchPath);
 
+
+
+function logisticGrowth(L,midpoint,k){
+    return function(x){
+        return L/(1+Math.exp(-1*k*(x-midpoint)))
+    }
+
+}
 // FadeInBranchPath.defaultProps={
 //     x1:"0%",
 //     x2:"100%",
