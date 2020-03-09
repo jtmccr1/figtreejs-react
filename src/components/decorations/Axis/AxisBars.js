@@ -19,7 +19,7 @@ export  default function AxisBars(props) {
 }
 
 AxisBars.defaultProps={
-    evenFill:"#DCDCDC",
+    evenFill:"#EDEDED",
     oddFill:"none",
     attrs:{
         rx:2,

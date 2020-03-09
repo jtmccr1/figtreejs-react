@@ -64,17 +64,19 @@ const link = linkHorizontal()
     .x(function(d) { return d.x; })
     .y(function(d) { return d.y; });
 
-export function coalescentPath(source,target,slope=10){
+export function coalescentPath(source,target,slope=10,startWidth=2){
    const adjustedTarget={...target,x:target.x/slope};
    const inverseTarget = {...adjustedTarget,y:source.y  -(adjustedTarget.y-source.y)};
-    const topD=link({source:source,target:adjustedTarget});
+   const start = {...source,y:source.y-startWidth/2};
+   const end = {...source,y:source.y+startWidth/2}
+    const topD=link({source:start,target:adjustedTarget});
 
     const linker=`L${target.x},${target.y}v${inverseTarget.y-adjustedTarget.y},0L${inverseTarget.x},${inverseTarget.y}`;
-    const bottomD=link({source:inverseTarget,target:source});
+    const bottomD=link({source:inverseTarget,target:end});
     return {full:topD+linker+bottomD+`L${source.x},${source.y}`,top:topD,bottom:bottomD};
 }
 
-export function makeCoalescent(vertex,targets,scales,slope=1){
+export function makeCoalescent(vertex,targets,scales,slope=1,){
     // TODO make slope and percent gradient based on min x
     const x=scales.x(max(targets,d=>d.x)-vertex.x);
     const y=-scales.y((0.4+vertex.y-min(targets,d=>d.y)));
