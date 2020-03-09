@@ -1,10 +1,10 @@
 import {ImmutableTree} from "./utils/Tree/immutableTree";
 import ImmutableCladeCollection from "./utils/immutableCladeCollection";
 import Branches from "./components/Baubles/Branches/Branches";
-import BranchPath,{FadeInBranchPath} from "./components/Baubles/Branches/BranchPath";
+import RectangularBranchPath,{FadeInBranchPath} from "./components/Baubles/Branches/RectangularBranchPath";
 import Nodes from "./components/Baubles/Nodes/Nodes"
 import NodeShape from "./components/Baubles/Nodes/Circle";
-import CoalescentNode,{FadedCoalescentNode} from "./components/Baubles/Nodes/CoalescentNode"
+import CoalescentShape,{FadedCoalescentNode} from "./components/Baubles/Nodes/CoalescentShape"
 import Axis from "./components/decorations/Axis/Axis";
 import FigTree from "./components/FigTree";
 import {rectangularLayout,edgeFactory} from "./utils/layouts";
@@ -16,8 +16,8 @@ import {parseNewick,parseNexus} from "./utils/Tree/treeOperations";
 import{getParent,getNode,getDivergence,getNodes,getTips,getRootToTipLengths} from "./utils/Tree/treeSettersandGetters"
 import {orderByNodeDensity,annotateNode,collapseUnsupportedNodes} from "./utils/Tree/treeOperations";
 
-export {Branches,BranchPath,Nodes,NodeShape,customDateFormater,dateToDecimal,decimalToDate,Axis,AxisBars,Legend,
+export {Branches,RectangularBranchPath,Nodes,NodeShape,customDateFormater,dateToDecimal,decimalToDate,Axis,AxisBars,Legend,
     FigTree,ImmutableTree,ImmutableCladeCollection,rectangularLayout,edgeFactory,KDE,getParent,getNode,getDivergence,getNodes,getTips,
-    orderByNodeDensity,parseNewick,parseNexus,getRootToTipLengths,CoalescentNode,FadedCoalescentNode,FadeInBranchPath,annotateNode,
+    orderByNodeDensity,parseNewick,parseNexus,getRootToTipLengths,CoalescentShape,annotateNode,
     collapseUnsupportedNodes
 }

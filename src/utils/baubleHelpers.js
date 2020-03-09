@@ -6,7 +6,7 @@
  * @return {function(*=): {}}
  */
 
-export function mapAttrsToProps(attrs) {
+export function mapAttrsToProps(attrs={}) {
     return function (v) {
         const props = {};
         for (const [key, value] of Object.entries(attrs)) {

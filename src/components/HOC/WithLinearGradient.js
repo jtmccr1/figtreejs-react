@@ -1,5 +1,12 @@
 import React from "react";
 let counter =1;
+/**
+ * This is an HOC that creates a linear gradient def and returns this def and the wrapped component with the def
+ * applied.
+ * @param WrappedContainer
+ * @return {function(*): *}
+ */
+//TODO make possible to apply to a group of components so we don't need one per branch/node when they are the same.
 const withLinearGradient =WrappedContainer=>{
     function WithLinearGradient(props){
         props = {...defaultProps(),...props};
@@ -22,7 +29,6 @@ const withLinearGradient =WrappedContainer=>{
             </g>
         )
     }
-
     return WithLinearGradient;
 };
 

@@ -37,25 +37,13 @@ export default function FigTree(props){
                     <LayoutContext.Provider value={{vertices:vertices,edges:edges}}>
                         {/*<rect x="0" y="0" width="100%" height="100%" fill="none" pointerEvents={"visible"} onClick={()=>nodeDispatch({type:"clearSelection"})}/>*/}
                         <g transform={`translate(${margins.left},${margins.top})`}>
-                            {React.Children.map(props.children, (child, index) => {
-                                switch(child.type.name) {
-                                    //update this to use the data in the context
-                                    case "Axis":
-                                        return React.cloneElement(child, {
-                                            width,
-                                            height,
-                                            margins,
-                                        });
-                                    default:
-                                        return child;
-                                }
-                            }).reverse()}
+                            {/*TODO add layers and portals*/}
+                            {React.Children.toArray(props.children).reverse()}
                         </g>
                     </LayoutContext.Provider>
                 </TreeContext.Provider>
             </NodeContext.Provider>
         </ScaleContext.Provider>
-
             )
 }
 function setUpScales(size,margins,vertices){

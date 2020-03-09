@@ -4,6 +4,7 @@ import Node from "./Node";
 import {mapAttrsToProps} from "../../../utils/baubleHelpers";
 import {LayoutContext, NodeContext, ScaleContext} from "../../FigTree";
 import {reduceIterator} from "../../../utils/utilities";
+import CoalescentShape from "./CoalescentShape";
 
 function NodesHOC(ShapeComponent) {
     return function BaseNodes(props) {
@@ -16,6 +17,7 @@ function NodesHOC(ShapeComponent) {
         const baseAttrMapper = useMemo(() => mapAttrsToProps(attrs), [attrs]);
         const selectedAttrMapper = useMemo(() => mapAttrsToProps(selectedAttrs), [selectedAttrs]);
         const hoveredAttrMapper = useMemo(() => mapAttrsToProps(hoveredAttrs), [hoveredAttrs]);
+
 
         function attrMapper(v) {
             let attrs = baseAttrMapper(v);
@@ -39,15 +41,13 @@ function NodesHOC(ShapeComponent) {
         function shapeProps(v) {
             return {attrs: attrMapper(v), interactions: interactionMapper(v)}
         }
-
-//TODO add label as render prop?
         return (
             <g className={className}>
                 {reduceIterator(vertices.values(), (all, v) => {
                     if (filter(v)) {
                         all.push(
                             <Node key={`node-${v.id}`} classes={v.classes} x={scales.x(v.x)} y={scales.y(v.y)}>
-                            <ShapeComponent {...shapeProps(v)}/>
+                            <ShapeComponent {...shapeProps(v)} vertex={v}/>
                         </Node>)
                     }
                     return all;
@@ -72,7 +72,15 @@ CircleNodes.defaultProps={
     attrs:{r:2},
     selectedAttrs:{},
     hoveredAttrs:{}
+};
+const CoalescentNodes=NodesHOC(CoalescentShape);
+CoalescentNodes.defualtProps={
+    attrs: {
+        fill: "steelblue",
+        strokeWidth: 1,
+        stroke: 'black'
+    },
 }
- const Nodes={Circle:CircleNodes};
+const Nodes={Circle:CircleNodes,Coalescent:CoalescentNodes};
 export default Nodes;
 // Nested renders for selected and hovered nodes
