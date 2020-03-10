@@ -38,9 +38,6 @@ export default function FigTree(props){
                     <LayoutContext.Provider value={{vertices:vertices,edges:edges}}>
                         {/*<rect x="0" y="0" width="100%" height="100%" fill="none" pointerEvents={"visible"} onClick={()=>nodeDispatch({type:"clearSelection"})}/>*/}
                         <g transform={`translate(${margins.left},${margins.top})`}>
-                            <g id={"other-layer"}>
-                                {sortedChildren.Other}
-                            </g>
                             <g id={"axis-layer"}>
                                 {sortedChildren.Axis}
                             </g>
@@ -49,6 +46,10 @@ export default function FigTree(props){
                             </g>
                             <g id={"node-layer"}>
                                 {sortedChildren.Nodes}
+                            </g>
+                            <g id={"other-layer"}>
+                                {/*make legend layer*/}
+                                {sortedChildren.Other}
                             </g>
                         </g>
                     </LayoutContext.Provider>
