@@ -10,10 +10,10 @@ let counter =1;
 const withLinearGradient =WrappedContainer=>{
     function WithLinearGradient(props){
         props = {...defaultProps(),...props};
-        const {startingX,endingX,staringY,endingY,fillRamper,opacityRamper,n,gradientAttribute,attrs,...restProps} = props;
+        const {startingX,endingX,staringY,endingY,colorRamper,opacityRamper,n,gradientAttribute,attrs,...restProps} = props;
         const colorStops = [];
         for( let i=0;i<n;i++){
-            const style={stopColor:fillRamper(i/(n-1)),stopOpacity:opacityRamper(i/(n-1))};
+            const style={stopColor:colorRamper(i/(n-1)),stopOpacity:opacityRamper(i/(n-1))};
             colorStops.push( <stop key={i} offset={`${i/(n-1)}`} {...style}/>)
         }
         const idNumber = (counter+=1);
@@ -39,7 +39,7 @@ function defaultProps(){
         staringY:"0%",
         endingY:"0%",
         n:10,
-        fillRamper:i=>"grey",
+        colorRamper: i=>"grey",
         opacityRamper:i=>1,
         gradientAttribute: "fill"
     }

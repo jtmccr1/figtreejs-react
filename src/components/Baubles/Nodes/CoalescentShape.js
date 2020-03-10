@@ -5,11 +5,10 @@ import {extent, max, min} from "d3-array";
 import withLinearGradient from "../../HOC/WithLinearGradient";
 
 //TODO extract out fill => gradient function
-let counter =1;
 
 const pathComponent=({attrs})=><path {...attrs}/>;
-const FadedPath=withLinearGradient(pathComponent);
-console.log(FadedPath);
+
+export const FadedPath=withLinearGradient(pathComponent);
 
 export default function CoalescentShape (props){
     const {vertices} =  useContext(LayoutContext);
@@ -23,7 +22,7 @@ export default function CoalescentShape (props){
     const d=makeCoalescent(vertex,targets,scales,slope);
 
     return (
-        <FadedPath attrs={{...attrs,d:d}} endingX={`${100/slope}%`} fillRamper={i=>attrs.fill} opacityRamper={i=>1-i} />
+        <FadedPath attrs={{...attrs,d:d}} endingX={`${100/slope}%`} colorRamper={i=>attrs.fill} opacityRamper={i=>1-i} />
     )
 
 };
@@ -69,7 +68,7 @@ export function coalescentPath(source,target,slope=10,startWidth=2){
  * @param targets
  * @param scales
  * @param slope
- * @return {{top: *, bottom: *, full: string}}
+ * @return string
  */
 export function makeCoalescent(vertex,targets,scales,slope=1,){
     // TODO make slope and percent gradient based on min x
@@ -86,7 +85,7 @@ export function makeCoalescent(vertex,targets,scales,slope=1,){
  * @param source
  * @param targets
  */
-function calcSlope(source,targets){
+export function calcSlope(source,targets){
     const [min,max]=extent(targets,d=>d.x-source.x);
     return max / min;
 }
@@ -98,7 +97,7 @@ function calcSlope(source,targets){
 //     y1:"0%",
 //     y2:"0%",
 //     n:10,
-//     fillRamper:i=>"grey",
+//     colorRamper:i=>"grey",
 //     opacityRamper:i=>1-i*3,
 //     slope:5
 // };

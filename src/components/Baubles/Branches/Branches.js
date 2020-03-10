@@ -25,7 +25,7 @@ function BranchesHOC(PathComponent) {
                 return (
                     <Branch key={`branch-${e.id}`} classes={e.classes} x={scales.x(e.x)} y={scales.y(e.y)}>
                         <PathComponent {...getPosition(e)}
-                                       {...attrMapper(e)}
+                                       attrs = {{...attrMapper(e)}}
                                        edge={e}/>
                     </Branch>
                 )
