@@ -76,7 +76,7 @@ FigTree.defaultProps= {
     width: undefined, /** Width of svg */
     height: undefined,
     layout: rectangularVertices,
-    children: [<Branches/>],
+    children: [Branches],
     margins:{top:10,bottom:10,left:10,right:10}
 }
 

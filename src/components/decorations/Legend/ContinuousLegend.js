@@ -7,7 +7,7 @@ import {quantize, interpolate, interpolateRound} from "d3-interpolate";
 
 
 /**
- * Legend
+ * ContinuousLegend
  *
  * A color legend that accept continuous and sequential color scales. It is modeled after the color legends
  * at https://observablehq.com/@d3/color-legend
@@ -24,7 +24,7 @@ import {quantize, interpolate, interpolateRound} from "d3-interpolate";
  * @return {(number|*)[]|*}
  * @constructor
  */
-export default function Legend({scale,pos,width,height,direction,title,ticks} ){
+export default function ContinuousLegend({scale,pos,width,height,direction,title,ticks} ){
 
     let x;
     let colorRamper;
@@ -49,7 +49,7 @@ export default function Legend({scale,pos,width,height,direction,title,ticks} ){
 
 }
 
-Legend.defaultProps={
+ContinuousLegend.defaultProps={
     pos:{x:0,y:0},
     width:200,
     height:50,

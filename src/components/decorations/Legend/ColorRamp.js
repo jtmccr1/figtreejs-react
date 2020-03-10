@@ -18,7 +18,7 @@ function Rect({width,height,attrs}){
  * @return {*}
  * @constructor
  */
-//TODO move to Legend
+//TODO move to ContinuousLegend
 const ColorRamp = withLinearGradient(Rect);
 
 export default ColorRamp;

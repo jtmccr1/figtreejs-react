@@ -9,7 +9,7 @@ import { css, jsx } from '@emotion/core'
 
 
 /**
- * Legend
+ * ContinuousLegend
  *
  * A color legend that accept continuous and sequential color scales. It is modeled after the color legends
  * at https://observablehq.com/@d3/color-legend
