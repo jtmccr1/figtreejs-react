@@ -6,7 +6,7 @@ import {ScaleContext} from "../../FigTree.js";
 import {LayoutContext} from "../../FigTree";
 
 function BranchesHOC(PathComponent) {
-    return function BaseBranches(props){
+    return function Branches(props){
         const {scales} = useContext(ScaleContext);
         const {edges} = useContext(LayoutContext);
         const {attrs, filter} = props;
@@ -20,8 +20,7 @@ function BranchesHOC(PathComponent) {
             }
         };
 
-
-        return (<g className={"branch-layer"}>
+        return (<>
             {edges.filter(filter).map(e => {
                 return (
                     <Branch key={`branch-${e.id}`} classes={e.classes} x={scales.x(e.x)} y={scales.y(e.y)}>
@@ -32,14 +31,14 @@ function BranchesHOC(PathComponent) {
                 )
             })
             }
-        </g>)
+        </>)
     }
 }
 
 const RectangularBranches=BranchesHOC(RectangularBranchPath);
 RectangularBranches.defaultProps={
     filter:e=>true
-}
+};
 const CoalescentBranches = BranchesHOC(CoalescentBranch);
 const Branches={Rectangular:RectangularBranches,Coalescent:CoalescentBranches};
 export default Branches;

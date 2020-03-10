@@ -31,7 +31,7 @@ export const FadeInBranchPath=withLinearGradient((props)=>{
     return(<path  {...attrs}  {...path} fill={"none"} />)
 });
 
-const logisticRamp=logisticGrowth(1,0.9,10);
+const logisticRamp=logisticGrowth(1,0.9,100);
 
 
 import {LayoutContext,ScaleContext} from "../../FigTree";
@@ -59,7 +59,7 @@ function CoalescentBranchPathHOC(RegularPath){
         const fadedIn = (targetRange[0]*15/16 / (thisTarget.x - vertex.x));
 
 
-        const {full:clipPath}=coalescentPath(source,target,slope);
+        const d=coalescentPath(source,target,slope);
         const colorStops = [];
 
         for( let i=0;i<11;i++){
@@ -71,7 +71,7 @@ function CoalescentBranchPathHOC(RegularPath){
             <g>
             <defs>
                 <clipPath id={`clipPathEdge${edge.v1.id}`}>
-                    <path d={clipPath}/>
+                    <path d={d}/>
                 </clipPath>
                 <linearGradient id={`gradCoal${edge.v1.id}`} x1={"0%"} y1={"0%"} x2={`${fadedIn*100}%`} y2={"0%"}>
                     {colorStops}

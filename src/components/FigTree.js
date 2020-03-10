@@ -30,6 +30,7 @@ export default function FigTree(props){
     const edges = useMemo(()=>makeEdges(vertices),[vertices]);
     const scales=useMemo(()=>{return setUpScales({width,height},margins,vertices)},[tree]);
 
+    const sortedChildren = React.Children.toArray(props.children).reduce(childReducer,{"Nodes":[],"Branches":[],"Axis":[],"Other":[]});
     return (
         <ScaleContext.Provider value={{scales,width,height,margins}}>
             <NodeContext.Provider value={{state:NodeState,dispatch:nodeDispatch}}>
@@ -37,8 +38,18 @@ export default function FigTree(props){
                     <LayoutContext.Provider value={{vertices:vertices,edges:edges}}>
                         {/*<rect x="0" y="0" width="100%" height="100%" fill="none" pointerEvents={"visible"} onClick={()=>nodeDispatch({type:"clearSelection"})}/>*/}
                         <g transform={`translate(${margins.left},${margins.top})`}>
-                            {/*TODO add layers and portals*/}
-                            {React.Children.toArray(props.children).reverse()}
+                            <g id={"other-layer"}>
+                                {sortedChildren.Other}
+                            </g>
+                            <g id={"axis-layer"}>
+                                {sortedChildren.Axis}
+                            </g>
+                            <g id={"branch-layer"}>
+                                {sortedChildren.Branches}
+                            </g>
+                            <g id={"node-layer"}>
+                                {sortedChildren.Nodes}
+                            </g>
                         </g>
                     </LayoutContext.Provider>
                 </TreeContext.Provider>
@@ -66,4 +77,24 @@ FigTree.defaultProps= {
     layout: rectangularVertices,
     children: [<Branches/>],
     margins:{top:10,bottom:10,left:10,right:10}
+}
+
+function childReducer(acc,child){
+    const childName=child.type.name;
+    switch(childName){
+        case "Nodes":
+            acc["Nodes"].push(child);
+            break;
+        case "Branches":
+            acc["Branches"].push(child);
+            break;
+        case "Axis":
+            acc["Axis"].push(child);
+            break;
+        default:
+            acc["Other"].push(child);
+
+    }
+    return acc;
+
 }

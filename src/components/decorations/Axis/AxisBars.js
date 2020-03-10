@@ -1,4 +1,12 @@
 import React from 'react'
+
+/**
+ * This component adds vertical bars to the backgound of a figure. It is used a child of an Axis component and gets
+ * it's size and position attributes from it's parent.
+ * @param props
+ * @return {*}
+ * @constructor
+ */
 export  default function AxisBars(props) {
     const {scale,tickValues,height,margins,attrs,evenFill,oddFill,gap,lift} = props;
 

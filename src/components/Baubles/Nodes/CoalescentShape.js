@@ -1,53 +1,30 @@
-import React, {useContext, useMemo} from "react"
-import {animated, useSpring} from "react-spring";
-import {mapAttrsToProps} from "../../../utils/baubleHelpers";
-import {LayoutContext, NodeContext, ScaleContext} from "../../FigTree";
+import React, {useContext} from "react"
+import {LayoutContext, ScaleContext} from "../../FigTree";
 import {linkHorizontal} from "d3-shape";
-import {max, min,extent} from "d3-array";
+import {extent, max, min} from "d3-array";
 import withLinearGradient from "../../HOC/WithLinearGradient";
 
 //TODO extract out fill => gradient function
 let counter =1;
 
+const pathComponent=({attrs})=><path {...attrs}/>;
+const FadedPath=withLinearGradient(pathComponent);
+console.log(FadedPath);
+
 export default function CoalescentShape (props){
-    //HOC for node logic
     const {vertices} =  useContext(LayoutContext);
     const {scales} = useContext(ScaleContext);
-
     const {vertex,attrs} =props;
 
-    const {fill,path} = filterOutStrokeAttrs(attrs);
-
     const targets = vertex.node.children.map(child=>vertices.get(child));
-    const targetRange = extent(targets,d=>d.x-vertex.x);
-    // get 1/2 xmin  in terms of total and 3/4 min
 
-    const slope=targetRange[1]/(targetRange[0]/1);
-    const fadedOut = targetRange[0]*15/16 / targetRange[1];
+    const slope = calcSlope(vertex,targets);
 
+    const d=makeCoalescent(vertex,targets,scales,slope);
 
-    const {full:d,top,bottom}=makeCoalescent(vertex,targets,scales,slope);
-
-    const colorStops = [];
-
-    for( let i=0;i<11;i++){
-        const style={stopColor:fill.fill,stopOpacity:(1-(i/10))};
-        colorStops.push( <stop key={i} offset={`${i/(10)}`} {...style}/>)
-    }
-
-    const idNumber = (counter+=1);
     return (
-        <g>
-            <defs>
-                <linearGradient id={`gradCoal${idNumber}`} x1={"0%"} y1={"0%"} x2={`${fadedOut*100}%`} y2={"0%"}>
-                    {colorStops}
-                </linearGradient>
-                </defs>
-                <path className={"node-shape"} d={d}{...fill} fill={`url(#gradCoal${idNumber})`}/>
-                <path d={top} {...path} fill={"none"}/>
-                <path d={bottom} {...path} fill={"none"}/>
-        </g>
-);
+        <FadedPath attrs={{...attrs,d:d}} endingX={`${100/slope}%`} fillRamper={i=>attrs.fill} opacityRamper={i=>1-i} />
+    )
 
 };
 
@@ -57,25 +34,43 @@ CoalescentShape.defaultProps= {
         strokeWidth: 1,
         stroke: 'black'
     },
-    slope:5
 };
 
 const link = linkHorizontal()
     .x(function(d) { return d.x; })
     .y(function(d) { return d.y; });
 
+/**
+ * A helper function that takes a source and target object (with x, and y positions each) It calculates a symmetric
+ * coalescent shape between source, the target and the reflection of the taget about a horizontal line through the source.
+ * @param source -
+ * @param target -  the target object {x:,y:}
+ * @param slope - a number that deterimines how quickly the curve reaches the max/min height
+ * @param startWidth - The starting width of the shape
+ * @return string
+ */
 export function coalescentPath(source,target,slope=10,startWidth=2){
-   const adjustedTarget={...target,x:target.x/slope};
-   const inverseTarget = {...adjustedTarget,y:source.y  -(adjustedTarget.y-source.y)};
-   const start = {...source,y:source.y-startWidth/2};
-   const end = {...source,y:source.y+startWidth/2}
-    const topD=link({source:start,target:adjustedTarget});
+   const adjustedTarget={y:target.y,x:target.x/slope};
+   const inverseTarget = {x:adjustedTarget.x,y:source.y  -(adjustedTarget.y-source.y)};
+   const start = {x:source.x,y:source.y-startWidth/2};
+   const end = {x:source.x,y:source.y+startWidth/2};
 
-    const linker=`L${target.x},${target.y}v${inverseTarget.y-adjustedTarget.y},0L${inverseTarget.x},${inverseTarget.y}`;
-    const bottomD=link({source:inverseTarget,target:end});
-    return {full:topD+linker+bottomD+`L${source.x},${source.y}`,top:topD,bottom:bottomD};
+   const topD=link({source:start,target:adjustedTarget});
+   const linker=`L${target.x},${target.y}v${inverseTarget.y-adjustedTarget.y},0L${inverseTarget.x},${inverseTarget.y}`;
+   const bottomD=link({source:inverseTarget,target:end});
+
+   return topD+linker+bottomD+`L${start.x},${start.y}`;
 }
 
+/**
+ * This function takes a source vertex and target vertices. It calculates the target
+ * for vertex and passes data on to the coalescent path function.
+ * @param vertex
+ * @param targets
+ * @param scales
+ * @param slope
+ * @return {{top: *, bottom: *, full: string}}
+ */
 export function makeCoalescent(vertex,targets,scales,slope=1,){
     // TODO make slope and percent gradient based on min x
     const x=scales.x(max(targets,d=>d.x)-vertex.x);
@@ -84,20 +79,16 @@ export function makeCoalescent(vertex,targets,scales,slope=1,){
 
 }
 
-
-function filterOutStrokeAttrs(attrs){
-    const fill = Object.keys(attrs).filter(k=>!k.includes("stroke"))
-        .reduce((obj, key) => {
-        obj[key] = attrs[key];
-        return obj;
-    }, {});
-
-    const path =Object.keys(attrs).filter(k=>k.includes("stroke"))
-        .reduce((obj, key) => {
-            obj[key] = attrs[key];
-            return obj;
-        }, {});
-    return {fill,path}
+/**
+ * A helper function that takes the source and target vertices
+ * and calculates the slope so that the curve flattens and at
+ * at the closest vertex (in the x direction).
+ * @param source
+ * @param targets
+ */
+function calcSlope(source,targets){
+    const [min,max]=extent(targets,d=>d.x-source.x);
+    return max / min;
 }
 
 // const CoalescentShape = withLinearGradient(BaseCoalescentShape);

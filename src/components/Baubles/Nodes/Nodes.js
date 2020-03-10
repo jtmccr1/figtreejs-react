@@ -7,7 +7,7 @@ import {reduceIterator} from "../../../utils/utilities";
 import CoalescentShape from "./CoalescentShape";
 
 function NodesHOC(ShapeComponent) {
-    return function BaseNodes(props) {
+    return function Nodes(props) {
         const {scales} = useContext(ScaleContext);
         const {vertices} = useContext(LayoutContext);
         const {state, dispatch} = useContext(NodeContext);
@@ -42,7 +42,7 @@ function NodesHOC(ShapeComponent) {
             return {attrs: attrMapper(v), interactions: interactionMapper(v)}
         }
         return (
-            <g className={className}>
+            <>
                 {reduceIterator(vertices.values(), (all, v) => {
                     if (filter(v)) {
                         all.push(
@@ -52,7 +52,7 @@ function NodesHOC(ShapeComponent) {
                     }
                     return all;
                 }, [])}
-            </g>
+            </>
         )
     }
 }
