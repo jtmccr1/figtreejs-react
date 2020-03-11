@@ -1,8 +1,8 @@
 FigTree example:
 
 ```jsx harmony
-import {FigTree,Nodes,Branches} from "../index.js";	
-import {parseNewick,orderByNodeDensity} from "../utils/Tree/treeOperations"
+import {FigTree,Nodes,Branches} from "./index.js";	
+import {parseNewick,orderByNodeDensity} from "./treeOperations"
 
 
 const newickString =	

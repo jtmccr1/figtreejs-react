@@ -1,11 +1,11 @@
 import React,{useMemo,useReducer} from 'react';
 
 import {scaleLinear} from "d3-scale";
-import {extent} from "../utils/utilities";
-import Branches from "./Baubles/Branches/Branches";
-import {makeEdges, rectangularVertices} from "../utils/layouts";
-import {nodeReducer} from "../reducers/interactionReducer";
-import {parseNewick} from "../utils/Tree/treeOperations";
+import {extent} from "../../utils/utilities";
+import Branches from "../Baubles/Branches/Branches";
+import {makeEdges, rectangularVertices} from "../../utils/layouts";
+import {nodeReducer} from "../../reducers/interactionReducer";
+import {parseNewick} from "../../utils/Tree/treeOperations";
 
 /**
  * The FigTree component

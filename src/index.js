@@ -2,7 +2,7 @@ import {ImmutableTree} from "./utils/Tree/immutableTree";
 import Branches from "./components/Baubles/Branches/Branches";
 import Nodes from "./components/Baubles/Nodes/Nodes"
 import Axis from "./components/decorations/Axis/Axis";
-import FigTree from "./components/FigTree";
+import FigTree from "./components/Figtree/FigTree";
 import {rectangularLayout,edgeFactory} from "./utils/layouts";
 import {customDateFormater,dateToDecimal,decimalToDate} from "./utils/utilities";
 import AxisBars from "./components/decorations/Axis/AxisBars";
@@ -12,8 +12,10 @@ import{getParent,getNode,getDivergence,getNodes,getTips,getRootToTipLengths} fro
 import {orderByNodeDensity,annotateNode,collapseUnsupportedNodes} from "./utils/Tree/treeOperations";
 import Legend from "../src/components/decorations/Legend";
 import NodeBackgrounds from "./components/Baubles/Nodes/NodeBackgrounds";
+import Map from "./components/Map/Map";
+import Features from "./components/Map/Features";
 export {Branches,Nodes,customDateFormater,dateToDecimal,decimalToDate,Axis,AxisBars,Legend,
     FigTree,ImmutableTree,rectangularLayout,edgeFactory,KDE,getParent,getNode,getDivergence,getNodes,getTips,
     orderByNodeDensity,parseNewick,parseNexus,getRootToTipLengths,annotateNode,
-    collapseUnsupportedNodes,NodeBackgrounds
+    collapseUnsupportedNodes,NodeBackgrounds,Map,Features
 }

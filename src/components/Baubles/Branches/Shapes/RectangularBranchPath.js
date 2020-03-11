@@ -36,7 +36,7 @@ function sameProps(prev,curr){
 export default RectangularBranchPath;
 const logisticRamp=logisticGrowth(1,0.7,30);
 
-import {LayoutContext,ScaleContext} from "../../../FigTree";
+import {LayoutContext,ScaleContext} from "../../../Figtree/FigTree";
 import {calcSlope, coalescentPath, FadedPath, makeCoalescent} from "../../Nodes/Shapes/CoalescentShape";
 import {extent, max, min} from "d3-array";
 import withClipPath from "../../../HOC/withClipPath";

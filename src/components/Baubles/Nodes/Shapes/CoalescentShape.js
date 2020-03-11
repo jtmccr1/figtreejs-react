@@ -1,5 +1,5 @@
 import React, {useContext} from "react"
-import {LayoutContext, ScaleContext} from "../../../FigTree";
+import {LayoutContext, ScaleContext} from "../../../Figtree/FigTree";
 import {linkHorizontal} from "d3-shape";
 import {extent, max, min} from "d3-array";
 import withLinearGradient from "../../../HOC/WithLinearGradient";

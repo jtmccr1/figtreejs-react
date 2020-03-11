@@ -2,7 +2,7 @@ import React, {useMemo, useContext} from "react"
 import Circle from "./Shapes/Circle";
 import Node from "./Node";
 import {mapAttrsToProps} from "../../../utils/baubleHelpers";
-import {LayoutContext, NodeContext, ScaleContext} from "../../FigTree";
+import {LayoutContext, NodeContext, ScaleContext} from "../../Figtree/FigTree";
 import {reduceIterator} from "../../../utils/utilities";
 import CoalescentShape from "./Shapes/CoalescentShape";
 
@@ -44,9 +44,10 @@ function NodesHOC(ShapeComponent) {
             <>
                 {reduceIterator(vertices.values(), (all, v) => {
                     if (filter(v)) {
-                        const element =  <Node key={`node-${v.id}`} classes={v.classes} x={scales.x(v.x)} y={scales.y(v.y)}>
+                        const element = <Node key={`node-${v.id}`} classes={v.classes} x={scales.x(v.x)} y={scales.y(v.y)}>
                                             <ShapeComponent {...shapeProps(v)} vertex={v}/>
-                                        </Node>;
+                                        </Node>
+                                        ;
                         if(v.id===state.hovered){
                             all.push(element)
                         }
