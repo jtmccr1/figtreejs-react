@@ -37,7 +37,6 @@ function NodesHOC(ShapeComponent) {
                 onClick: () => selectorLogic(state.selected, dispatch, v.id)
             }
         }
-
         function shapeProps(v) {
             return {attrs: attrMapper(v), interactions: interactionMapper(v)}
         }
@@ -45,13 +44,19 @@ function NodesHOC(ShapeComponent) {
             <>
                 {reduceIterator(vertices.values(), (all, v) => {
                     if (filter(v)) {
-                        all.push(
-                            <Node key={`node-${v.id}`} classes={v.classes} x={scales.x(v.x)} y={scales.y(v.y)}>
-                            <ShapeComponent {...shapeProps(v)} vertex={v}/>
-                        </Node>)
+                        const element =  <Node key={`node-${v.id}`} classes={v.classes} x={scales.x(v.x)} y={scales.y(v.y)}>
+                                            <ShapeComponent {...shapeProps(v)} vertex={v}/>
+                                        </Node>;
+                        if(v.id===state.hovered){
+                            all.push(element)
+                        }
+                        else{
+                            all.unshift(element)
+                        }
                     }
-                    return all;
-                }, [])}
+                    return all
+                }, [])
+                }
             </>
         )
     }
@@ -80,7 +85,7 @@ CoalescentNodes.defualtProps={
         strokeWidth: 1,
         stroke: 'black'
     },
-}
+};
 const Nodes={Circle:CircleNodes,Coalescent:CoalescentNodes};
 export default Nodes;
 // Nested renders for selected and hovered nodes

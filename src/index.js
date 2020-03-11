@@ -11,9 +11,9 @@ import {parseNewick,parseNexus} from "./utils/Tree/treeOperations";
 import{getParent,getNode,getDivergence,getNodes,getTips,getRootToTipLengths} from "./utils/Tree/treeSettersandGetters"
 import {orderByNodeDensity,annotateNode,collapseUnsupportedNodes} from "./utils/Tree/treeOperations";
 import Legend from "../src/components/decorations/Legend";
-
+import NodeBackgrounds from "./components/Baubles/Nodes/NodeBackgrounds";
 export {Branches,Nodes,customDateFormater,dateToDecimal,decimalToDate,Axis,AxisBars,Legend,
     FigTree,ImmutableTree,rectangularLayout,edgeFactory,KDE,getParent,getNode,getDivergence,getNodes,getTips,
     orderByNodeDensity,parseNewick,parseNexus,getRootToTipLengths,annotateNode,
-    collapseUnsupportedNodes,
+    collapseUnsupportedNodes,NodeBackgrounds
 }
