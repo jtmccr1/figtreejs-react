@@ -1,6 +1,6 @@
 import React,{useMemo,useContext} from "react"
 import Branch from "./Branch";
-import RectangularBranchPath, {CoalescentBranch} from "./RectangularBranchPath";
+import RectangularBranchPath, {CoalescentBranch} from "./Shapes/RectangularBranchPath";
 import {mapAttrsToProps} from "../../../utils/baubleHelpers";
 import {ScaleContext} from "../../FigTree.js";
 import {LayoutContext} from "../../FigTree";
@@ -25,7 +25,7 @@ function BranchesHOC(PathComponent) {
                 return (
                     <Branch key={`branch-${e.id}`} classes={e.classes} x={scales.x(e.x)} y={scales.y(e.y)}>
                         <PathComponent {...getPosition(e)}
-                                       attrs = {{...attrMapper(e)}}
+                                       attrs={attrMapper(e)}
                                        edge={e}/>
                     </Branch>
                 )

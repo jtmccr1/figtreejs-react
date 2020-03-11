@@ -29,9 +29,8 @@ const withLinearGradient =WrappedContainer=>{
             </g>
         )
     }
-    return WithLinearGradient;
+    return React.memo(WithLinearGradient,sameGradientProps);
 };
-
 function defaultProps(){
     return {
         startingX:"0%",
@@ -43,6 +42,17 @@ function defaultProps(){
         opacityRamper:i=>1,
         gradientAttribute: "fill"
     }
+}
+
+function sameGradientProps(prev,curr){
+    const gradientProps =["startingX","endingX","staringY","endingY","colorRamper","opacityRamper","n","gradientAttribute"];
+    for(const key of gradientProps){
+        if(prev[key]!==curr[key]){
+            return false
+        }
+    }
+    return true
+
 }
 
 export default withLinearGradient;

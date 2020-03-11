@@ -1,8 +1,8 @@
 import React, {useContext} from "react"
-import {LayoutContext, ScaleContext} from "../../FigTree";
+import {LayoutContext, ScaleContext} from "../../../FigTree";
 import {linkHorizontal} from "d3-shape";
 import {extent, max, min} from "d3-array";
-import withLinearGradient from "../../HOC/WithLinearGradient";
+import withLinearGradient from "../../../HOC/WithLinearGradient";
 
 //TODO extract out fill => gradient function
 

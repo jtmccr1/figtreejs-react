@@ -18,24 +18,23 @@ const basicNode =(props)=>{
 };
 
 function samesies(prev,curr){
-    const prevChildren = [].concat(prev.children).map(child=>child.props);
-    const currChildren =[].concat(curr.children).map(child=>child.props);
+    const prevChildrenAttrs = [].concat(prev.children).map(child=>child.props.attrs);
+    const currChildrenAttrs =[].concat(curr.children).map(child=>child.props.attrs);
     const prevProps = {x:prev.x,y:prev.y};
     const currProps = {x:curr.x,y:curr.y};
 
     if(!areEqualShallow(prevProps,currProps)){
         return false;
     }
-    if(prevChildren.length!==currChildren.length){
+    if(prevChildrenAttrs.length!==currChildrenAttrs.length){
         return false
     }
-    for (let i = 0; i < prevChildren.length; i++) {
-        if(!areEqualShallow(prevChildren[i],currChildren[i])){
+    for (let i = 0; i < prevChildrenAttrs.length; i++) {
+        if(!areEqualShallow(prevChildrenAttrs[i],currChildrenAttrs[i])){
             return false
         }
     }
     return true
-
     }
 
 const Node = React.memo(basicNode,samesies);

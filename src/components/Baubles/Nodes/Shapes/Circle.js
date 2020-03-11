@@ -1,7 +1,7 @@
 import React, {useContext,useMemo} from "react"
 import {useSpring,animated} from "react-spring";
-import {mapAttrsToProps} from "../../../utils/baubleHelpers";
-import {NodeContext} from "../../FigTree";
+import {mapAttrsToProps} from "../../../../utils/baubleHelpers";
+import {NodeContext} from "../../../FigTree";
 
 const Circle =(props)=>{
    const {attrs,interactions} = props;
@@ -16,4 +16,13 @@ Circle.defaultProps={
 		strokeWidth:0,
 		stroke:'black'},
 };
-export default React.memo(Circle);
+export default React.memo(Circle,sameAttributes);
+function sameAttributes(prev,curr){
+	for(const [key,val] of Object.entries(prev.attrs)){
+		if(curr.attrs[key]!==val){
+			return false
+		}
+	}
+	return true
+
+}

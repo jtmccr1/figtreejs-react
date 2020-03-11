@@ -2,7 +2,7 @@ import React from "react";
 let counter =1;
 
 export default function withClipPath(WrappedContainer){
-   return function ClippedPath(props){
+   function ClippedPath(props){
        const {clipPath,clipTransform,...restProps}=props;
        const id=`clipPath${(counter+=1)}`;
        return(
@@ -18,5 +18,7 @@ export default function withClipPath(WrappedContainer){
            </>
        )
    }
+
+   return React.memo(ClippedPath);
 
 }
