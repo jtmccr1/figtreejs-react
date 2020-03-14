@@ -4,9 +4,10 @@ import { css, jsx } from '@emotion/core'
 import {ProjectionContext} from "./Map"
 import {mapAttrsToProps} from "../../utils/baubleHelpers";
 import {geoPath} from "d3-geo";
-import {range} from "d3-array";
+import {max, range} from "d3-array";
 import React, {useContext,useCallback, useState,useEffect,useRef} from "react";
-import {useSpring, useChain,animated, useTrail} from "react-spring"
+import {animated, useSprings, useSpring} from "react-spring"
+import {scaleLinear} from "d3-scale";
 
 export default function GreatCircleArc({start,stop,attrs,...restProps}) {
     const attrMapper = mapAttrsToProps(attrs);
@@ -34,7 +35,6 @@ export function PointsOnPath({start,stop,attrs,...restProps}){
    const measuredPath= useCallback(node => {
         if (node !== null) {
             setNode(node);
-            console.log(node)
         }
     }, []);
 
@@ -48,7 +48,7 @@ export function PointsOnPath({start,stop,attrs,...restProps}){
         <>
             <GreatCircleArc start={start} stop={stop} attrs={{strokeWidth:0,ref:measuredPath, fill:"none"}}/>
             {node &&
-            <MakePaths node={node} path={pathMaker(link)} />
+            <MakePaths node={node} />
             }
             </>
     )
@@ -56,19 +56,46 @@ export function PointsOnPath({start,stop,attrs,...restProps}){
 
 
 }
-function MakePaths({node,path}) { //maybe just node
+function MakePaths({node}) { //maybe just node
     const totalLength=node.getTotalLength();
-    const [go,setGo] = useState(false);
-    const head = useTrail(30,{
-        strokeWidth:go?5:0,
-    });
+    const [offset,setOffset] = useState(0);
 
 
 
     useEffect(()=>{
-        setTimeout(()=>setGo(true),2000)
+        setTimeout(()=>setOffset(1),2000)
     },[]);
 
-    return head.map(({strokeWidth},i)=><animated.path key={i} strokeWidth={strokeWidth} d={path} css={css`stroke-linecap:round; stroke-dasharray:${totalLength/30},${totalLength}; stroke-dashoffset:${(i/30)*-1*totalLength}; stroke:red;fill:none;`} />)
+    return BallisticMissal({length:0.5,maxWidth:5,node:node,offset:offset})
+}
+
+function BallisticMissal(props){
+
+    const {length,maxWidth,node}=props;
+    const numberOfsegments = 30;
+    const path = node.getAttribute("d");
+    const totalLength = node.getTotalLength();
+    const missalLength = totalLength*length;
+    const segmentLength= missalLength/numberOfsegments;
+
+    function setOffset(i){
+        return -1*(props.offset)*(totalLength+missalLength)+segmentLength+(i*segmentLength);
+    }
+
+    const segmentStyles = range(0,numberOfsegments).map(i=>({strokeDashoffset:setOffset(i)})); //-i*segmentLength
+    console.log(range(0,numberOfsegments));
+    console.log(segmentStyles);
+
+    const strokeWidthScale = scaleLinear().domain([0,numberOfsegments]).range([maxWidth,0]);
+
+    const springs = useSprings(segmentStyles.length, segmentStyles);
+
+    // get path length
+    // get length of missal
+    // split into 10 groups with decreasing width and offsets
+
+    return (springs.map((el,i)=><animated.path key={i} d={path} style={el} css={css`stroke-linecap:round; stroke-width:${strokeWidthScale(i)}; stroke-dasharray:${segmentLength},${2*totalLength}; stroke:red;fill:none;`} />));
+
+
 }
 
