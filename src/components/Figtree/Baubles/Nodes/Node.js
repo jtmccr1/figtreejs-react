@@ -8,10 +8,10 @@ import {areEqualShallow} from "../../../../utils/utilities";
  * @return {*}
  */
 const basicNode =(props)=>{
-    const {x,y,classes} = props;
+    const {x,y,classes,id} = props;
     const position = useSpring({transform:`translate(${x},${y})`});
     return(
-        <animated.g className={`node ${classes.join(" ")} `} {...position} >
+        <animated.g id={id} className={`node ${classes.join(" ")} `} {...position} >
             {props.children}
         </animated.g>
     )

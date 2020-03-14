@@ -3,11 +3,11 @@ import React from "react";
 import {areEqualShallow} from "../../../../utils/utilities";
 
 const basicBranch = (props) =>{
-    const {x,y,classes,interactions} = props;
+    const {x,y,classes,interactions,id} = props;
     const position = useSpring({transform:`translate(${x},${y})`});
 
     return(
-        <animated.g className={`branch ${classes.join(" ")} `} {...position} {...interactions} >
+        <animated.g id={id} className={`branch ${classes.join(" ")} `} {...position} {...interactions} >
             {props.children}
         </animated.g>
     )

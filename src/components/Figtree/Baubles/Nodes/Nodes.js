@@ -44,7 +44,7 @@ function NodesHOC(ShapeComponent) {
             <>
                 {reduceIterator(vertices.values(), (all, v) => {
                     if (filter(v)) {
-                        const element = <Node key={`node-${v.id}`} classes={v.classes} x={scales.x(v.x)} y={scales.y(v.y)}>
+                        const element = <Node key={`node-${v.id}`} id={`node-${v.id}`}classes={v.classes} x={scales.x(v.x)} y={scales.y(v.y)}>
                                             <ShapeComponent {...shapeProps(v)} vertex={v}/>
                                         </Node>
                                         ;

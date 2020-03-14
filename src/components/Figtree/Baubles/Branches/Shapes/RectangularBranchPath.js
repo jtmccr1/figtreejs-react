@@ -17,8 +17,8 @@ function branchPathGenerator({x0,y0,x1,y1}) {
             .curve(curveStepBefore);
         return (
             branchLine(
-                [{x: 0, y: y0 - y1},
-                    {x: x1 - x0, y: 0}
+                [{x: 0.001, y: y0 - y1}, //tiny adjustment for faded line (can't have y or x dimension not change at all
+                    {x: x1 - x0, y: 0.001}
                 ]))
         // return (output)
 }

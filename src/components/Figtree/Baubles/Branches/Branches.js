@@ -23,7 +23,7 @@ function BranchesHOC(PathComponent) {
         return (<>
             {edges.filter(filter).map(e => {
                 return (
-                    <Branch key={`branch-${e.id}`} classes={e.classes} x={scales.x(e.x)} y={scales.y(e.y)}>
+                    <Branch key={`branch-${e.id}`} id={`branch-${e.id}`} classes={e.classes} x={scales.x(e.x)} y={scales.y(e.y)}>
                         <PathComponent {...getPosition(e)}
                                        attrs={attrMapper(e)}
                                        edge={e}/>
