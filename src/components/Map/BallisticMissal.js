@@ -25,10 +25,6 @@ export default function BallisticMissal(props){
     const opacityScale = scaleLinear().domain([0,numberOfsegments]).range([1,0.5]);
     const springs = useSprings(segmentStyles.length, segmentStyles);
 
-    // get path length
-    // get length of missal
-    // split into 10 groups with decreasing width and offsets
-
     return (springs.map((el,i)=><animated.path key={i} d={path} style={el} css={css`stroke-linecap:round; stroke-width:${strokeWidthScale(i)}; opacity:${opacityScale(i)}; stroke-dasharray:${segmentLength},${2*totalLength}; stroke:red;fill:none;`} />));
 
 }

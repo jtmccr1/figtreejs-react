@@ -21,10 +21,5 @@ export const nodeReducer=produce((draft,action)=>{
             draft.selected =[];
     }
 });
-// hover
 
-//unhover
 
-//select
-
-//deselect

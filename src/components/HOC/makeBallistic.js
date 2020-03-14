@@ -5,7 +5,7 @@ export default function makeBallistic(WrappedPath){
     return function(props){
         const [node,setNode] = useState(null);
 
-        const{relativeLength,maxWidth,progress,...pathProps} = props;
+        const{missileProps,pathProps} = props;
 
         const measuredPath= useCallback(node => {
             if (node !== null) {
@@ -16,7 +16,7 @@ export default function makeBallistic(WrappedPath){
         return<>
             <WrappedPath {...pathProps} ref={measuredPath}/>
             {node &&
-            <BallisticMissal relativeLength={relativeLength} maxWidth={maxWidth} progress={progress} node={node}/>
+            <BallisticMissal {...missileProps} node={node}/>
             }
         </>
     }
