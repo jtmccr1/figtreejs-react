@@ -1,6 +1,11 @@
+// this comment tells babel to convert jsx to calls to a function called jsx instead of React.createElement
+/** @jsx jsx */
+import { css, jsx } from '@emotion/core'
 import {range} from "d3-array";
 import {scaleLinear} from "d3-scale";
 import {animated, useSprings} from "react-spring";
+import React from "react"
+
 
 export default function BallisticMissal(props){
 
