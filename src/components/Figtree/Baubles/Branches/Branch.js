@@ -1,6 +1,6 @@
 import {animated, useSpring} from "react-spring";
 import React from "react";
-import {areEqualShallow} from "../../../utils/utilities";
+import {areEqualShallow} from "../../../../utils/utilities";
 
 const basicBranch = (props) =>{
     const {x,y,classes,interactions} = props;

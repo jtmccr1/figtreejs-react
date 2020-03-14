@@ -1,5 +1,5 @@
-import {splitAtExposedCommas} from "../src/utils/Tree/immutableTree";
-import {Type} from "../src/utils/Tree/immutableTree";
+import {splitAtExposedCommas} from "../../src/utils/Tree/immutableTree";
+import {Type} from "../../src/utils/Tree/immutableTree";
 import {timeParse} from "d3-time-format";
 
 import {
@@ -8,14 +8,14 @@ import {
     rotate,
     collapseUnsupportedNodes,
     annotateNode
-} from "../src/utils/Tree/treeOperations";
+} from "../../src/utils/Tree/treeOperations";
 import {
     getDivergence,
     getNode,
     getParent,
     getRootToTipLengths,
     getTips, setLength,
-} from "../src/utils/Tree/treeSettersandGetters";
+} from "../../src/utils/Tree/treeSettersandGetters";
 
 const treeString="(('A|2020-01':1,B|1980-01-11[&length_range={1,1.5},location=\"Janesburgh\",location.prob=0.8,location.set.prob={0.8,0.2},location.set={\"Janesburgh\",\"JanosAires\"}]:2):3,C|1960[&length_range={2,4},location=\"Mabalako\",location.prob=1.0,location.set.prob={1.0},location.set={\"Mabalako\"}]:4);"
 const expectedTree = {
@@ -210,9 +210,9 @@ describe("Tree Tests",()=>{
 
         expect(tree).not.toBe(annotatedTree);
         expect(getNode(tree,"B")).toBe(getNode(annotatedTree,"B"));
-        expect(getNode(annotatedTree,"A").annotations).toEqual({Host:"Bat"})
-        expect(getNode(annotatedTree,"A").annotationTypes).toEqual({Host:{type:Type.DISCRETE,values: new Set(["Bat"])}})
-        expect(annotatedTree.annotationTypes).toEqual({Host:{type:Type.DISCRETE,values: new Set(["Bat"])}})
+        expect(getNode(annotatedTree,"A").annotations).toEqual({Host:"Bat"});
+        expect(getNode(annotatedTree,"A").annotationTypes).toEqual({Host:{type:Type.DISCRETE,values: new Set(["Bat"])}});
+        expect(annotatedTree.annotationTypes).toEqual({Host:{type:Type.DISCRETE,values: new Set(["Bat"])}});
     })
 });
 

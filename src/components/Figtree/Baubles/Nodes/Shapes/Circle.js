@@ -1,7 +1,7 @@
 import React, {useContext,useMemo} from "react"
 import {useSpring,animated} from "react-spring";
-import {mapAttrsToProps} from "../../../../utils/baubleHelpers";
-import {NodeContext} from "../../../Figtree/FigTree";
+import {mapAttrsToProps} from "../../../../../utils/baubleHelpers";
+import {NodeContext} from "../../../FigTree";
 
 const Circle =(props)=>{
    const {attrs,interactions} = props;

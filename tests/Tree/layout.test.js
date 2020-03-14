@@ -1,7 +1,7 @@
-import {getVertexClassesFromNode, makeVertexFromNode} from "../src/utils/layouts/layoutHelpers";
-import {parseNewick} from "../src/utils/Tree/treeOperations";
-import {getNode} from "../src/utils/Tree/treeSettersandGetters";
-import {makeEdges, rectangularLayout, rectangularVertices} from "../src/utils/layouts/index";
+import {getVertexClassesFromNode, makeVertexFromNode} from "../../src/utils/layouts/layoutHelpers";
+import {parseNewick} from "../../src/utils/Tree/treeOperations";
+import {getNode} from "../../src/utils/Tree/treeSettersandGetters";
+import {makeEdges, rectangularLayout, rectangularVertices} from "../../src/utils/layouts";
 const tree = parseNewick("((A[&rate=0.9,host=\"bat\"]:2.1,B[&rate=1.1]:3)[&rate=1.5]:5,C[&rate=4]:1);");
 
 describe("Testing layout helper functions",()=> {

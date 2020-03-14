@@ -1,9 +1,9 @@
 import React, {useMemo, useContext} from "react"
 import Circle from "./Shapes/Circle";
 import Node from "./Node";
-import {mapAttrsToProps} from "../../../utils/baubleHelpers";
-import {LayoutContext, NodeContext, ScaleContext} from "../../Figtree/FigTree";
-import {reduceIterator} from "../../../utils/utilities";
+import {mapAttrsToProps} from "../../../../utils/baubleHelpers";
+import {LayoutContext, NodeContext, ScaleContext} from "../../FigTree";
+import {reduceIterator} from "../../../../utils/utilities";
 import CoalescentShape from "./Shapes/CoalescentShape";
 
 function NodesHOC(ShapeComponent) {

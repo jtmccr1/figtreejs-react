@@ -1,6 +1,6 @@
 import React from "react"
 import {animated, useSpring} from "react-spring";
-import {areEqualShallow} from "../../../utils/utilities";
+import {areEqualShallow} from "../../../../utils/utilities";
 
 /**
  * This positions a group at x,y with classes and calls a nodeShape with the remaining props.

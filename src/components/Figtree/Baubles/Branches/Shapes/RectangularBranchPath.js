@@ -1,7 +1,7 @@
 import React, {useCallback, useContext} from "react";
 import {curveStepBefore, line} from "d3-shape";
 import{useSpring,animated} from "react-spring";
-import withLinearGradient from "../../../HOC/WithLinearGradient";
+import withLinearGradient from "../../../../HOC/WithLinearGradient";
 
 // potentiall pass in mapper not attrs so we can cache and make more efficient.
 const rectangularBranchPath=(props)=>{
@@ -36,11 +36,11 @@ function sameProps(prev,curr){
 export default RectangularBranchPath;
 const logisticRamp=logisticGrowth(1,0.7,30);
 
-import {LayoutContext,ScaleContext} from "../../../Figtree/FigTree";
+import {LayoutContext,ScaleContext} from "../../../FigTree";
 import {calcSlope, coalescentPath, FadedPath, makeCoalescent} from "../../Nodes/Shapes/CoalescentShape";
 import {extent, max, min} from "d3-array";
-import withClipPath from "../../../HOC/withClipPath";
-import {areEqualShallow} from "../../../../utils/utilities";
+import withClipPath from "../../../../HOC/withClipPath";
+import {areEqualShallow} from "../../../../../utils/utilities";
 
 
 

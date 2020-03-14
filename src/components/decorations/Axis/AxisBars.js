@@ -8,7 +8,7 @@ import React from 'react'
  * @constructor
  */
 export  default function AxisBars(props) {
-    const {scale,tickValues,height,margins,attrs,evenFill,oddFill,gap,lift} = props;
+    const {scale,tickValues,height,attrs,evenFill,oddFill,gap,lift} = props;
 
     return(
         <g className={"axisBars"}>
@@ -17,8 +17,8 @@ export  default function AxisBars(props) {
                     const fill = i%2===0?evenFill:oddFill;
                     acc.push(<rect key={i} transform={`translate(${scale(tickValues[i])},0)`}
                                    width={width}
-                                   y={-1*(height-margins.bottom-margins.top+gap+lift)}
-                                   height ={(height-margins.bottom-margins.top+gap+lift)}
+                                   y={-1*(height+gap+lift)}
+                                   height ={(height+gap+lift)}
                                    fill={fill} {...{rx:2,ry:2,...attrs}} />);
                     return acc;
                 },[])}

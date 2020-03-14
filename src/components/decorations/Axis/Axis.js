@@ -6,7 +6,7 @@ import {ScaleContext} from "../../Figtree/FigTree";
 //TODO update for context
 export  default function Axis(props) {
 
-    const {scales,width,height,margins}=useContext(ScaleContext);
+    const {scales,width,height}=useContext(ScaleContext);
     const {direction,title,ticks,gap} = props;
 
     const scale = makeAxisScale(props,scales);
@@ -18,7 +18,7 @@ export  default function Axis(props) {
         tickValues = scale.ticks(ticks.number);
     }
 
-    const transform=direction==="horizontal"? `translate(${0},${height-margins.bottom-margins.top+gap})`:`translate(${-1*gap},${0})`;
+    const transform=direction==="horizontal"? `translate(${0},${height+gap})`:`translate(${-1*gap},${0})`;
 
 
 //TODO break this into parts HOC with logic horizontal/ vertical axis ect.
@@ -30,7 +30,6 @@ export  default function Axis(props) {
                     scale,
                     width,
                     height,
-                    margins,
                     tickValues,
                     gap
                 });

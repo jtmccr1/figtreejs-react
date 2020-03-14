@@ -1,9 +1,9 @@
 import React,{useMemo,useContext} from "react"
 import Branch from "./Branch";
 import RectangularBranchPath, {CoalescentBranch} from "./Shapes/RectangularBranchPath";
-import {mapAttrsToProps} from "../../../utils/baubleHelpers";
-import {ScaleContext} from "../../Figtree/FigTree.js";
-import {LayoutContext} from "../../Figtree/FigTree";
+import {mapAttrsToProps} from "../../../../utils/baubleHelpers";
+import {ScaleContext} from "../../FigTree.js";
+import {LayoutContext} from "../../FigTree";
 
 function BranchesHOC(PathComponent) {
     return function Branches(props){
