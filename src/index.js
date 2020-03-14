@@ -14,9 +14,9 @@ import Legend from "../src/components/decorations/Legend";
 import NodeBackgrounds from "./components/Baubles/Nodes/NodeBackgrounds";
 import Map from "./components/Map/Map";
 import Features from "./components/Map/Features";
-import GreatCircleArc,{PointsOnPath} from "./components/Map/GreatCircleArc";
+import GreatCircleArc,{GreatCircleArcMissal} from "./components/Map/GreatCircleArc";
 export {Branches,Nodes,customDateFormater,dateToDecimal,decimalToDate,Axis,AxisBars,Legend,
     FigTree,ImmutableTree,rectangularLayout,edgeFactory,KDE,getParent,getNode,getDivergence,getNodes,getTips,
     orderByNodeDensity,parseNewick,parseNexus,getRootToTipLengths,annotateNode,
-    collapseUnsupportedNodes,NodeBackgrounds,Map,Features,GreatCircleArc,PointsOnPath
+    collapseUnsupportedNodes,NodeBackgrounds,Map,Features,GreatCircleArc,GreatCircleArcMissal
 }
