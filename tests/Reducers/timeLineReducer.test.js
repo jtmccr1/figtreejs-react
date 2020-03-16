@@ -1,4 +1,4 @@
-import timelineReducer from "../../src/reducers/timelineReducer";
+import timelineReducer from "../../src/Context/reducers/timelineReducer";
 import {scaleTime} from "d3-scale";
 import {timeParse} from "d3-time-format";
 const timeConverter =timeParse("%Y-%m-%d");

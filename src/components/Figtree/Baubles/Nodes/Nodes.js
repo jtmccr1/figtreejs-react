@@ -18,7 +18,7 @@ function NodesHOC(ShapeComponent) {
         const selectedAttrMapper = useMemo(() => mapAttrsToProps(selectedAttrs), [selectedAttrs]);
         const hoveredAttrMapper = useMemo(() => mapAttrsToProps(hoveredAttrs), [hoveredAttrs]);
 
-
+//TODO rework this so we handle the new state layout.
         function attrMapper(v) {
             let attrs = baseAttrMapper(v);
             if (state.hovered === v.id) {

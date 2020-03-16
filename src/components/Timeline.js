@@ -1,6 +1,6 @@
 import React, {useReducer} from "react"
 import {scaleLinear, scaleTime} from "d3-scale";
-import timelineReducer from "../reducers/timelineReducer";
+import timelineReducer from "../Context/reducers/timelineReducer";
 
 const  defaultTimeline =  scaleTime().domain([new Date(8640000000000000),new Date(-8640000000000000)]).range([0,220]);
 

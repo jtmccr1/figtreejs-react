@@ -24,7 +24,7 @@ export default function  withTimelineConsumer(WrappedPlot){
         if(incomingMaxDate>currentMaxDate){
             timelineDispatch({type:"new max",payload:{maxDate:incomingMaxDate}})
         }
-    };
+    }
 
     const pos ={x:timeline(incomingMinDate), y:props.pos.y};
     const width = componentWidth-pos.x-(componentWidth-timeline(incomingMaxDate));

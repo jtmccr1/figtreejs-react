@@ -4,7 +4,7 @@ import {scaleLinear} from "d3-scale";
 import {extent} from "../../utils/utilities";
 import Branches from "./Baubles/Branches/Branches";
 import {makeEdges, rectangularVertices} from "../../utils/layouts";
-import {nodeReducer} from "../../reducers/interactionReducer";
+import {nodeReducer} from "../../Context/reducers/interactionReducer";
 import {parseNewick} from "../../utils/Tree/treeOperations";
 import {getDateRange} from "../../utils/Tree/treeSettersandGetters";
 
