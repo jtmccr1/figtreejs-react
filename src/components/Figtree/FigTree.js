@@ -6,6 +6,7 @@ import Branches from "./Baubles/Branches/Branches";
 import {makeEdges, rectangularVertices} from "../../utils/layouts";
 import {nodeReducer} from "../../reducers/interactionReducer";
 import {parseNewick} from "../../utils/Tree/treeOperations";
+import {getDateRange} from "../../utils/Tree/treeSettersandGetters";
 
 /**
  * The FigTree component
@@ -78,6 +79,7 @@ FigTree.defaultProps= {
     layout: rectangularVertices,
     children: [Branches],
     pos:{x:10,y:10},
+    getDateExtent:(tree)=>getDateRange(tree),
 };
 
 function childReducer(acc,child){

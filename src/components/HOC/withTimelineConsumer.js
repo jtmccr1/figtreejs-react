@@ -1,7 +1,6 @@
 import React, {useContext} from "react";
-import timelineReducer from "../../reducers/timelineReducer";
-import TimelineContext from "../Figure";
-import XContext from "../Figure";
+import TimelineContext from "../Timeline";
+import XContext from "../Timeline";
 /**
  * This HOC returns a plot component with updated scales so that the plot is aligned with a global x timescale.
  * @param WrappedPlot
@@ -9,8 +8,6 @@ import XContext from "../Figure";
  */
 export default function  withTimelineConsumer(WrappedPlot){
     return function(props){
-
-
     const {timeline,timelineDispatch} = useContext(TimelineContext);
     const componentWidth = useContext(XContext);
     const [currentMinDate,currentMaxDate] = timeline.domain();

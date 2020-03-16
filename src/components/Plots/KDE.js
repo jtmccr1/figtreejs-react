@@ -1,5 +1,5 @@
 import React from 'react';
-import {epanechnikov, kdeFactory} from "../../../utils/utilities";
+import {epanechnikov, kdeFactory} from "../../utils/utilities";
 import {scaleLinear} from "d3-scale";
 import{range,extent,deviation,quantile} from "d3-array";
 import {area,line} from "d3-shape";

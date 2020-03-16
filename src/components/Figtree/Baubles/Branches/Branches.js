@@ -1,6 +1,7 @@
 import React,{useMemo,useContext} from "react"
 import Branch from "./Branch";
-import RectangularBranchPath, {CoalescentBranch} from "./Shapes/RectangularBranchPath";
+import RectangularBranchPath from "./Shapes/RectangularBranchPath";
+import CoalescentBranch from "./Shapes/CoalescentBranchPath";
 import {mapAttrsToProps} from "../../../../utils/baubleHelpers";
 import {ScaleContext} from "../../FigTree.js";
 import {LayoutContext} from "../../FigTree";
@@ -40,5 +41,6 @@ RectangularBranches.defaultProps={
     filter:e=>true
 };
 const CoalescentBranches = BranchesHOC(CoalescentBranch);
-const Branches={Rectangular:RectangularBranches,Coalescent:CoalescentBranches};
+const Branches={Rectangular:RectangularBranches,
+    Coalescent:CoalescentBranches};
 export default Branches;

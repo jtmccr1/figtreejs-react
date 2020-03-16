@@ -13,7 +13,7 @@ export const XContext = React.createContext(100);
  * @return {*}
  * @constructor
  */
-export default function Figure(props){
+export default function Timeline(props){
     const{width,height,margins,padding} = props;
     const componentWidth = width-margins.left-margins.right;
 
@@ -33,7 +33,7 @@ export default function Figure(props){
     )
 }
 
-Figure.defaultProps={
+Timeline.defaultProps={
     width:800,
     height:600,
     margins:{top:10,right:10,bottom:70,left:70},

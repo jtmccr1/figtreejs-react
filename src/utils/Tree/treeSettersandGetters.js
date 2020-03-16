@@ -1,5 +1,6 @@
 import {produce} from "immer";
-import {memoize, mergeMaps, setParentMap} from "../utilities";
+import {dateToDecimal, decimalToDate, memoize, mergeMaps, setParentMap} from "../utilities";
+import {timeYear} from "d3-time";
 
 const nodeCalls ={self:Symbol("self"),parent:Symbol("parent")}
 /**
@@ -13,6 +14,7 @@ const nodeCalls ={self:Symbol("self"),parent:Symbol("parent")}
 export function getParent(tree,nodeId) {
             return nodeGetter(tree,nodeId,nodeCalls.parent)
 }
+//TODO return null if node not in tree;
 const nodeGetter=(function(){
         const cache=new Map();
         return function nodeGetter(tree,nodeId,call){
@@ -107,6 +109,12 @@ export function getTips(tree){
     return [...getNodesIterator(tree)].filter(n=>!n.children);
 }
 
+export function getDateRange(tree,scale=1){
+    const mostRecentDate = tree.annotationTypes.date.extent[1];
+    const rootHeight = getDivergence(tree,getNodes(tree).find(node=>node.annotations.date===mostRecentDate));
+    const rootDate = decimalToDate(dateToDecimal(mostRecentDate) -rootHeight);
+    return [rootDate,mostRecentDate]
+}
 
 
 export function setLength(tree,nodeid,length){

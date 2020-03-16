@@ -4,7 +4,7 @@ module.exports = {
     {
       name:"FigTree",
       components: "src/components/*.js",
-      ignore:"src/components/Figure.js"
+      ignore:"src/components/Timeline.js"
     },
 
     {

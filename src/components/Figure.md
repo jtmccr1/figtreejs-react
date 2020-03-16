@@ -1,4 +1,4 @@
-Figure example
+Timeline example
 
 
 ```jsx harmony
@@ -15,8 +15,8 @@ const edges =   tree.getPostOrder().filter(id=>id!==tree.getRoot()).map(id=>make
 
 
 
-     <Figure margins={{top:10,bottom:10,left:10,right:10}} width={600} height={400} >
+     <Timeline margins={{top:10,bottom:10,left:10,right:10}} width={600} height={400} >
          <Branches edges ={edges} curvature={0} label={e=>e.label} onHover={()=>true} onClick={()=>true} attrs={{strokeWidth:5}}/>
         <Nodes vertices ={vertices} label={e=>e.label}  />
-     </Figure>
+     </Timeline>
 ```

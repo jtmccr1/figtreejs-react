@@ -3,7 +3,7 @@ import {LayoutContext, ScaleContext} from "../../../FigTree";
 import {linkHorizontal} from "d3-shape";
 import {extent, max, min} from "d3-array";
 import withLinearGradient from "../../../../HOC/WithLinearGradient";
-
+import {getTips} from "../../../../../utils/Tree/treeSettersandGetters"
 //TODO extract out fill => gradient function
 
 const pathComponent=({attrs})=><path {...attrs}/>;
@@ -15,16 +15,14 @@ export default function CoalescentShape (props){
     const {scales} = useContext(ScaleContext);
     const {vertex,attrs} =props;
 
-    const targets = vertex.node.children.map(child=>vertices.get(child));
+    const targets = getTips(vertex.node).map(decedent=>vertices.get(decedent))
+        .concat(vertex.node.children.map(child=>vertices.get(child)));
 
     const slope = calcSlope(vertex,targets);
-
     const d=makeCoalescent(vertex,targets,scales,slope);
 
-    return (
-        <FadedPath attrs={{...attrs,d:d}} endingX={`${100/slope}%`} colorRamper={i=>attrs.fill} opacityRamper={i=>1-i} />
-    )
 
+    return  <FadedPath attrs={{...attrs,d:d}} endingX={`${100/slope}%`} colorRamper={i=>attrs.fill} opacityRamper={i=>1-i} />
 };
 
 CoalescentShape.defaultProps= {
@@ -48,15 +46,18 @@ const link = linkHorizontal()
  * @param startWidth - The starting width of the shape
  * @return string
  */
-export function coalescentPath(source,target,slope=10,startWidth=2){
-   const adjustedTarget={y:target.y,x:target.x/slope};
-   const inverseTarget = {x:adjustedTarget.x,y:source.y  -(adjustedTarget.y-source.y)};
+
+// need max x for top and bottom, diff y
+export function coalescentPath(source,topTarget,bottomTarget,slope=10,startWidth=2){
+   const adjustedTopTarget={y:topTarget.y,x:topTarget.x/slope};
+   const adjustedBottomTarget = {x:bottomTarget.x/slope,y:bottomTarget.y};
+
    const start = {x:source.x,y:source.y-startWidth/2};
    const end = {x:source.x,y:source.y+startWidth/2};
 
-   const topD=link({source:start,target:adjustedTarget});
-   const linker=`L${target.x},${target.y}v${inverseTarget.y-adjustedTarget.y},0L${inverseTarget.x},${inverseTarget.y}`;
-   const bottomD=link({source:inverseTarget,target:end});
+   const topD=link({source:start,target:adjustedTopTarget});
+   const linker=`L${topTarget.x},${topTarget.y}v${adjustedBottomTarget.y-adjustedTopTarget.y},0L${adjustedBottomTarget.x},${adjustedBottomTarget.y}`;
+   const bottomD=link({source:adjustedBottomTarget,target:end});
 
    return topD+linker+bottomD+`L${start.x},${start.y}`;
 }
@@ -70,12 +71,14 @@ export function coalescentPath(source,target,slope=10,startWidth=2){
  * @param slope
  * @return string
  */
-export function makeCoalescent(vertex,targets,scales,slope=1,){
-    // TODO make slope and percent gradient based on min x
-    const x=scales.x(max(targets,d=>d.x)-vertex.x);
-    const y=-scales.y((0.4+vertex.y-min(targets,d=>d.y)));
-    return coalescentPath({x:0,y:0},{x:x,y:y},slope)
+export function makeCoalescent(vertex,targets,scales,slope=1,adjustments={x:0,y:0}){
+    const xStart = adjustments.x;
+    const xEnd=scales.x(max(targets,d=>d.x)-vertex.x)+adjustments.x;
+    const yStart = adjustments.y;
+    const yTop=-scales.y((vertex.y-min(targets,d=>d.y)+0.4))+adjustments.y;
+    const yBottom =scales.y((max(targets,d=>d.y)-vertex.y+0.4))+adjustments.y;
 
+    return coalescentPath({x:xStart,y:yStart},{x:xEnd,y:yTop},{x:xEnd,y:yBottom},slope)
 }
 
 /**
