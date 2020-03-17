@@ -1,5 +1,5 @@
 //https://stackoverflow.com/questions/27936772/how-to-deep-merge-instead-of-shallow-merge
-import {timeParse,timeFormat} from "d3-time-format"
+import {timeFormat, timeParse} from "d3-time-format"
 import {mean} from "d3-array"
 
 export function isObject(item) {
@@ -148,3 +148,12 @@ export function reduceIterator(iterator, reducer,startingValue=[]) {
 
     }
 }
+
+export const DataType = {
+    DISCRETE: Symbol("DISCRETE"),
+    BOOLEAN: Symbol("BOOLEAN"),
+    INTEGER: Symbol("INTEGER"),
+    FLOAT: Symbol("FLOAT"),
+    PROBABILITIES: Symbol("PROBABILITIES"),
+    DATE: Symbol("DATE")
+};

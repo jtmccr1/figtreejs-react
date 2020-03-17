@@ -1,6 +1,6 @@
 /*
 import ImmutableCladeCollection, {mergeClade, treeReducer} from "../src/utils/immutableCladeCollection"
-import {ImmutableTree,Type} from "../src/utils/Tree/immutableTree";
+import {ImmutableTree,DataType} from "../src/utils/Tree/immutableTree";
 
 describe("Testing tree collection",()=>{
     const tree1String="((A[&rate=1]:2.1,B[&rate=1.1]:3)[&rate=1.5]:5,C[&rate=4]:1);";
@@ -22,7 +22,7 @@ describe("Testing tree collection",()=>{
     it("Should make a collection from 1 tree",()=>{
         const tree = ImmutableTree.parseNewick(tree1String,{tipMap});
         const expectedOutput = {
-            annotationTypes:{rate:{type:Type.FLOAT,extent:[1,4]}},
+            annotationTypes:{rate:{type:DataType.FLOAT,extent:[1,4]}},
             cladesById:{
                 "2":{
                     count:1,
@@ -58,7 +58,7 @@ describe("Testing tree collection",()=>{
         const trees = [tree1String,tree2String].map(ts=>ImmutableTree.parseNewick(ts,{tipMap}));
         const collection = ImmutableCladeCollection.collectTrees(trees);
         const expectedOutput = {
-            annotationTypes:{rate:{type:Type.FLOAT,extent:[1,4]}},
+            annotationTypes:{rate:{type:DataType.FLOAT,extent:[1,4]}},
             cladesById:{
                 "2":{
                     count:2,

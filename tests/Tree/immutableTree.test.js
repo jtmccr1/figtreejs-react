@@ -1,5 +1,4 @@
 import {splitAtExposedCommas} from "../../src/utils/Tree/immutableTree";
-import {Type} from "../../src/utils/Tree/immutableTree";
 import {timeParse} from "d3-time-format";
 
 import {
@@ -16,6 +15,7 @@ import {
     getRootToTipLengths,
     getTips, setLength,
 } from "../../src/utils/Tree/treeSettersandGetters";
+import {DataType} from "../../src/utils/utilities";
 
 const treeString="(('A|2020-01':1,B|1980-01-11[&length_range={1,1.5},location=\"Janesburgh\",location.prob=0.8,location.set.prob={0.8,0.2},location.set={\"Janesburgh\",\"JanosAires\"}]:2):3,C|1960[&length_range={2,4},location=\"Mabalako\",location.prob=1.0,location.set.prob={1.0},location.set={\"Mabalako\"}]:4);"
 const expectedTree = {
@@ -38,7 +38,7 @@ const expectedTree = {
                     date: timeParse("%Y-%m-%d")("2020-01-15")
                 },
                 annotationTypes:{
-                    date: {type: Type.DATE, extent: [timeParse("%Y-%m-%d")("2020-01-15"), timeParse("%Y-%m-%d")("2020-01-15")]}
+                    date: {type: DataType.DATE, extent: [timeParse("%Y-%m-%d")("2020-01-15"), timeParse("%Y-%m-%d")("2020-01-15")]}
                 }
             },
             {
@@ -54,19 +54,19 @@ const expectedTree = {
                     date: timeParse("%Y-%m-%d")("1980-01-11")
                 },
                 annotationTypes: {
-                    length_range: {type: Type.FLOAT, extent: [1, 1.5]},
-                    location: {type: Type.DISCRETE, values: new Set(["Janesburgh"])},
-                    location_prob: {type: Type.FLOAT, extent: [0.8, 0.8]},
-                    location_probSet: {type: Type.PROBABILITIES, values: [{"Janesburgh": 0.8, "JanosAires": 0.2}]},
-                    date: {type: Type.DATE, extent: [timeParse("%Y-%m-%d")("1980-01-11"), timeParse("%Y-%m-%d")("1980-01-11")]}
+                    length_range: {type: DataType.FLOAT, extent: [1, 1.5]},
+                    location: {type: DataType.DISCRETE, values: new Set(["Janesburgh"])},
+                    location_prob: {type: DataType.FLOAT, extent: [0.8, 0.8]},
+                    location_probSet: {type: DataType.PROBABILITIES, values: [{"Janesburgh": 0.8, "JanosAires": 0.2}]},
+                    date: {type: DataType.DATE, extent: [timeParse("%Y-%m-%d")("1980-01-11"), timeParse("%Y-%m-%d")("1980-01-11")]}
                 }
             }],
         annotationTypes: {
-            length_range: {type: Type.FLOAT, extent: [1, 1.5]},
-            location: {type: Type.DISCRETE, values: new Set(["Janesburgh"])},
-            location_prob: {type: Type.FLOAT, extent: [0.8, 0.8]},
-            location_probSet: {type: Type.PROBABILITIES, values: [{"Janesburgh": 0.8, "JanosAires": 0.2}]},
-            date: {type: Type.DATE, extent: [timeParse("%Y-%m-%d")("1980-01-11"), timeParse("%Y-%m-%d")("2020-01-15")]}
+            length_range: {type: DataType.FLOAT, extent: [1, 1.5]},
+            location: {type: DataType.DISCRETE, values: new Set(["Janesburgh"])},
+            location_prob: {type: DataType.FLOAT, extent: [0.8, 0.8]},
+            location_probSet: {type: DataType.PROBABILITIES, values: [{"Janesburgh": 0.8, "JanosAires": 0.2}]},
+            date: {type: DataType.DATE, extent: [timeParse("%Y-%m-%d")("1980-01-11"), timeParse("%Y-%m-%d")("2020-01-15")]}
         }
     },
         {
@@ -82,19 +82,19 @@ const expectedTree = {
                 date: timeParse("%Y-%m-%d")("1960-06-15")
             },
             annotationTypes: {
-                length_range: {type: Type.INTEGER, extent: [2, 4]},
-                location: {type: Type.DISCRETE, values: new Set(["Mabalako"])},
-                location_prob: {type: Type.INTEGER, extent: [1,1]},
-                location_probSet: {type: Type.PROBABILITIES, values: [{"Mabalako": 1}]},
-                date: {type: Type.DATE, extent: [timeParse("%Y-%m-%d")("1960-06-15"), timeParse("%Y-%m-%d")("1960-06-15")]}
+                length_range: {type: DataType.INTEGER, extent: [2, 4]},
+                location: {type: DataType.DISCRETE, values: new Set(["Mabalako"])},
+                location_prob: {type: DataType.INTEGER, extent: [1,1]},
+                location_probSet: {type: DataType.PROBABILITIES, values: [{"Mabalako": 1}]},
+                date: {type: DataType.DATE, extent: [timeParse("%Y-%m-%d")("1960-06-15"), timeParse("%Y-%m-%d")("1960-06-15")]}
             }
         }],
     annotationTypes: {
-        length_range: {type: Type.FLOAT, extent: [1, 4]},
-        location: {type: Type.DISCRETE, values: new Set(["Janesburgh", "Mabalako"])},
-        location_prob: {type: Type.FLOAT, extent: [0.8, 1]},
-        location_probSet: {type: Type.PROBABILITIES, values: [ {"Janesburgh": 0.8, "JanosAires": 0.2},{"Mabalako": 1}]},
-        date: {type: Type.DATE, extent: [timeParse("%Y-%m-%d")("1960-06-15"), timeParse("%Y-%m-%d")("2020-01-15")]}
+        length_range: {type: DataType.FLOAT, extent: [1, 4]},
+        location: {type: DataType.DISCRETE, values: new Set(["Janesburgh", "Mabalako"])},
+        location_prob: {type: DataType.FLOAT, extent: [0.8, 1]},
+        location_probSet: {type: DataType.PROBABILITIES, values: [ {"Janesburgh": 0.8, "JanosAires": 0.2},{"Mabalako": 1}]},
+        date: {type: DataType.DATE, extent: [timeParse("%Y-%m-%d")("1960-06-15"), timeParse("%Y-%m-%d")("2020-01-15")]}
     }
 };
 describe("Tree Tests",()=>{
@@ -211,8 +211,8 @@ describe("Tree Tests",()=>{
         expect(tree).not.toBe(annotatedTree);
         expect(getNode(tree,"B")).toBe(getNode(annotatedTree,"B"));
         expect(getNode(annotatedTree,"A").annotations).toEqual({Host:"Bat"});
-        expect(getNode(annotatedTree,"A").annotationTypes).toEqual({Host:{type:Type.DISCRETE,values: new Set(["Bat"])}});
-        expect(annotatedTree.annotationTypes).toEqual({Host:{type:Type.DISCRETE,values: new Set(["Bat"])}});
+        expect(getNode(annotatedTree,"A").annotationTypes).toEqual({Host:{type:DataType.DISCRETE,values: new Set(["Bat"])}});
+        expect(annotatedTree.annotationTypes).toEqual({Host:{type:DataType.DISCRETE,values: new Set(["Bat"])}});
     })
 });
 

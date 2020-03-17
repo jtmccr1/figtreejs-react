@@ -1,5 +1,5 @@
 import {mean} from "d3-array";
-import {Type} from "../Tree/immutableTree";
+import {DataType} from "../utilities";
 
 export function getVertexClassesFromNode(tree){
     let classes = [(!tree.children ? "external-node" : "internal-node")];
@@ -7,14 +7,14 @@ export function getVertexClassesFromNode(tree){
         classes=classes.concat(Object.entries(tree.annotationTypes)
                 .filter(([key]) => {
                     return tree.annotationTypes[key] &&
-                        (tree.annotationTypes[key].type === Type.DISCRETE ||
-                            tree.annotationTypes[key].type === Type.BOOLEAN ||
-                            tree.annotationTypes[key].type === Type.INTEGER);
+                        (tree.annotationTypes[key].type === DataType.DISCRETE ||
+                            tree.annotationTypes[key].type === DataType.BOOLEAN ||
+                            tree.annotationTypes[key].type === DataType.INTEGER);
                 })
                 .map(([key, value]) =>{
-                    if(tree.annotationTypes[key].type===Type.DISCRETE || tree.annotationTypes[key].type === Type.INTEGER){
+                    if(tree.annotationTypes[key].type===DataType.DISCRETE || tree.annotationTypes[key].type === DataType.INTEGER){
                         return `${key}-${tree.annotations[key]}`;
-                    }else if(tree.annotationTypes[key].type === Type.BOOLEAN && tree.annotations[key] ){
+                    }else if(tree.annotationTypes[key].type === DataType.BOOLEAN && tree.annotations[key] ){
                         return `${key}`
                     }
                 }));

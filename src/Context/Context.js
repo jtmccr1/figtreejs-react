@@ -1,9 +1,7 @@
 import React from "react";
-
+import interactionReducer,{initialState} from "./reducers/interactionReducer";
 
 export const InteractionProvider = React.createContext(false);
-const state={};
-const reducer=()=>true;
-const defaultInteractionContext= {state,reducer};
+const defaultInteractionContext= {initialState,reducer:interactionReducer};
 
 export const defaultContextValues=new Map([[InteractionProvider,defaultInteractionContext]]);

@@ -1,11 +1,9 @@
-import React from "react"
-import ColorRamp from "./ColorRamp";
-import Axis from "../../Axis/Axis";
-import {format} from "d3-format";
-import {quantize, interpolate, interpolateRound} from "d3-interpolate";
+import React, {useContext} from "react"
 // this comment tells babel to convert jsx to calls to a function called jsx instead of React.createElement
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core'
+import {InteractionProvider} from "../../../Context/Context";
+import {DataType} from "../../../utils/utilities";
 
 
 /**
@@ -19,26 +17,28 @@ import { css, jsx } from '@emotion/core'
  * @param pos
  * @param width
  * @param height
- * @param direction
  * @param title
- * @param ticks
- * @param tickFormat
  * @return {(number|*)[]|*}
  * @constructor
  */
 
 export default function DiscreteLegend({scale,pos,width,height,swatchSize,format,title,columns} ){
+//TODO hard coded location on hover call back.
+    const {state,dispatch} = useContext(InteractionProvider);
+    const onHover=(value)=>()=>dispatch({type:"hover",payload:{dataType:DataType.DISCRETE,key:"location",value:value}});
+    const onUnHover =()=>dispatch({type:"unhover",payload:{}});
     return(
         <foreignObject x={pos.x} y={pos.y} width={width} height={height}>
             <div css={css`display: flex; align-items: center; min-height: 33px; font: 12px sans-serif;`}>
                 <div css={css`width: 100%; columns: ${columns};"`}>
                     {scale.domain().map(value => {
                         return(
-                            <div key={value} css={css`break-inside: avoid;
+                            <div key={value} css={css`cursor:pointer;
+                                                      break-inside: avoid;
                                                       display: flex;
                                                       align-items: center;
                                                       padding-bottom: 1px;
-                                                        `}>
+                                                        `} onMouseEnter={onHover(value)} onMouseLeave={()=>onUnHover()} >
                                 <div css={css`width: ${swatchSize}px;
                                   height: ${swatchSize}px;
                                   margin: 0 0.5em 0 0;

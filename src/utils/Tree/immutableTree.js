@@ -1,18 +1,8 @@
-import {extent,max} from "d3-array";
+import {extent, max} from "d3-array";
 import {timeParse} from "d3-time-format";
-import {decimalToDate} from "../utilities";
+import {decimalToDate, DataType} from "../utilities";
 import BitSet from "bitset/bitset";
 
-
-
-export const Type = {
-    DISCRETE : Symbol("DISCRETE"),
-    BOOLEAN : Symbol("BOOLEAN"),
-    INTEGER : Symbol("INTEGER"),
-    FLOAT: Symbol("FLOAT"),
-    PROBABILITIES: Symbol("PROBABILITIES"),
-    DATE:Symbol("DATE")
-};
 
 export class ImmutableTree{
     constructor(treeData){
@@ -361,10 +351,10 @@ export function reconcileAnnotations(incomingAnnotations,currentAnnotations={}){
         } else {
             const type = types.type;
             if (annotation.type !== type) {
-                if ((type === Type.INTEGER && annotation.type === Type.FLOAT) ||
-                    (type === Type.FLOAT && annotation.type === Type.INTEGER)) {
+                if ((type === DataType.INTEGER && annotation.type === DataType.FLOAT) ||
+                    (type === DataType.FLOAT && annotation.type === DataType.INTEGER)) {
                     // upgrade to float
-                    annotation.type = Type.FLOAT;
+                    annotation.type = DataType.FLOAT;
                     if (annotation.values) {
                         delete annotation.values;
                     }
@@ -373,7 +363,7 @@ export function reconcileAnnotations(incomingAnnotations,currentAnnotations={}){
                     throw Error(`existing values of the annotation, ${key}, in the tree is not of the same type`);
                 }
             } else if (annotation.type === type) {
-                if (type === Type.DISCRETE) {
+                if (type === DataType.DISCRETE) {
                     if (!annotation.values) {
                         annotation.values = new Set();
                     }
@@ -395,32 +385,32 @@ function typeAnnotations(annotations){
             const annotation = {};
              annotationTypes[key] = annotation;
         if(addValues instanceof Date){
-            annotation.type=Type.DATE;
+            annotation.type=DataType.DATE;
             annotation.extent = [addValues,addValues];
         } else if (Array.isArray(addValues)) {
             // is a set of  values
             let type;
             if(addValues.map(v=>isNaN(v)).reduce((acc,curr)=>acc&&curr,true)) {
-                type = Type.DISCRETE;
+                type = DataType.DISCRETE;
                 annotation.type = type;
                 if (!annotation.values) {
                     annotation.values = new Set();
                 }
                 annotation.values.add(...addValues);
             }else if(addValues.map(v=>parseFloat(v)).reduce((acc,curr)=>acc&&Number.isInteger(curr),true)){
-                type =Type.INTEGER;
+                type =DataType.INTEGER;
                 annotation.extent=extent(addValues)
             }else{
-                type = Type.FLOAT;
+                type = DataType.FLOAT;
                 annotation.extent=extent(addValues)
             }
 
             if (annotation.type && annotation.type !== type) {
-                if ((type === Type.INTEGER && annotation.type === Type.FLOAT) ||
-                    (type === Type.FLOAT && annotation.type === Type.INTEGER)) {
+                if ((type === DataType.INTEGER && annotation.type === DataType.FLOAT) ||
+                    (type === DataType.FLOAT && annotation.type === DataType.INTEGER)) {
                     // upgrade to float
-                    type = Type.FLOAT;
-                    annotation.type = Type.FLOAT;
+                    type = DataType.FLOAT;
+                    annotation.type = DataType.FLOAT;
                     if(annotation.values){
                         delete annotation.values;
                     }else{
@@ -442,9 +432,9 @@ function typeAnnotations(annotations){
                 }
                 if (typeof value === typeof 1.0) {
                     // This is a vector of probabilities of different states
-                    type = (type === undefined) ? Type.PROBABILITIES : type;
+                    type = (type === undefined) ? DataType.PROBABILITIES : type;
 
-                    if (type === Type.DISCRETE) {
+                    if (type === DataType.DISCRETE) {
                         throw Error(`the values of annotation, ${key}, should be all boolean or all floats`);
                     }
 
@@ -453,9 +443,9 @@ function typeAnnotations(annotations){
                         throw Error(`the values of annotation, ${key}, should be probabilities of states and add to 1.0`);
                     }
                 } else if (typeof value === typeof true) {
-                    type = (type === undefined) ? Type.DISCRETE : type;
+                    type = (type === undefined) ? DataType.DISCRETE : type;
 
-                    if (type === Type.PROBABILITIES) {
+                    if (type === DataType.PROBABILITIES) {
                         console.warn(annotations)
                         throw Error(`the values of annotation, ${key}, should be all boolean or all floats`);
                     }
@@ -470,30 +460,30 @@ function typeAnnotations(annotations){
             annotation.type = type;
             annotation.values = annotation.values? [...annotation.values, addValues]:[addValues]
         } else {
-            let type = Type.DISCRETE;
+            let type = DataType.DISCRETE;
 
             if (typeof addValues === typeof true) {
-                type = Type.BOOLEAN;
+                type = DataType.BOOLEAN;
             } else if (!isNaN(addValues)) {
-                type = (addValues % 1 === 0 ? Type.INTEGER : Type.FLOAT);
+                type = (addValues % 1 === 0 ? DataType.INTEGER : DataType.FLOAT);
             }
 
             if (annotation.type && annotation.type !== type) {
-                if ((type === Type.INTEGER && annotation.type === Type.FLOAT) ||
-                    (type === Type.FLOAT && annotation.type === Type.INTEGER)) {
+                if ((type === DataType.INTEGER && annotation.type === DataType.FLOAT) ||
+                    (type === DataType.FLOAT && annotation.type === DataType.INTEGER)) {
                     // upgrade to float
-                    type = Type.FLOAT;
+                    type = DataType.FLOAT;
                 } else {
                     throw Error(`existing values of the annotation, ${key}, in the tree is not of the same type`);
                 }
             }
 
-            if (type === Type.DISCRETE) {
+            if (type === DataType.DISCRETE) {
                 if (!annotation.values) {
                     annotation.values = new Set();
                 }
                 annotation.values.add(addValues);
-            }else if( type===Type.FLOAT|| type===Type.INTEGER){
+            }else if( type===DataType.FLOAT|| type===DataType.INTEGER){
                 annotation.extent=[addValues,addValues]
             }
 
