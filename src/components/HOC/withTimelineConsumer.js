@@ -8,7 +8,9 @@ import XContext from "../Timeline";
  */
 export default function  withTimelineConsumer(WrappedPlot){
     return function(props){
+        console.log(useContext(TimelineContext));
     const {timeline,timelineDispatch} = useContext(TimelineContext);
+
     const componentWidth = useContext(XContext);
     const [currentMinDate,currentMaxDate] = timeline.domain();
 

@@ -1,6 +1,6 @@
 import React from "react"
 import ColorRamp from "./ColorRamp";
-import Axis from "../../Axis/Axis";
+import Axis from "../Axis/Axis";
 import {format} from "d3-format";
 import {quantize, interpolate, interpolateRound} from "d3-interpolate";
 

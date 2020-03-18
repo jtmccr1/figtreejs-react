@@ -1,11 +1,11 @@
 import {ImmutableTree} from "./utils/Tree/immutableTree";
 import Branches from "./components/Figtree/Baubles/Branches/Branches";
 import Nodes from "./components/Figtree/Baubles/Nodes/Nodes"
-import Axis from "./components/Axis/Axis";
+import Axis from "./components/decorations/Axis/Axis";
 import FigTree from "./components/Figtree/FigTree";
 import {rectangularLayout,edgeFactory} from "./utils/layouts";
 import {customDateFormater,dateToDecimal,decimalToDate} from "./utils/utilities";
-import AxisBars from "./components/Axis/AxisBars";
+import AxisBars from "./components/decorations/Axis/AxisBars";
 import KDE from "./components/Plots/KDE";
 import {parseNewick,parseNexus} from "./utils/Tree/treeOperations";
 import{getParent,getNode,getDivergence,getNodes,getTips,getRootToTipLengths,getDateRange} from "./utils/Tree/treeSettersandGetters"

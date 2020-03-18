@@ -2,7 +2,7 @@ import React,{useContext} from 'react'
 import {line} from "d3-shape"
 import {mean,quantile,range} from "d3-array"
 import {format} from "d3-format"
-import {useScales} from "../../hooks";
+import {useScales} from "../../../hooks";
 export  default function Axis(props) {
 
     const {scales,width,height}=useScales();

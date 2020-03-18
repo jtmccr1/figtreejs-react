@@ -2,9 +2,8 @@ import React, {useContext,useCallback} from "react"
 // this comment tells babel to convert jsx to calls to a function called jsx instead of React.createElement
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core'
-import {InteractionContext} from "../../../Context/Context";
 import {DataType} from "../../../utils/utilities";
-import ReactTooltip from "react-tooltip";
+import {useInteractions} from "../../../hooks";
 
 
 /**
@@ -25,7 +24,7 @@ import ReactTooltip from "react-tooltip";
 
 export default function DiscreteLegend({scale,pos,width,height,swatchSize,format,annotation,columns} ){
 //TODO hard coded location on hover call back.
-    const {state,dispatch} = useContext(InteractionContext);
+    const {dispatch} = useInteractions();
     const onHover=useCallback((value)=>()=>dispatch({type:"hover",payload:{dataType:DataType.DISCRETE,key:annotation,value:value}}))
     const onUnHover = useCallback(()=>dispatch({type:"unhover",payload:{}}));
     return(
