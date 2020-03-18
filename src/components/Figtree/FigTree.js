@@ -4,10 +4,9 @@ import {scaleLinear} from "d3-scale";
 import {extent} from "../../utils/utilities";
 import Branches from "./Baubles/Branches/Branches";
 import {makeEdges, rectangularVertices} from "../../utils/layouts";
-import {nodeReducer} from "../../Context/reducers/interactionReducer";
 import {parseNewick} from "../../utils/Tree/treeOperations";
 import {getDateRange} from "../../utils/Tree/treeSettersandGetters";
-import {InteractionProvider} from "../../Context/Context";
+import {InteractionContext,ScaleContext} from "../../Context/Context";
 import withConditionalContextProvider from "../HOC/withConditionalContextProvider.js"
 /**
  * The FigTree component
@@ -15,10 +14,7 @@ import withConditionalContextProvider from "../HOC/withConditionalContextProvide
  * It also passes it's scales to it's children props as well as the edges to the branches and the nodes to the nodes.
  */
 
-export const ScaleContext = React.createContext(
-    {scales:{x:scaleLinear().domain([0,100]).range([0,230]),y:scaleLinear().domain([0,100]).range([0,240])},
-        width:300,height:300
-    });
+
 export const TreeContext = React.createContext(parseNewick(    '((((((virus1:0.1,virus2:0.12)0.95:0.08,(virus3:0.011,virus4:0.0087)1.0:0.15)0.65:0.03,virus5:0.21)1.0:0.2,(virus6:0.45,virus7:0.4)0.51:0.02)1.0:0.1,virus8:0.4)1.0:0.1,(virus9:0.04,virus10:0.03)1.0:0.6);'));
 export const LayoutContext = React.createContext({vertices:new Map(),edges:[]});
 function FigTree(props){
@@ -54,7 +50,7 @@ function FigTree(props){
             )
 }
 
-export default withConditionalContextProvider(FigTree,InteractionProvider);
+export default withConditionalContextProvider(FigTree,InteractionContext);
 
 function setUpScales(width,height,vertices){
     const xdomain = extent(vertices.values(),d=>d.x);

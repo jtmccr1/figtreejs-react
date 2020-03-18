@@ -1,9 +1,10 @@
-import React, {useContext} from "react"
+import React, {useContext,useCallback} from "react"
 // this comment tells babel to convert jsx to calls to a function called jsx instead of React.createElement
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core'
-import {InteractionProvider} from "../../../Context/Context";
+import {InteractionContext} from "../../../Context/Context";
 import {DataType} from "../../../utils/utilities";
+import ReactTooltip from "react-tooltip";
 
 
 /**
@@ -22,18 +23,18 @@ import {DataType} from "../../../utils/utilities";
  * @constructor
  */
 
-export default function DiscreteLegend({scale,pos,width,height,swatchSize,format,title,columns} ){
+export default function DiscreteLegend({scale,pos,width,height,swatchSize,format,annotation,columns} ){
 //TODO hard coded location on hover call back.
-    const {state,dispatch} = useContext(InteractionProvider);
-    const onHover=(value)=>()=>dispatch({type:"hover",payload:{dataType:DataType.DISCRETE,key:"location",value:value}});
-    const onUnHover =()=>dispatch({type:"unhover",payload:{}});
+    const {state,dispatch} = useContext(InteractionContext);
+    const onHover=useCallback((value)=>()=>dispatch({type:"hover",payload:{dataType:DataType.DISCRETE,key:annotation,value:value}}))
+    const onUnHover = useCallback(()=>dispatch({type:"unhover",payload:{}}));
     return(
         <foreignObject x={pos.x} y={pos.y} width={width} height={height}>
             <div css={css`display: flex; align-items: center; min-height: 33px; font: 12px sans-serif;`}>
                 <div css={css`width: 100%; columns: ${columns};"`}>
                     {scale.domain().map(value => {
                         return(
-                            <div key={value} css={css`cursor:pointer;
+                            <div key={value}  css={css`cursor:pointer;
                                                       break-inside: avoid;
                                                       display: flex;
                                                       align-items: center;
@@ -42,7 +43,8 @@ export default function DiscreteLegend({scale,pos,width,height,swatchSize,format
                                 <div css={css`width: ${swatchSize}px;
                                   height: ${swatchSize}px;
                                   margin: 0 0.5em 0 0;
-                                  background:${scale(value)}`}/>
+                                  background:${scale(value)}
+                                  `}/>
                                   <div css={css`
                                 white-space: nowrap;
                                 overflow: hidden;
@@ -54,11 +56,12 @@ export default function DiscreteLegend({scale,pos,width,height,swatchSize,format
                     )}
                 </div>
             </div>
-
         </foreignObject>
     )
 
 }
+
+
 
 DiscreteLegend.defaultProps={
     pos:{x:50,y:0},

@@ -2,11 +2,10 @@ import React,{useContext} from 'react'
 import {line} from "d3-shape"
 import {mean,quantile,range} from "d3-array"
 import {format} from "d3-format"
-import {ScaleContext} from "../Figtree/FigTree";
-//TODO update for context
+import {useScales} from "../../hooks";
 export  default function Axis(props) {
 
-    const {scales,width,height}=useContext(ScaleContext);
+    const {scales,width,height}=useScales();
     const {direction,title,ticks,gap} = props;
 
     const scale = makeAxisScale(props,scales);

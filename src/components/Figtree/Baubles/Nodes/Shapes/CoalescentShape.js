@@ -1,9 +1,10 @@
 import React, {useContext} from "react"
-import {LayoutContext, ScaleContext} from "../../../FigTree";
+import {LayoutContext} from "../../../FigTree";
 import {linkHorizontal} from "d3-shape";
 import {extent, max, min} from "d3-array";
 import withLinearGradient from "../../../../HOC/WithLinearGradient";
 import {getTips} from "../../../../../utils/Tree/treeSettersandGetters"
+import {useScales} from "../../../../../hooks";
 //TODO extract out fill => gradient function
 
 const pathComponent=({attrs})=><path {...attrs}/>;
@@ -12,7 +13,7 @@ export const FadedPath=withLinearGradient(pathComponent);
 
 export default function CoalescentShape (props){
     const {vertices} =  useContext(LayoutContext);
-    const {scales} = useContext(ScaleContext);
+    const {scales} = useScales();
     const {vertex,attrs} =props;
 
     const targets = getTips(vertex.node).map(decedent=>vertices.get(decedent))

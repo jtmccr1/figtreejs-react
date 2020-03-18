@@ -18,8 +18,8 @@ const basicNode =(props)=>{
 };
 
 function samesies(prev,curr){
-    const prevChildrenAttrs = [].concat(prev.children).map(child=>child.props.attrs);
-    const currChildrenAttrs =[].concat(curr.children).map(child=>child.props.attrs);
+    const prevChildrenAttrs = [].concat(React.Children.toArray(prev.children)[0]).map(child=>child.props.attrs);
+    const currChildrenAttrs =[].concat(React.Children.toArray(curr.children)[0]).map(child=>child.props.attrs);
     const prevProps = {x:prev.x,y:prev.y};
     const currProps = {x:curr.x,y:curr.y};
 

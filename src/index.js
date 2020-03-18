@@ -16,8 +16,11 @@ import Map from "./components/Map/Map";
 import Features from "./components/Map/Features";
 import GreatCircleArc,{GreatCircleArcMissal} from "./components/Map/GreatCircleArc";
 import Timeline from "./components/Timeline";
+import InteractionContainer from "../src/components/InteractionContainer"
+import Label from "../src/components/Figtree/Label"
 export {Branches,Nodes,customDateFormater,dateToDecimal,decimalToDate,Axis,AxisBars,Legend,
     FigTree,ImmutableTree,rectangularLayout,edgeFactory,KDE,getParent,getNode,getDivergence,getNodes,getTips,
     orderByNodeDensity,parseNewick,parseNexus,getRootToTipLengths,annotateNode,
-    collapseUnsupportedNodes,NodeBackgrounds,Map,Features,GreatCircleArc,GreatCircleArcMissal,Timeline,getDateRange
+    collapseUnsupportedNodes,NodeBackgrounds,Map,Features,GreatCircleArc,GreatCircleArcMissal,Timeline,getDateRange,
+    InteractionContainer,Label
 }

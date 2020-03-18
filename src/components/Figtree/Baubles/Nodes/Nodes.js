@@ -1,58 +1,35 @@
 import React, {useMemo, useContext} from "react"
 import Circle from "./Shapes/Circle";
 import Node from "./Node";
-import {mapAttrsToProps} from "../../../../utils/baubleHelpers";
-import {LayoutContext, ScaleContext} from "../../FigTree";
+import {LayoutContext} from "../../FigTree";
 import {DataType, reduceIterator} from "../../../../utils/utilities";
 import CoalescentShape from "./Shapes/CoalescentShape";
-import {InteractionProvider} from "../../../../Context/Context";
+import {useAttributeMappers, useScales} from "../../../../hooks";
 
+/**
+ * This HOC takes a node shape and returns a shape for each vertex. It also handles converting
+ * attributes that can be functions into display attributes that are passed to the shape.
+ * @param ShapeComponent
+ * @returns {function(*): *}
+ * @constructor
+ */
+const hoverHelpers = {predicate:nodeHoverpredicate,actionCreator:nodeHoverAction};
+const selectionHelpers = {predicate:()=>false,actionCreator:()=>{}};
 function NodesHOC(ShapeComponent) {
     return function Nodes(props) {
-        const {scales} = useContext(ScaleContext);
+        const {scales} = useScales();
         const {vertices} = useContext(LayoutContext);
-        const {state, dispatch} = useContext(InteractionProvider);
-        const {filter, attrs, selectedAttrs, hoveredAttrs} = props;
-
-        const baseAttrMapper = useMemo(() => mapAttrsToProps(attrs), [attrs]);
-        const selectedAttrMapper = useMemo(() => mapAttrsToProps(selectedAttrs), [selectedAttrs]);
-        const hoveredAttrMapper = useMemo(() => mapAttrsToProps(hoveredAttrs), [hoveredAttrs]);
-
-        function attrMapper(v) {
-            let attrs = baseAttrMapper(v);
-            if (nodeHoverHelper(state,v)) {
-                attrs = {...attrs, ...hoveredAttrMapper(v)};
-            }
-            if (nodeSelectionHelper(state,v)) {
-                attrs = {...attrs, ...selectedAttrMapper(v)};
-            }
-            return attrs;
-        };
-
-        function interactionMapper(v) {
-            return {
-                onMouseEnter: () => dispatch({type: "hover", payload:{type:DataType.DISCRETE,key:"id",value:v.id}}),
-                onMouseLeave: () => dispatch({type: "unhover"}),
-                // onClick: () => selectorLogic(state.selected, dispatch, v.id)
-            }
-        }
-        function shapeProps(v) {
-            return {attrs: attrMapper(v), interactions: interactionMapper(v)}
-        }
+        const {filter} = props;
+        const shapeProps = useAttributeMappers(props,hoverHelpers,selectionHelpers);
         return (
             <>
                 {reduceIterator(vertices.values(), (all, v) => {
                     if (filter(v)) {
-                        const element = <Node key={`node-${v.id}`} id={`node-${v.id}`}classes={v.classes} x={scales.x(v.x)} y={scales.y(v.y)}>
+                        const element = <Node  key={`node-${v.id}`} id={`node-${v.id}`} classes={v.classes} x={scales.x(v.x)} y={scales.y(v.y)}>
                                             <ShapeComponent {...shapeProps(v)} vertex={v}/>
-                                        </Node>
-                                        ;
-                        if(v.id===state.hovered){
+                                            {React.Children.map(props.children,child=>React.cloneElement(child,{data:v,...child.props}))}
+                                        </Node>;
                             all.push(element)
-                        }
-                        else{
-                            all.unshift(element)
-                        }
                     }
                     return all
                 }, [])
@@ -76,7 +53,9 @@ CircleNodes.defaultProps={
     filter:(v)=>true,
     attrs:{r:2},
     selectedAttrs:{},
-    hoveredAttrs:{}
+    hoveredAttrs:{},
+    tooltip:{},
+    label:()=>false,
 };
 const CoalescentNodes=NodesHOC(CoalescentShape);
 CoalescentNodes.defualtProps={
@@ -85,13 +64,19 @@ CoalescentNodes.defualtProps={
         strokeWidth: 1,
         stroke: 'black'
     },
+    tooltip:{},
 };
 const Nodes={Circle:CircleNodes,Coalescent:CoalescentNodes};
 export default Nodes;
 
 
 
-function nodeHoverHelper({hovered},vertex){
+function nodeHoverAction(vertex){
+    return {type:"hover",payload:{type:DataType.DISCRETE,key:"id",value:vertex.id}}
+}
+
+
+function nodeHoverpredicate({hovered},vertex){
     if(hovered.key==="id") {
         return vertex.id === hovered.value;
     }
@@ -101,7 +86,7 @@ function nodeHoverHelper({hovered},vertex){
     return false;
 }
 
-function nodeSelectionHelper({selected},vertex){
+function nodeSelectionPredicate({selected},vertex){
     return false;
 }
 

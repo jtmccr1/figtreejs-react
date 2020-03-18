@@ -1,20 +1,20 @@
 import React, {useCallback, useContext, useMemo} from "react";
 import withLinearGradient from "../../../../HOC/WithLinearGradient";
-import {LayoutContext,ScaleContext} from "../../../FigTree";
+import {LayoutContext} from "../../../FigTree";
 import {calcSlope, makeCoalescent} from "../../Nodes/Shapes/CoalescentShape";
 import {extent} from "d3-array";
 import withClipPath from "../../../../HOC/withClipPath";
 import {getTips} from "../../../../..";
 import RectangularBranchPath from "./RectangularBranchPath";
+import {useScales} from "../../../../../hooks";
 
 const logisticRamp=logisticGrowth(1,0.7,30);
 const FadedClippedPath=React.memo(withClipPath(withLinearGradient(RectangularBranchPath)));
 
-function coalescentBranch(props){
+function BaseCoalescentBranch(props){
     const {vertices} =  useContext(LayoutContext);
-    const {scales} = useContext(ScaleContext);
+    const {scales} = useScales();
     const {edge,y1,y0} =props;
-
     const vertex = vertices.get(edge.v0.node);
 
     const childTargets = vertex.node.children.map(child=>vertices.get(child));
@@ -34,7 +34,10 @@ function coalescentBranch(props){
     />
 }
 
-const CoalescentBranch=React.memo(coalescentBranch,()=>false);
+const CoalescentBranch=React.memo(BaseCoalescentBranch,()=>false);
+CoalescentBranch.defaultProps={
+    fade:"relative",
+};
 export default CoalescentBranch;
 
 function logisticGrowth(L,midpoint,k){

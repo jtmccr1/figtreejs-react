@@ -123,3 +123,17 @@ export function setLength(tree,nodeid,length){
       node.length=length;
     })
 }
+
+export function getTraitTransitions(tree,annotation){
+    const traverse = function *(tree) {
+        if (tree.children) {
+            for (const child of tree.children) {
+                if(child.annotations[annotation]!==tree.annotations[annotation]){
+                    yield {parent:tree,child:child}
+                }
+                yield* traverse(child);
+            }
+        }
+    };
+    return [...traverse(tree)];
+}

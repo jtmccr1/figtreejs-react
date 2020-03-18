@@ -3,12 +3,12 @@ import Branch from "./Branch";
 import RectangularBranchPath from "./Shapes/RectangularBranchPath";
 import CoalescentBranch from "./Shapes/CoalescentBranchPath";
 import {mapAttrsToProps} from "../../../../utils/baubleHelpers";
-import {ScaleContext} from "../../FigTree.js";
 import {LayoutContext} from "../../FigTree";
+import {useScales} from "../../../../hooks";
 
 function BranchesHOC(PathComponent) {
     return function Branches(props){
-        const {scales} = useContext(ScaleContext);
+        const {scales} = useScales();
         const {edges} = useContext(LayoutContext);
         const {attrs, filter} = props;
         const attrMapper = useMemo(() => mapAttrsToProps(attrs), [attrs]);
@@ -28,6 +28,8 @@ function BranchesHOC(PathComponent) {
                         <PathComponent {...getPosition(e)}
                                        attrs={attrMapper(e)}
                                        edge={e}/>
+                        {React.Children.map(props.children,child=>React.cloneElement(child,{data:e,...child.props}))}
+
                     </Branch>
                 )
             })
@@ -41,6 +43,7 @@ RectangularBranches.defaultProps={
     filter:e=>true
 };
 const CoalescentBranches = BranchesHOC(CoalescentBranch);
+
 const Branches={Rectangular:RectangularBranches,
     Coalescent:CoalescentBranches};
 export default Branches;

@@ -28,7 +28,6 @@ export function makeVertexFromNode(node,labelBelow){
     return {
         id:node.id,
         textLabel:{
-            labelBelow:labelBelow,
             x:leftLabel?"-6":"12",
             y:leftLabel?(labelBelow ? "-8": "8" ):"0",
             alignmentBaseline: leftLabel?(labelBelow ? "bottom": "hanging" ):"middle",
