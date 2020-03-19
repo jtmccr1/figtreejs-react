@@ -1,18 +1,17 @@
 import React from 'react';
-import {epanechnikov, kdeFactory} from "../../utils/utilities";
+import {epanechnikov, kdeFactory} from "../../../utils/utilities";
 import {scaleLinear} from "d3-scale";
 import{range,extent,deviation,quantile} from "d3-array";
 import {area,line} from "d3-shape";
-import band from "d3-scale/src/band";
+import {useData, useScales} from "../../../hooks";
 
-export default function KDE({data,height,width,kernel,numberOfThresholds,attrs,...props}){
-    const x = scaleLinear().domain(extent(data)).range([0,width]);
-    const y = scaleLinear().range([height,0]);
+export default function KDE({kernel,numberOfThresholds,attrs,...props}){
+    const {height,width,scales} = useScales();
+    const {x,y}=scales;
+    const data = useData();
     const thresholdScale = scaleLinear().domain([0,numberOfThresholds]).range(x.domain());
 
-
     const bandwidth =0.9*Math.min(deviation(data),IQR(data)/1.34)*Math.pow(data.length,(-1/5));
-
     const thresholds = range(numberOfThresholds).map(t=>thresholdScale(t));
     const kde = kdeFactory(kernel(bandwidth))(thresholds);
     const estimate = kde(data);

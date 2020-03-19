@@ -1,14 +1,15 @@
 import {useCallback,useContext} from "react";
 import {mapAttrsToProps} from "../utils/baubleHelpers";
-import {InteractionContext, ScaleContext} from "../Context/Context";
+import {DataContext, InteractionContext, ScaleContext} from "../Context/Context";
 
 export function useAttributeMappers(props,hover,select){
     const { attrs, selectedAttrs, hoveredAttrs,interactions,tooltip} = props;
+    const {scales}=useScales();
     const {state,dispatch} =useInteractions();
-    const baseAttrMapper = useCallback(mapAttrsToProps((attrs?attrs:{})), [attrs]);
-    const selectedAttrMapper = useCallback(mapAttrsToProps(selectedAttrs?selectedAttrs:{}), [selectedAttrs]);
-    const hoveredAttrMapper = useCallback(mapAttrsToProps((hoveredAttrs?hoveredAttrs:{})), [hoveredAttrs]);
-    const tooltipMapper = useCallback(mapAttrsToProps(tooltip?tooltip:{}),[tooltip]);
+    const baseAttrMapper = useCallback(mapAttrsToProps((attrs?attrs:{}),scales), [attrs]);
+    const selectedAttrMapper = useCallback(mapAttrsToProps((selectedAttrs?selectedAttrs:{}),scales), [selectedAttrs]);
+    const hoveredAttrMapper = useCallback(mapAttrsToProps((hoveredAttrs?hoveredAttrs:{}),scales), [hoveredAttrs]);
+    const tooltipMapper = useCallback(mapAttrsToProps((tooltip?tooltip:{}),scales),[tooltip]);
 
     function attrMapper(dataEntry) {
         let attrs = baseAttrMapper(dataEntry);
@@ -47,13 +48,12 @@ export function useAttributeMappers(props,hover,select){
 
 }
 
-function shapeProps(v) {
-    return {attrs: attrMapper(v), interactions: interactionMapper(v),tooltip:tooltipMapper(v)}
-}
-
 export  function useInteractions(){
     return useContext(InteractionContext)
 }
 export  function useScales(){
     return useContext(ScaleContext)
+}
+export function useData(){
+    return useContext(DataContext);
 }

@@ -2,14 +2,8 @@ module.exports = {
   components: 'src/components/**/*.js',
   sections:[
     {
-      name:"FigTree",
-      components: "src/components/*.js",
-      ignore:"src/components/Timeline.js"
-    },
-
-    {
-      name:"Baubles",
-      components: "src/components/Baubles/*.js"
+      name:"Plots",
+      components: ["src/components/Plots/*.js","src/components/Plots/Elements/Element.js"],
     },
     {
       name:"Decorations",
@@ -24,12 +18,20 @@ module.exports = {
           name:"Axis",
           components: "src/components/decorations/Axis/*.js",
         },
-        {
-          name:"Plots",
-          components: "src/components/decorations/Plots/*.js",
-        }
       ]
     },
+
+    {
+      name:"FigTree",
+      components: "src/components/Figtree/*.js",
+      ignore:"src/components/Timeline.js"
+    },
+
+    {
+      name:"Baubles",
+      components: "src/components/Figtree/Baubles/*.js"
+    },
+
 
     ],
   webpackConfig: {

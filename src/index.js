@@ -6,7 +6,7 @@ import FigTree from "./components/Figtree/FigTree";
 import {rectangularLayout,edgeFactory} from "./utils/layouts";
 import {customDateFormater,dateToDecimal,decimalToDate} from "./utils/utilities";
 import AxisBars from "./components/decorations/Axis/AxisBars";
-import KDE from "./components/Plots/KDE";
+import KDE from "./components/Plots/layouts/KDE";
 import {parseNewick,parseNexus} from "./utils/Tree/treeOperations";
 import{getParent,getNode,getDivergence,getNodes,getTips,getRootToTipLengths,getDateRange} from "./utils/Tree/treeSettersandGetters"
 import {orderByNodeDensity,annotateNode,collapseUnsupportedNodes} from "./utils/Tree/treeOperations";
@@ -17,10 +17,12 @@ import Features from "./components/Map/Features";
 import GreatCircleArc,{GreatCircleArcMissal} from "./components/Map/GreatCircleArc";
 import Timeline from "./components/Timeline";
 import InteractionContainer from "../src/components/InteractionContainer"
-import Label from "../src/components/Figtree/Label"
+import Label from "./components/Figtree/Baubles/Label"
+import PlotLayer from "./components/Plots/PlotLayer"
+import Element from "./components/Plots/Elements/Element"
 export {Branches,Nodes,customDateFormater,dateToDecimal,decimalToDate,Axis,AxisBars,Legend,
     FigTree,ImmutableTree,rectangularLayout,edgeFactory,KDE,getParent,getNode,getDivergence,getNodes,getTips,
     orderByNodeDensity,parseNewick,parseNexus,getRootToTipLengths,annotateNode,
     collapseUnsupportedNodes,NodeBackgrounds,Map,Features,GreatCircleArc,GreatCircleArcMissal,Timeline,getDateRange,
-    InteractionContainer,Label
+    InteractionContainer,Label,PlotLayer,Element
 }

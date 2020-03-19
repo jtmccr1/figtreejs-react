@@ -10,7 +10,6 @@ export default function Label(props){
     console.log(data);
     return <text css={css`${props.css}`} {...attrs(data)}>{text(data)}</text>
 }
-
 Label.defaultProps={
     attrs:(v)=>v.textLabel,
     text:(v)=>v.id,
