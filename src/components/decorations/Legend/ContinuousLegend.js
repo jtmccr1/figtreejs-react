@@ -3,8 +3,7 @@ import ColorRamp from "./ColorRamp";
 import Axis from "../Axis/Axis";
 import {format} from "d3-format";
 import {quantize, interpolate, interpolateRound} from "d3-interpolate";
-
-
+import{ScaleContext} from "../../../Context/Context";
 
 /**
  * ContinuousLegend
@@ -43,7 +42,9 @@ export default function ContinuousLegend({scale,pos,width,height,direction,title
         <g className={"legend"} transform={`translate(${pos.x},${pos.y})`}>
             <text transform={`translate(0,-6)`}>{title}</text>
             <ColorRamp {...{colorRamper: colorRamper,width,height}}/>
-            <Axis transform={`translate(${0},${height})`} {...{width,height,direction,ticks}} scale={x} />
+            <ScaleContext.Provider value={{scales:{x:x,y:null},width,height}}>
+                <Axis transform={`translate(${0},${height})`} {...{width,height,direction,ticks}} scale={x} />
+            </ScaleContext.Provider>
         </g>
     )
 

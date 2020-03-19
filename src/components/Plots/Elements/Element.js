@@ -10,12 +10,20 @@ function withElementManagerHOC(ShapeComponent,hoverHelpers,selectionHelpers) {
         const data = useData();
         const {filter,css} = props;
         const shapeProps = useAttributeMappers(props,hoverHelpers,selectionHelpers);
+        function getGroupProps(d){
+            return {
+                css:props.css?css`${props.css}`:null,
+                key:`g-${d.id}`,
+                id:`node-${d.id}`,
+                classes:d.classes?d.classes:null,
+                transform:("x" in d && "y" in d)?`translate(${scales.x(d.x)},${scales.y(d.y)})`:null
+            };
+        }
         return (
             <>
                 {data.reduce((all, d) => {
-                    if (filter(d)) {
-                        const element = <g css={(props.css?css`${props.css}`:null)}  key={`g-${d.id}`} id={`node-${d.id}`} classes={d.classes}
-                                           transform={`translate(${scales.x(d.x)},${scales.y(d.y)})`}>
+                    if (filter?filter(d):true) {
+                        const element = <g {...getGroupProps(d)}>
                             <ShapeComponent {...shapeProps(d)} data={d}/>
                             {React.Children.map(props.children,child=>React.cloneElement(child,{data:d,...child.props}))}
                         </g>;
@@ -27,6 +35,15 @@ function withElementManagerHOC(ShapeComponent,hoverHelpers,selectionHelpers) {
             </>
         )
     }
+}
+function getGprops(d){
+    return {
+        css:props.css?css`${props.css}`:null,
+        key:`g-${d.id}`,
+        id:`node-${d.id}`,
+        classes:d.classes?d.classes:null,
+        transform:("x" in d && "y" in d)?`translate(${scales.x(d.x)},${scales.y(d.y)})`:null
+    };
 }
 
 import BaseElements from "./BaseElements";

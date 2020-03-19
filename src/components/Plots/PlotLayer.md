@@ -28,11 +28,11 @@ const pathLayout = (data)=>([{x:scales.x.domain()[0],y:scales.y.domain()[0],anno
 const lineData = pathLayout(data);
 
 <svg width={width} height={height}>
-    <PlotLayer data={data}  width={width-margins.left-margins.right} height={height-margins.bottom-margins.top}  pos={{x:margins.left,y:margins.top}}>
-        <Element.circle filter={()=>true} attrs={{r:6,fill:"black"}} hoveredAttrs={{r:10,fill:'#ae7e56',strokeWidth:2}}/>
+    <PlotLayer data={data}  width={width-margins.left-margins.right} scales={scales} height={height-margins.bottom-margins.top}  pos={{x:margins.left,y:margins.top}}>
+        <Element.circle  attrs={{r:6,fill:"black"}} hoveredAttrs={{r:10,fill:'#ae7e56',strokeWidth:2}}/>
     </PlotLayer>
         <PlotLayer data={lineData} scales={scales} width={width-margins.left-margins.right} height={height-margins.bottom-margins.top}  pos={{x:margins.left,y:margins.top}}>
-            <Element.path filter={()=>true} attrs={{d:path,fill:"none",stroke:"black",strokeWidth:1}} hoveredAttrs={{stroke:"grey",strokeWidth:2}}/>
+            <Element.path attrs={{d:path,fill:"none",stroke:"black",strokeWidth:1}} hoveredAttrs={{stroke:"grey",strokeWidth:2}}/>
         </PlotLayer>
 </svg>
 ```

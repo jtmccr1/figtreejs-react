@@ -13,8 +13,7 @@ import withConditionalContextProvider from "../HOC/withConditionalContextProvide
  * @constructor
  */
 function PlotLayer(props){
-    const {width,height,pos,data,} = props;
-    const scales=props.scales?props.scales:useMemo(()=>{return setUpScales(width,height,data)},[data]);
+    const {width,height,pos,data,scales} = props;
 return(
     <ScaleContext.Provider value={{scales,width,height}}>
         <DataContext.Provider value={data}>
@@ -26,17 +25,3 @@ return(
 );
 }
 export default withConditionalContextProvider(PlotLayer,InteractionContext);
-
-function setUpScales(width,height,data){
-    const xdomain = extent(data,d=>d.x);
-    const ydomain =  extent(data,d=>d.y);
-
-    const x = scaleLinear()
-        .domain(xdomain)
-        .range([0, width]);
-
-    const y = scaleLinear()
-        .domain(ydomain)
-        .range([0,height]);
-    return {x,y};
-}

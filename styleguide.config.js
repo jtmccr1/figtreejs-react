@@ -11,8 +11,8 @@ module.exports = {
       sections:[
         {
           name:"Legends",
-          components: "src/components/decorations/ContinuousLegend/*.js",
-          ignore:"src/components/decorations/ContinuousLegend/ColorRamp.js"
+          components: "src/components/decorations/Legend/*.js",
+          ignore:"src/components/decorations/Legend/ColorRamp.js"
         },
         {
           name:"Axis",
