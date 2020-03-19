@@ -2,13 +2,13 @@ import React, {useContext,useMemo} from "react"
 import {useSpring,animated} from "react-spring";
 //TODO animate path d with did
 function withElemental(AnimatedComponent){
-    return function withElemental(props){
+    return React.memo(function withElemental(props){
         const {attrs,interactions,tooltip,...rest} = props;
         const visibleProperties= useSpring(attrs);
         return (
             <AnimatedComponent {...tooltip}  {...visibleProperties} {...interactions} {...rest}/>
         );
-    }
+    })
 }
 
 const Path = withElemental(animated.path);
