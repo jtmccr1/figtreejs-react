@@ -33,7 +33,8 @@ export function makeVertexFromNode(node,labelBelow){
             alignmentBaseline: leftLabel?(labelBelow ? "bottom": "hanging" ):"middle",
             textAnchor:leftLabel?"end":"start",
         },
-        classes: getVertexClassesFromNode(node)
+        classes: getVertexClassesFromNode(node),
+        annotations:node.annotations,
     };
 }
 

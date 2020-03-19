@@ -13,14 +13,13 @@ import {useAttributeMappers, useScales} from "../../../../hooks";
  * @returns {function(*): *}
  * @constructor
  */
-const hoverHelpers = {predicate:nodeHoverpredicate,actionCreator:nodeHoverAction};
-const selectionHelpers = {predicate:()=>false,actionCreator:()=>{}};
+
 function NodesHOC(ShapeComponent) {
     return function Nodes(props) {
         const {scales} = useScales();
         const {vertices} = useContext(LayoutContext);
-        const {filter} = props;
-        const shapeProps = useAttributeMappers(props,hoverHelpers,selectionHelpers);
+        const {filter,hoverKey,selectionKey} = props;
+        const shapeProps = useAttributeMappers(props,hoverKey,selectionKey);
         return (
             <>
                 {reduceIterator(vertices.values(), (all, v) => {
@@ -71,22 +70,5 @@ export default Nodes;
 
 
 
-function nodeHoverAction(vertex){
-    return {type:"hover",payload:{type:DataType.DISCRETE,key:"id",value:vertex.id}}
-}
 
-
-function nodeHoverpredicate({hovered},vertex){
-    if(hovered.key==="id") {
-        return vertex.id === hovered.value;
-    }
-    if(hovered.key in vertex.node.annotations) {
-        return hovered.value===vertex.node.annotations[hovered.key]
-    }
-    return false;
-}
-
-function nodeSelectionPredicate({selected},vertex){
-    return false;
-}
 

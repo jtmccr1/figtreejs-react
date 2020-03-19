@@ -1,8 +1,9 @@
 import {useCallback,useContext} from "react";
 import {mapAttrsToProps} from "../utils/baubleHelpers";
 import {DataContext, InteractionContext, ScaleContext} from "../Context/Context";
+import {DataType} from "../utils/utilities";
 
-export function useAttributeMappers(props,hover,select){
+export function useAttributeMappers(props,hoverKey="id",selectionKey="id"){
     const { attrs, selectedAttrs, hoveredAttrs,interactions,tooltip} = props;
     const {scales}=useScales();
     const {state,dispatch} =useInteractions();
@@ -13,35 +14,38 @@ export function useAttributeMappers(props,hover,select){
 
     function attrMapper(dataEntry) {
         let attrs = baseAttrMapper(dataEntry);
-        if (hover.predicate(state,dataEntry)) {
+        if (hoverPredicate(state,dataEntry)) {
             attrs = {...attrs, ...hoveredAttrMapper(dataEntry)};
         }
-        if (select.predicate(state,dataEntry)) {
-            attrs = {...attrs, ...selectedAttrMapper(dataEntry)};
-        }
+        // if (select.predicate(state,dataEntry)) {
+        //     attrs = {...attrs, ...selectedAttrMapper(dataEntry)};
+        // }
         return attrs;
     };
 
     function interactionMapper(dataEntry) {
-        const optionalInteractions = interactions?interactions:{};
+        const optionalInteractions = interactions ? interactions : {};
         return {
             onMouseEnter: () => {
-                if("onMouseEnter" in optionalInteractions){
+                if ("onMouseEnter" in optionalInteractions) {
                     interactions.onMouseEnter(dataEntry);
                 }
-                dispatch(hover.actionCreator(dataEntry))},
+                dispatch(hoverAction(dataEntry, hoverKey))
+            },
             onMouseLeave: () => {
-                if("onMouseLeave" in optionalInteractions){
+                if ("onMouseLeave" in optionalInteractions) {
                     interactions.onMouseLeave(dataEntry);
                 }
-                dispatch({type:"unhover"})},
+                dispatch({type: "unhover"})
+            },
             onClick: () => {
-                if("onClick" in optionalInteractions){
+                if ("onClick" in optionalInteractions) {
                     interactions.onClick(dataEntry);
                 }
-                dispatch(select.actionCreator(dataEntry))}
-        }
-    };
+                // dispatch(select.actionCreator(dataEntry))}
+            }
+        };
+    }
     return function shapeProps(dataEntry) {
         return {attrs: attrMapper(dataEntry), interactions: interactionMapper(dataEntry),tooltip:tooltipMapper(dataEntry)}
     }
@@ -56,4 +60,21 @@ export  function useScales(){
 }
 export function useData(){
     return useContext(DataContext);
+}
+
+function hoverAction(dataEntry,key){
+    const value = key==="id"?dataEntry.id:dataEntry.annotations[key];
+    return {type:"hover",payload:{type:DataType.DISCRETE,key:key,value:value}}
+}
+
+function hoverPredicate({hovered},dataEntry){
+    if(hovered.key==="id") {
+        return dataEntry.id === hovered.value;
+    }
+    if("annotations" in dataEntry){
+        if(hovered.key in dataEntry.annotations) {
+            return hovered.value===dataEntry.annotations[hovered.key]
+        }
+    }
+    return false;
 }

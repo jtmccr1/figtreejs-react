@@ -3,10 +3,10 @@ import {useSpring,animated} from "react-spring";
 //TODO animate path d with did
 function withElemental(AnimatedComponent){
     return function withElemental(props){
-        const {attrs,interactions,tooltip} = props;
+        const {attrs,interactions,tooltip,...rest} = props;
         const visibleProperties= useSpring(attrs);
         return (
-            <AnimatedComponent {...tooltip}  {...visibleProperties} {...interactions}/>
+            <AnimatedComponent {...tooltip}  {...visibleProperties} {...interactions} {...rest}/>
         );
     }
 }

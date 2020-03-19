@@ -1,15 +1,17 @@
 import React, {useContext} from 'react';
-
+import BaseElement from "../Plots/Elements/BaseElements"
 import {ProjectionContext} from "./Map"
-import {mapAttrsToProps} from "../../utils/baubleHelpers";
 import {geoPath} from "d3-geo";
+import {useAttributeMappers} from "../../hooks";
 
-export default function Features({geographies,attrs}){
-    const attrMapper=mapAttrsToProps(attrs);
+export default function Features(props){
+
+    const {hoverKey,selectionKey,geographies} = props;
+    const shapeProps = useAttributeMappers(props,hoverKey,selectionKey);
     const projection = useContext(ProjectionContext);
     const pathMaker = geoPath().projection(projection);
 
     return (<>
-        {geographies.map((d,i)=><path key={`path-${i}`} d={pathMaker(d)} {...attrMapper(d)} />)};
+        {geographies.map((d,i)=><BaseElement.path key={`path-${i}`} d={pathMaker(d)} {...shapeProps(d)} />)};
             </>)
 }
