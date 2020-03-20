@@ -1,5 +1,6 @@
 import React, {useContext,useMemo} from "react"
 import {useSpring,animated} from "react-spring";
+import {sameAttributes} from "../../Figtree/Baubles/Nodes/Shapes/Circle";
 //TODO animate path d with did
 function withElemental(AnimatedComponent){
     return React.memo(function withElemental(props){
@@ -8,7 +9,7 @@ function withElemental(AnimatedComponent){
         return (
             <AnimatedComponent {...tooltip}  {...visibleProperties} {...interactions} {...rest}/>
         );
-    })
+    }, sameAttributes)
 }
 
 const Path = withElemental(animated.path);

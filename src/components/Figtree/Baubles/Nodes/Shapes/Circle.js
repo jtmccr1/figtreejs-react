@@ -16,7 +16,7 @@ Circle.defaultProps={
 		stroke:'black'},
 };
 export default React.memo(Circle,sameAttributes);
-function sameAttributes(prev,curr){
+export function sameAttributes(prev,curr){
 	for(const [key,val] of Object.entries(prev.attrs)){
 		if(curr.attrs[key]!==val){
 			return false

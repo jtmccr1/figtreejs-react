@@ -7,7 +7,6 @@ export  default function Axis(props) {
 
     const {scales,width,height}=useScales();
     const {direction,title,ticks,gap} = props;
-
     const scale = makeAxisScale(props,scales);
     // scaleSequentialQuantile doesn’t implement tickValues or tickFormat.
     let tickValues;
@@ -18,7 +17,6 @@ export  default function Axis(props) {
     }
 
     const transform=direction==="horizontal"? `translate(${0},${height+gap})`:`translate(${-1*gap},${0})`;
-
 
 //TODO break this into parts HOC with logic horizontal/ vertical axis ect.
     return(
@@ -33,6 +31,7 @@ export  default function Axis(props) {
                     gap
                 });
             })}
+
             <path d={getPath(scale,direction)} stroke={"black"}/>
             <g>
                 {tickValues.map((t, i)=>{
@@ -99,10 +98,11 @@ function makeAxisScale(props,contextScales) {
         if (reverse) {
             axisScale.domain(axisScale.domain().reverse());
         }
-        return axisScale.domain(axisScale.domain().map(d => (d + offsetBy) * scaleBy));
-    }else{
-        return axisScale
+        if(offsetBy!==0||scaleBy!==1){
+            return axisScale.domain(axisScale.domain().map(d => (d + offsetBy) * scaleBy));
+        }
     }
+        return axisScale
 
 
 

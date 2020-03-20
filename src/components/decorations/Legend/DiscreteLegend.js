@@ -3,7 +3,7 @@ import React, {useContext,useCallback} from "react"
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core'
 import {DataType} from "../../../utils/utilities";
-import {useInteractions} from "../../../hooks";
+import {useInteractions, useInteractionsDispatch} from "../../../hooks";
 
 
 /**
@@ -24,7 +24,7 @@ import {useInteractions} from "../../../hooks";
 
 export default function DiscreteLegend({scale,pos,width,height,swatchSize,format,annotation,columns} ){
 //TODO hard coded location on hover call back.
-    const {dispatch} = useInteractions();
+    const dispatch = useInteractionsDispatch();
     const onHover=useCallback((value)=>()=>dispatch({type:"hover",payload:{dataType:DataType.DISCRETE,key:annotation,value:value}}))
     const onUnHover = useCallback(()=>dispatch({type:"unhover",payload:{}}));
     return(

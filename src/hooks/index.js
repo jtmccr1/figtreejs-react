@@ -1,6 +1,12 @@
 import {useCallback,useContext} from "react";
 import {mapAttrsToProps} from "../utils/baubleHelpers";
-import {DataContext, InteractionContext, ScaleContext} from "../Context/Context";
+import {
+    DataContext,
+    InteractionContext,
+    InteractionDispatchContext,
+    InteractionStateContext,
+    ScaleContext
+} from "../Context/Context";
 import {DataType} from "../utils/utilities";
 
 export function useAttributeMappers(props,hoverKey="id",selectionKey="id"){
@@ -53,8 +59,17 @@ export function useAttributeMappers(props,hoverKey="id",selectionKey="id"){
 }
 
 export  function useInteractions(){
-    return useContext(InteractionContext)
+    const state = useInteractionsState();
+    const dispatch = useInteractionsDispatch();
+    return {state,dispatch}
 }
+export function useInteractionsState(){
+    return useContext(InteractionStateContext)
+}
+export function useInteractionsDispatch(){
+    return useContext(InteractionDispatchContext)
+}
+
 export  function useScales(){
     return useContext(ScaleContext)
 }

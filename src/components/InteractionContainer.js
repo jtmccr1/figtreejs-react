@@ -1,5 +1,4 @@
 import React from "react";
-import withConditionalContextProvider from "./HOC/withConditionalContextProvider";
-import {InteractionContext} from "../Context/Context";
+import withConditionalInteractionProvider from "./HOC/withConditionalInteractionProvider";
 const JustChildren = (props)=><>{props.children}</>;
-export default withConditionalContextProvider(JustChildren,InteractionContext);
+export default withConditionalInteractionProvider(JustChildren);

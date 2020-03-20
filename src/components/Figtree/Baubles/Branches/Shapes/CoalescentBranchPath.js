@@ -21,7 +21,7 @@ function BaseCoalescentBranch(props){
     const targets = useMemo(()=>getTips(vertex.node).map(decedent=>vertices.get(decedent)).concat(childTargets),[vertex]);
     const targetRange = extent(childTargets,d=>d.x-vertex.x);
     const thisTarget = vertices.get(edge.v1.node);
-    const slope = calcSlope(vertex,targets);
+    const slope = useMemo(()=> calcSlope(vertex,targets),[vertex,targets]);
     const fadedIn = (targetRange[0]*100/ (thisTarget.x - vertex.x));
     const clipPath=useMemo(()=>makeCoalescent(vertex,targets,scales,slope,{x:0,y:y0-y1}),[vertex,scales,edge]);
     const colorRamper=useCallback(i=>props.attrs.stroke,[props.attrs.stroke]);
@@ -34,7 +34,7 @@ function BaseCoalescentBranch(props){
     />
 }
 
-const CoalescentBranch=React.memo(BaseCoalescentBranch,()=>false);
+const CoalescentBranch=React.memo(BaseCoalescentBranch,()=>true);
 CoalescentBranch.defaultProps={
     fade:"relative",
 };

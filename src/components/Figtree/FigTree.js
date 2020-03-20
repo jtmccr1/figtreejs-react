@@ -6,8 +6,8 @@ import Branches from "./Baubles/Branches/Branches";
 import {makeEdges, rectangularVertices} from "../../utils/layouts";
 import {parseNewick} from "../../utils/Tree/treeOperations";
 import {getDateRange} from "../../utils/Tree/treeSettersandGetters";
-import {InteractionContext,ScaleContext} from "../../Context/Context";
-import withConditionalContextProvider from "../HOC/withConditionalContextProvider.js"
+import {ScaleContext} from "../../Context/Context";
+import withConditionalInteractionProvider from "../HOC/withConditionalInteractionProvider.js"
 /**
  * The FigTree component
  * This takes a tree and layout options. It calls the layout and handles state for this figure.
@@ -50,7 +50,7 @@ function FigTree(props){
             )
 }
 
-export default withConditionalContextProvider(FigTree,InteractionContext);
+export default withConditionalInteractionProvider(FigTree);
 
 function setUpScales(width,height,vertices){
     const xdomain = extent(vertices.values(),d=>d.x);
