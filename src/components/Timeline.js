@@ -17,8 +17,7 @@ export default function Timeline(props){
     const{width,height,margins,padding} = props;
     const componentWidth = width-margins.left-margins.right;
 
-    defaultTimeline.range([0,width-margins.left-margins.right]);
-
+    defaultTimeline.range([margins.left,width-margins.left-margins.right]);
     const [timeline,timelineDispatch] = useReducer(timelineReducer,defaultTimeline);
     return(
         <TimelineContext.Provider value={{timeline,timelineDispatch}}>

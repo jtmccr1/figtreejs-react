@@ -20,6 +20,7 @@ function NodesHOC(ShapeComponent) {
         const {vertices} = useContext(LayoutContext);
         const {filter,hoverKey,selectionKey} = props;
         const shapeProps = useAttributeMappers(props,hoverKey,selectionKey);
+        console.log(scales.x.range());
         return (
             <>
                 {reduceIterator(vertices.values(), (all, v) => {

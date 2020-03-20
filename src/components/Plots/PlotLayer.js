@@ -3,6 +3,7 @@ import {extent} from "d3-array";
 import {scaleLinear} from "d3-scale";
 import {ScaleContext, DataContext} from "../../Context/Context";
 import withConditionalInteractionProvider from "../HOC/withConditionalInteractionProvider";
+import withTimelineConsumer from "../HOC/withTimelineConsumer";
 
 /**
  * This is a basic plot component. It takes data, layout,width, height and position of a group on an svg
@@ -26,6 +27,7 @@ return(
     </ScaleContext.Provider>
 );
 }
+
 export default withConditionalInteractionProvider(PlotLayer);
 
 function setUpScales(width,height,data,dataAccessor,scaleTypes){

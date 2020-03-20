@@ -8,6 +8,7 @@ import {parseNewick} from "../../utils/Tree/treeOperations";
 import {getDateRange} from "../../utils/Tree/treeSettersandGetters";
 import {ScaleContext} from "../../Context/Context";
 import withConditionalInteractionProvider from "../HOC/withConditionalInteractionProvider.js"
+import withTimelineConsumer from "../HOC/withTimelineConsumer";
 /**
  * The FigTree component
  * This takes a tree and layout options. It calls the layout and handles state for this figure.

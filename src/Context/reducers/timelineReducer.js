@@ -1,11 +1,19 @@
 export default function timelineReducer(timeScale,action){
-    const [minTime,maxTime] = timeScale.domain();
+    const [minDate,maxDate] = timeScale.domain();
+
+    let newScale;
     switch(action.type){
         case "new max":
-            return timeScale.copy().domain([minTime,action.payload.maxTime]);
+            newScale= timeScale.copy().domain([minDate,action.payload.maxDate]);
+            break;
         case"new min":
-            return timeScale.copy().domain([action.payload.minTime,maxTime]);
+            newScale= timeScale.copy().domain([action.payload.minDate,maxDate]);
+            break;
         case "new extent":
-            return timeScale.copy().domain([action.payload.minTime,action.payload.maxTime]);
+            newScale= timeScale.copy().domain([action.payload.minDate,action.payload.maxDate]);
+            break;
+        default:
+             newScale=timeScale;
     }
+    return newScale
 }

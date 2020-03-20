@@ -13,10 +13,10 @@ export function useAttributeMappers(props,hoverKey="id",selectionKey="id"){
     const { attrs, selectedAttrs, hoveredAttrs,interactions,tooltip} = props;
     const {scales}=useScales();
     const {state,dispatch} =useInteractions();
-    const baseAttrMapper = useCallback(mapAttrsToProps((attrs?attrs:{}),scales), [attrs]);
-    const selectedAttrMapper = useCallback(mapAttrsToProps((selectedAttrs?selectedAttrs:{}),scales), [selectedAttrs]);
-    const hoveredAttrMapper = useCallback(mapAttrsToProps((hoveredAttrs?hoveredAttrs:{}),scales), [hoveredAttrs]);
-    const tooltipMapper = useCallback(mapAttrsToProps((tooltip?tooltip:{}),scales),[tooltip]);
+    const baseAttrMapper = useCallback(mapAttrsToProps((attrs?attrs:{}),scales), [attrs,scales]);
+    const selectedAttrMapper = useCallback(mapAttrsToProps((selectedAttrs?selectedAttrs:{}),scales), [selectedAttrs,scales]);
+    const hoveredAttrMapper = useCallback(mapAttrsToProps((hoveredAttrs?hoveredAttrs:{}),scales), [hoveredAttrs,scales]);
+    const tooltipMapper = useCallback(mapAttrsToProps((tooltip?tooltip:{}),scales),[tooltip,scales]);
 
     function attrMapper(dataEntry) {
         let attrs = baseAttrMapper(dataEntry);
