@@ -23,9 +23,6 @@ export function useAttributeMappers(props,hoverKey="id",selectionKey="id"){
         if (hoverPredicate(state,dataEntry)) {
             attrs = {...attrs, ...hoveredAttrMapper(dataEntry)};
         }
-        // if (select.predicate(state,dataEntry)) {
-        //     attrs = {...attrs, ...selectedAttrMapper(dataEntry)};
-        // }
         return attrs;
     };
 

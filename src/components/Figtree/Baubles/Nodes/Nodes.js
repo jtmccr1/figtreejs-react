@@ -5,7 +5,7 @@ import {LayoutContext} from "../../FigTree";
 import {DataType, reduceIterator} from "../../../../utils/utilities";
 import CoalescentShape from "./Shapes/CoalescentShape";
 import {useAttributeMappers, useScales} from "../../../../hooks";
-
+import { v4 as uuidv4 } from 'uuid';
 /**
  * This HOC takes a node shape and returns a shape for each vertex. It also handles converting
  * attributes that can be functions into display attributes that are passed to the shape.
@@ -20,14 +20,13 @@ function NodesHOC(ShapeComponent) {
         const {vertices} = useContext(LayoutContext);
         const {filter,hoverKey,selectionKey} = props;
         const shapeProps = useAttributeMappers(props,hoverKey,selectionKey);
-        console.log(scales.x.range());
         return (
             <>
                 {reduceIterator(vertices.values(), (all, v) => {
                     if (filter(v)) {
                         const element = <Node  key={`node-${v.id}`} id={`node-${v.id}`} classes={v.classes} x={scales.x(v.x)} y={scales.y(v.y)}>
                                             <ShapeComponent {...shapeProps(v)} vertex={v}/>
-                                            {React.Children.map(props.children,child=>React.cloneElement(child,{data:v,...child.props}))}
+                                            {/*{React.Children.map(props.children,child=>React.cloneElement(child,{data:v,...child.props}))}*/}
                                         </Node>;
                             all.push(element)
                     }
