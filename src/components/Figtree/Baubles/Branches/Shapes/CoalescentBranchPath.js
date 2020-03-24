@@ -8,30 +8,27 @@ import {getTips} from "../../../../..";
 import RectangularBranchPath from "./RectangularBranchPath";
 import {useScales} from "../../../../../hooks";
 
-const logisticRamp=logisticGrowth(1,0.7,30);
-const FadedClippedPath=React.memo(withClipPath(withLinearGradient(RectangularBranchPath)));
+const logisticRamp=logisticGrowth(1,0.95,90);
+const FadedPath = React.memo(withLinearGradient(RectangularBranchPath));
+//Danger hardCoded
+
 
 function BaseCoalescentBranch(props){
     const {vertices} =  useContext(LayoutContext);
-    const {scales} = useScales();
     const {edge,y1,y0} =props;
     const vertex = vertices.get(edge.v0.node);
 
     const childTargets = vertex.node.children.map(child=>vertices.get(child));
-    const targets = useMemo(()=>getTips(vertex.node).map(decedent=>vertices.get(decedent)).concat(childTargets),[vertex]);
     const targetRange = extent(childTargets,d=>d.x-vertex.x);
     const thisTarget = vertices.get(edge.v1.node);
-    const slope = useMemo(()=> calcSlope(vertex,targets),[vertex,targets]);
     const fadedIn = (targetRange[0]*100/ (thisTarget.x - vertex.x));
-    const clipPath=useMemo(()=>makeCoalescent(vertex,targets,scales,slope,{x:0,y:y0-y1}),[vertex,scales,edge]);
+
     const colorRamper=useCallback(i=>props.attrs.stroke,[props.attrs.stroke]);
     const opacityRamper=useCallback(i=>logisticRamp(i),[]);
+        return <FadedPath   colorRamper={colorRamper} opacityRamper={opacityRamper} endingX={`${fadedIn}%`} gradientAttribute={"stroke"}
+                           {...props}/>
 
-    return <FadedClippedPath
-        clipPath={clipPath} clipTransform={`translate(0,${(y0-y1)})`}
-        colorRamper={colorRamper} opacityRamper={opacityRamper} endingX={`${fadedIn}%`} gradientAttribute={"stroke"}
-        {...props}
-    />
+
 }
 
 const CoalescentBranch=React.memo(BaseCoalescentBranch,()=>true);

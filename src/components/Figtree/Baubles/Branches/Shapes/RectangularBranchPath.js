@@ -6,10 +6,10 @@ import {areEqualShallow} from "../../../../../utils/utilities";
 
 // potentiall pass in mapper not attrs so we can cache and make more efficient.
 const rectangularBranchPath=(props)=>{
-    let {x0,y0,x1,y1,attrs} = props;
+    let {x0,y0,x1,y1,attrs,...rest} = props;
     let path ={d:branchPathGenerator({x0,y0,x1,y1})};
     const allAttrs= useSpring(attrs);
-    return(<animated.path {...allAttrs}  {...path} fill={"none"} />)
+    return(<animated.path {...allAttrs}  {...path} {...rest} fill={"none"} />)
 };
 function branchPathGenerator({x0,y0,x1,y1}) {
         const branchLine = line()
@@ -18,8 +18,8 @@ function branchPathGenerator({x0,y0,x1,y1}) {
             .curve(curveStepBefore);
         return (
             branchLine(
-                [{x: 0.001, y: y0 - y1}, //tiny adjustment for faded line (can't have y or x dimension not change at all
-                    {x: x1 - x0, y: 0.001}
+                [{x:x0+0.001, y: y0}, //tiny adjustment for faded line (can't have y or x dimension not change at all
+                    {x: x1, y: y1+0.001}
                 ]))
         // return (output)
 }

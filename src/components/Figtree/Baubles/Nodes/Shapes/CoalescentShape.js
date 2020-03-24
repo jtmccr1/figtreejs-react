@@ -23,7 +23,7 @@ export default function CoalescentShape (props){
     const d=makeCoalescent(vertex,targets,scales,slope);
 
 
-    return  <FadedPath attrs={{...attrs,d:d}} endingX={`${100/slope}%`} colorRamper={i=>attrs.fill} opacityRamper={i=>1-i} />
+    return  <FadedPath attrs={{...attrs,d:d}} endingX={`${100/slope}%`} colorRamper={i=>attrs.fill} opacityRamper={i=>1-i*1} />
 };
 
 CoalescentShape.defaultProps= {
@@ -49,8 +49,8 @@ const link = linkHorizontal()
  */
 
 // need max x for top and bottom, diff y
-export function coalescentPath(source,topTarget,bottomTarget,slope=10,startWidth=2){
-   const adjustedTopTarget={y:topTarget.y,x:topTarget.x/slope};
+export function coalescentPath(source,topTarget,bottomTarget,slope=1,startWidth=2){
+    const adjustedTopTarget={y:topTarget.y,x:topTarget.x/slope};
    const adjustedBottomTarget = {x:bottomTarget.x/slope,y:bottomTarget.y};
 
    const start = {x:source.x,y:source.y-startWidth/2};
@@ -72,13 +72,12 @@ export function coalescentPath(source,topTarget,bottomTarget,slope=10,startWidth
  * @param slope
  * @return string
  */
-export function makeCoalescent(vertex,targets,scales,slope=1,adjustments={x:0,y:0}){
-    const xStart = adjustments.x;
-    const xEnd=scales.x(max(targets,d=>d.x)-vertex.x)+adjustments.x;
-    const yStart = adjustments.y;
-    const yTop=-scales.y((vertex.y-min(targets,d=>d.y)+0.4))+adjustments.y;
-    const yBottom =scales.y((max(targets,d=>d.y)-vertex.y+0.4))+adjustments.y;
-
+export function makeCoalescent(vertex,targets,scales,slope=1){
+    const xStart = scales.x(vertex.x);
+    const xEnd=scales.x(max(targets,d=>d.x));
+    const yStart = scales.y(vertex.y);
+    const yTop=scales.y((min(targets,d=>d.y)-0.4));
+    const yBottom =scales.y((max(targets,d=>d.y)+0.4));
     return coalescentPath({x:xStart,y:yStart},{x:xEnd,y:yTop},{x:xEnd,y:yBottom},slope)
 }
 
@@ -90,7 +89,7 @@ export function makeCoalescent(vertex,targets,scales,slope=1,adjustments={x:0,y:
  * @param targets
  */
 export function calcSlope(source,targets){
-    const [min,max]=extent(targets,d=>d.x-source.x);
+    const [min,max]=extent(targets,d=>d.x);
     return max / min;
 }
 

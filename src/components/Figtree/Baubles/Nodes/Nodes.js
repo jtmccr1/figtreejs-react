@@ -20,15 +20,11 @@ function NodesHOC(ShapeComponent) {
         const {vertices} = useContext(LayoutContext);
         const {filter,hoverKey,selectionKey} = props;
         const shapeProps = useAttributeMappers(props,hoverKey,selectionKey);
-        console.log(scales.x.range());
         return (
             <>
                 {reduceIterator(vertices.values(), (all, v) => {
                     if (filter(v)) {
-                        const element = <Node  key={`node-${v.id}`} id={`node-${v.id}`} classes={v.classes} x={scales.x(v.x)} y={scales.y(v.y)}>
-                                            <ShapeComponent {...shapeProps(v)} vertex={v}/>
-                                            {React.Children.map(props.children,child=>React.cloneElement(child,{data:v,...child.props}))}
-                                        </Node>;
+                        const element = <ShapeComponent key={v.id} {...shapeProps(v)} vertex={v}  x={scales.x(v.x)} y={scales.y(v.y)}/>
                             all.push(element)
                     }
                     return all
@@ -36,15 +32,6 @@ function NodesHOC(ShapeComponent) {
                 }
             </>
         )
-    }
-}
-
-function selectorLogic(selection,dispatcher,vertexId){
-    if(selection.length===1&&selection[0]===vertexId){
-
-        dispatcher({type:"clearSelection"})
-    }else{
-        dispatcher({type:"select",payload:vertexId})
     }
 }
 

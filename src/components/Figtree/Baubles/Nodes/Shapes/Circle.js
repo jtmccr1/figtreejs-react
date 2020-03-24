@@ -2,10 +2,10 @@ import React, {useContext,useMemo} from "react"
 import {useSpring,animated} from "react-spring";
 
 const Circle =(props)=>{
-   const {attrs,interactions,tooltip} = props;
-    const visibleProperties= useSpring(attrs);
+   const {attrs,interactions,tooltip,x:cx,y:cy} = props;
+    const visibleProperties= useSpring({...attrs,cx,cy});
     return (
-    	<animated.circle {...tooltip} className={"node-shape"} {...visibleProperties} {...interactions}/>
+    	<animated.circle {...tooltip}  className={"node-shape"} {...visibleProperties} {...interactions}/>
     	);
 };
 

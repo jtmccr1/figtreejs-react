@@ -23,15 +23,9 @@ function BranchesHOC(PathComponent) {
 
         return (<>
             {edges.filter(filter).map(e => {
-                return (
-                    <Branch key={`branch-${e.id}`} id={`branch-${e.id}`} classes={e.classes} x={scales.x(e.x)} y={scales.y(e.y)}>
-                        <PathComponent {...getPosition(e)}
+                return (<PathComponent  key={`branch-${e.id}`} {...getPosition(e)}
                                        attrs={attrMapper(e)}
-                                       edge={e}/>
-                        {React.Children.map(props.children,child=>React.cloneElement(child,{data:e,...child.props}))}
-
-                    </Branch>
-                )
+                                       edge={e}/>)
             })
             }
         </>)

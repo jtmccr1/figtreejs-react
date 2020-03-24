@@ -10,6 +10,7 @@ const tree = parseNewick(newickString,{labelName:"support"});
 <svg width={600} height={400}>
     <FigTree   width={600-margins.left-margins.right} height={400-margins.bottom-margins.top} data={tree} layout={rectangularVertices} pos={{x:margins.left,y:margins.top}}>
             <Nodes.Circle attrs={{r:2,fill:"black"}} hoveredAttrs={{r:10,fill:'#ae7e56',strokeWidth:2}} selectedAttrs={{fill:"#c0625e"}}/>
+            <Nodes.Coalescent filter={(v=>v.node.children)}/>
         <Branches.Rectangular attrs={{strokeWidth:4,stroke:"black"}} />
     </FigTree>
 </svg>
