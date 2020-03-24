@@ -31,7 +31,7 @@ export default function DiscreteLegend({scale,pos,width,height,swatchSize,format
         <foreignObject x={pos.x} y={pos.y} width={width} height={height}>
             <div css={css`display: flex; align-items: center; min-height: 33px; font: 12px sans-serif;`}>
                 <div css={css`width: 100%; columns: ${columns};"`}>
-                    {scale.domain().map(value => {
+                    {scale.domain().sort().map(value => {
                         return(
                             <div key={value}  css={css`cursor:pointer;
                                                       break-inside: avoid;

@@ -43,6 +43,9 @@ export default withConditionalInteractionProvider(FigTree);
 function setUpScales(width,height,vertices){
     const xdomain = extent(vertices.values(),d=>d.x);
     const ydomain =  extent(vertices.values(),d=>d.y);
+    // padding
+        ydomain[0]-=1;
+        ydomain[1]+=1;
 
     const x = scaleLinear()
         .domain(xdomain)
