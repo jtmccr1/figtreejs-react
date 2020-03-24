@@ -46,6 +46,7 @@ export function useAttributeMappers(props,hoverKey="id",selectionKey="id"){
             },
             onClick: () => {
                 if ("onClick" in optionalInteractions) {
+                    console.log("clicked");
                     interactions.onClick(dataEntry);
                 }
                 // dispatch(select.actionCreator(dataEntry))}

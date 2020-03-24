@@ -1,5 +1,5 @@
 import React, {useMemo, useContext} from "react"
-import Circle from "./Shapes/Circle";
+import {Circle,AnimatedCircle} from "./Shapes/Circle";
 import Node from "./Node";
 import {LayoutContext} from "../../FigTree";
 import {DataType, reduceIterator} from "../../../../utils/utilities";
@@ -22,7 +22,7 @@ function NodesHOC(ShapeComponent) {
         const shapeProps = useAttributeMappers(props,hoverKey,selectionKey);
         return (
             <>
-                {reduceIterator(vertices.values(), (all, v) => {
+                {[...vertices.values()].sort((a,b)=>a.x-b.x).reduce( (all, v) => {
                     if (filter(v)) {
                         const element = <ShapeComponent key={v.id} {...shapeProps(v)} vertex={v}  x={scales.x(v.x)} y={scales.y(v.y)}/>
                             all.push(element)
@@ -44,6 +44,17 @@ CircleNodes.defaultProps={
     tooltip:{},
     label:()=>false,
 };
+const AnimatedCircleNodes = NodesHOC(AnimatedCircle);
+AnimatedCircleNodes.defaultProps={
+    filter:(v)=>true,
+    attrs:{r:2},
+    selectedAttrs:{},
+    hoveredAttrs:{},
+    tooltip:{},
+    label:()=>false,
+};
+
+
 const CoalescentNodes=NodesHOC(CoalescentShape);
 CoalescentNodes.defualtProps={
     attrs: {
@@ -52,8 +63,9 @@ CoalescentNodes.defualtProps={
         stroke: 'black'
     },
     tooltip:{},
+    filter:(v)=>true,
 };
-const Nodes={Circle:CircleNodes,Coalescent:CoalescentNodes};
+const Nodes={Circle:CircleNodes,Coalescent:CoalescentNodes,AnimatedCircleNodes:AnimatedCircleNodes};
 export default Nodes;
 
 

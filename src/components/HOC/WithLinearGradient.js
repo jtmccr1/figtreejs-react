@@ -29,7 +29,7 @@ const withLinearGradient =WrappedContainer=>{
             </g>
         )
     }
-    return React.memo(WithLinearGradient,sameGradientProps);
+    return WithLinearGradient;
 };
 function defaultProps(){
     return {

@@ -7,9 +7,11 @@ import withClipPath from "../../../../HOC/withClipPath";
 import {getTips} from "../../../../..";
 import RectangularBranchPath from "./RectangularBranchPath";
 import {useScales} from "../../../../../hooks";
+import {sameAttributes} from "../../Nodes/Shapes/Circle";
+import {areEqualShallow} from "../../../../../utils/utilities";
 
 const logisticRamp=logisticGrowth(1,0.95,90);
-const FadedPath = React.memo(withLinearGradient(RectangularBranchPath));
+const FadedPath = React.memo(withLinearGradient(RectangularBranchPath),sameProps);
 //Danger hardCoded
 
 
@@ -31,7 +33,17 @@ function BaseCoalescentBranch(props){
 
 }
 
-const CoalescentBranch=React.memo(BaseCoalescentBranch,()=>true);
+const CoalescentBranch=React.memo(BaseCoalescentBranch,sameProps);
+function sameProps(prev,curr){
+    const primitiveKeys=["x0","y0","x1","y1"];
+    for(const key of primitiveKeys){
+        if(prev[key]!==curr[key]){
+            return false
+        }
+    }
+    return areEqualShallow(prev.attrs,curr.attrs);
+}
+
 CoalescentBranch.defaultProps={
     fade:"relative",
 };

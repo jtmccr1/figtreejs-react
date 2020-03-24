@@ -8,8 +8,7 @@ import {areEqualShallow} from "../../../../../utils/utilities";
 const rectangularBranchPath=(props)=>{
     let {x0,y0,x1,y1,attrs,...rest} = props;
     let path ={d:branchPathGenerator({x0,y0,x1,y1})};
-    const allAttrs= useSpring(attrs);
-    return(<animated.path {...allAttrs}  {...path} {...rest} fill={"none"} />)
+    return(<path {...attrs}  {...path} {...rest} fill={"none"} />)
 };
 function branchPathGenerator({x0,y0,x1,y1}) {
         const branchLine = line()

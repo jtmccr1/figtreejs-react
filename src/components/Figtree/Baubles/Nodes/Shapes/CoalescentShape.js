@@ -4,17 +4,18 @@ import {linkHorizontal} from "d3-shape";
 import {extent, max, min} from "d3-array";
 import withLinearGradient from "../../../../HOC/WithLinearGradient";
 import {getTips} from "../../../../../utils/Tree/treeSettersandGetters"
-import {useScales} from "../../../../../hooks";
+import {useInteractions, useScales} from "../../../../../hooks";
 //TODO extract out fill => gradient function
 
-const pathComponent=({attrs})=><path {...attrs}/>;
+const pathComponent=({attrs,interactions})=><path pointerEvents={"painted"} {...attrs} {...interactions}/>;
 
 export const FadedPath=withLinearGradient(pathComponent);
 
 export default function CoalescentShape (props){
     const {vertices} =  useContext(LayoutContext);
     const {scales} = useScales();
-    const {vertex,attrs} =props;
+
+    const {vertex,attrs,interactions} =props;
 
     const targets = getTips(vertex.node).map(decedent=>vertices.get(decedent))
         .concat(vertex.node.children.map(child=>vertices.get(child)));
@@ -23,7 +24,7 @@ export default function CoalescentShape (props){
     const d=makeCoalescent(vertex,targets,scales,slope);
 
 
-    return  <FadedPath attrs={{...attrs,d:d}} endingX={`${100/slope}%`} colorRamper={i=>attrs.fill} opacityRamper={i=>1-i*1} />
+    return  <FadedPath attrs={{...attrs,d:d}} interactions={interactions} endingX={`${100/slope}%`} colorRamper={i=>attrs.fill} opacityRamper={i=>1-i*1} />
 };
 
 CoalescentShape.defaultProps= {
