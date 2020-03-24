@@ -6,7 +6,6 @@ let counter =1;
  * @param WrappedContainer
  * @return {function(*): *}
  */
-//TODO make possible to apply to a group of components so we don't need one per branch/node when they are the same.
 const withLinearGradient =WrappedContainer=>{
     function WithLinearGradient(props){
         props = {...defaultProps(),...props};

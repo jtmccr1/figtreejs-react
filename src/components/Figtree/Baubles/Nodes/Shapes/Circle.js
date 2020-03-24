@@ -28,8 +28,8 @@ export function sameAttributes(prev,curr){
 			return false
 		}
 	}
-	if("cy" in prev){
-		return prev.cx===curr.cx&&prev.cy===curr.cy;
+	if("x" in prev){
+		return prev.x===curr.x && prev.y===curr.y;
 	}
 	return true;
 }

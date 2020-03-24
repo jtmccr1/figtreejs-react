@@ -5,6 +5,7 @@ import {LayoutContext} from "../../FigTree";
 import {DataType, reduceIterator} from "../../../../utils/utilities";
 import CoalescentShape from "./Shapes/CoalescentShape";
 import {useAttributeMappers, useScales} from "../../../../hooks";
+import Rectangle from "./Shapes/Rectangle";
 
 /**
  * This HOC takes a node shape and returns a shape for each vertex. It also handles converting
@@ -54,6 +55,15 @@ AnimatedCircleNodes.defaultProps={
     label:()=>false,
 };
 
+const RectangularNodes = NodesHOC(Rectangle);
+Rectangle.defualtProps={
+    filter:(v)=>true,
+    attrs:{width:10,height:5},
+    selectedAttrs:{},
+    hoveredAttrs:{},
+    tooltip:{},
+}
+
 
 const CoalescentNodes=NodesHOC(CoalescentShape);
 CoalescentNodes.defualtProps={
@@ -65,7 +75,7 @@ CoalescentNodes.defualtProps={
     tooltip:{},
     filter:(v)=>true,
 };
-const Nodes={Circle:CircleNodes,Coalescent:CoalescentNodes,AnimatedCircleNodes:AnimatedCircleNodes};
+const Nodes={Circle:CircleNodes,Coalescent:CoalescentNodes,AnimatedCircleNodes:AnimatedCircleNodes,Rectangle:RectangularNodes};
 export default Nodes;
 
 

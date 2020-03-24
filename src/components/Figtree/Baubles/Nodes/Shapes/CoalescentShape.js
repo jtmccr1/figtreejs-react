@@ -7,7 +7,7 @@ import {getTips} from "../../../../../utils/Tree/treeSettersandGetters"
 import {useInteractions, useScales} from "../../../../../hooks";
 //TODO extract out fill => gradient function
 
-const pathComponent=({attrs,interactions})=><path pointerEvents={"painted"} {...attrs} {...interactions}/>;
+const pathComponent=({attrs,interactions})=><path pointerEvents={"visiblePoint"} {...attrs} {...interactions}/>;
 
 export const FadedPath=withLinearGradient(pathComponent);
 

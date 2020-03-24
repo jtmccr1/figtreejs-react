@@ -24,26 +24,13 @@ function FigTree(props){
     const edges = useMemo(()=>makeEdges(vertices),[vertices]);
     const scales=useMemo(()=>{return setUpScales(width,height,vertices)},[tree]);
 
-    const sortedChildren = React.Children.toArray(props.children).reduce(childReducer,{"Nodes":[],"Branches":[],"Axis":[],"Other":[]});
     return (
         <ScaleContext.Provider value={{scales,width,height}}>
                 <TreeContext.Provider value={tree}>
                     <LayoutContext.Provider value={{vertices:vertices,edges:edges}}>
                         {/*<rect x="0" y="0" width="100%" height="100%" fill="none" pointerEvents={"visible"} onClick={()=>nodeDispatch({type:"clearSelection"})}/>*/}
                         <g transform={`translate(${pos.x},${pos.y})`}>
-                            <g id={"axis-layer"}>
-                                {sortedChildren.Axis}
-                            </g>
-                            <g id={"branch-layer"}>
-                                {sortedChildren.Branches}
-                            </g>
-                            <g id={"node-layer"}>
-                                {sortedChildren.Nodes}
-                            </g>
-                            <g id={"other-layer"}>
-                                {/*make legend layer*/}
-                                {sortedChildren.Other}
-                            </g>
+                            {props.children}
                         </g>
                     </LayoutContext.Provider>
                 </TreeContext.Provider>
@@ -78,6 +65,7 @@ FigTree.defaultProps= {
 
 function childReducer(acc,child){
     const childName=child.type.name;
+    console.log(childName);
     switch(childName){
         case "Nodes":
             acc["Nodes"].push(child);
