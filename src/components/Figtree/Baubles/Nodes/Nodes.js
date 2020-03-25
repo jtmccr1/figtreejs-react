@@ -1,10 +1,7 @@
 import React, {useMemo, useContext} from "react"
 import {Circle,AnimatedCircle} from "./Shapes/Circle";
-import Node from "./Node";
-import {LayoutContext} from "../../FigTree";
-import {DataType, reduceIterator} from "../../../../utils/utilities";
 import CoalescentShape from "./Shapes/CoalescentShape";
-import {useAttributeMappers, useScales} from "../../../../hooks";
+import {useAttributeMappers, useLayout, useScales} from "../../../../hooks";
 import Rectangle from "./Shapes/Rectangle";
 
 /**
@@ -18,12 +15,12 @@ import Rectangle from "./Shapes/Rectangle";
 function NodesHOC(ShapeComponent) {
     return function Nodes(props) {
         const {scales} = useScales();
-        const {vertices} = useContext(LayoutContext);
-        const {filter,hoverKey,selectionKey} = props;
+        const {vertices} =useLayout();
+        const {filter,hoverKey,selectionKey,sortFactor} = props;
         const shapeProps = useAttributeMappers(props,hoverKey,selectionKey);
         return (
             <>
-                {[...vertices.values()].sort((a,b)=>a.x-b.x).reduce( (all, v) => {
+                {[...vertices.values()].sort((a,b)=>sortFactor*(a.x-b.x)).reduce( (all, v) => {
                     if (filter(v)) {
                         const element = <ShapeComponent key={v.id} {...shapeProps(v)} vertex={v}  x={scales.x(v.x)} y={scales.y(v.y)}/>
                             all.push(element)
@@ -44,6 +41,7 @@ CircleNodes.defaultProps={
     hoveredAttrs:{},
     tooltip:{},
     label:()=>false,
+    sortFactor:1,
 };
 const AnimatedCircleNodes = NodesHOC(AnimatedCircle);
 AnimatedCircleNodes.defaultProps={
@@ -53,6 +51,7 @@ AnimatedCircleNodes.defaultProps={
     hoveredAttrs:{},
     tooltip:{},
     label:()=>false,
+    sortFactor:1,
 };
 
 const RectangularNodes = NodesHOC(Rectangle);
@@ -62,6 +61,7 @@ Rectangle.defualtProps={
     selectedAttrs:{},
     hoveredAttrs:{},
     tooltip:{},
+    sortFactor:1,
 }
 
 

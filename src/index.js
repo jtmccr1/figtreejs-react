@@ -20,9 +20,10 @@ import InteractionContainer from "../src/components/InteractionContainer"
 import Label from "./components/Figtree/Baubles/Label"
 import PlotLayer from "./components/Plots/PlotLayer"
 import Element from "./components/Plots/Elements/Element"
+import {useFigtreeContext} from "./hooks"
 export {Branches,Nodes,customDateFormater,dateToDecimal,decimalToDate,Axis,AxisBars,Legend,
     FigTree,ImmutableTree,rectangularLayout,edgeFactory,KDE,getParent,getNode,getDivergence,getNodes,getTips,
     orderByNodeDensity,parseNewick,parseNexus,getRootToTipLengths,annotateNode,
     collapseUnsupportedNodes,NodeBackgrounds,Map,Features,GreatCircleArc,GreatCircleArcMissal,Timeline,getDateRange,
-    InteractionContainer,Label,PlotLayer,Element
+    InteractionContainer,Label,PlotLayer,Element,useFigtreeContext
 }

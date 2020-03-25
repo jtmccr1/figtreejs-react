@@ -1,15 +1,13 @@
-import React,{useMemo,useContext} from "react"
-import Branch from "./Branch";
+import React,{useMemo} from "react"
 import RectangularBranchPath from "./Shapes/RectangularBranchPath";
 import CoalescentBranch from "./Shapes/CoalescentBranchPath";
 import {mapAttrsToProps} from "../../../../utils/baubleHelpers";
-import {LayoutContext} from "../../FigTree";
-import {useScales} from "../../../../hooks";
+import {useLayout, useScales} from "../../../../hooks";
 
 function BranchesHOC(PathComponent) {
     return function Branches(props){
         const {scales} = useScales();
-        const {edges} = useContext(LayoutContext);
+        const {edges} = useLayout();
         const {attrs, filter} = props;
         const attrMapper = useMemo(() => mapAttrsToProps(attrs), [attrs]);
         function getPosition(e){

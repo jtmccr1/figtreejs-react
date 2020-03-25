@@ -4,11 +4,9 @@ import {scaleLinear} from "d3-scale";
 import {extent} from "../../utils/utilities";
 import Branches from "./Baubles/Branches/Branches";
 import {makeEdges, rectangularVertices} from "../../utils/layouts";
-import {parseNewick} from "../../utils/Tree/treeOperations";
 import {getDateRange} from "../../utils/Tree/treeSettersandGetters";
-import {ScaleContext} from "../../Context/Context";
+import {ScaleContext,TreeContext,LayoutContext} from "../../Context/Context";
 import withConditionalInteractionProvider from "../HOC/withConditionalInteractionProvider.js"
-import withTimelineConsumer from "../HOC/withTimelineConsumer";
 /**
  * The FigTree component
  * This takes a tree and layout options. It calls the layout and handles state for this figure.
@@ -16,8 +14,6 @@ import withTimelineConsumer from "../HOC/withTimelineConsumer";
  */
 
 
-export const TreeContext = React.createContext(parseNewick(    '((((((virus1:0.1,virus2:0.12)0.95:0.08,(virus3:0.011,virus4:0.0087)1.0:0.15)0.65:0.03,virus5:0.21)1.0:0.2,(virus6:0.45,virus7:0.4)0.51:0.02)1.0:0.1,virus8:0.4)1.0:0.1,(virus9:0.04,virus10:0.03)1.0:0.6);'));
-export const LayoutContext = React.createContext({vertices:new Map(),edges:[]});
 function FigTree(props){
     const {layout,width,height,data:tree,pos} = props;
     const vertices = useMemo(()=>layout(tree),[tree]);

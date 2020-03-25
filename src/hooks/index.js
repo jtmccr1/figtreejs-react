@@ -4,8 +4,8 @@ import {
     DataContext,
     InteractionContext,
     InteractionDispatchContext,
-    InteractionStateContext,
-    ScaleContext
+    InteractionStateContext, LayoutContext,
+    ScaleContext, TreeContext
 } from "../Context/Context";
 import {DataType} from "../utils/utilities";
 
@@ -77,6 +77,16 @@ export  function useScales(){
 export function useData(){
     return useContext(DataContext);
 }
+export function useLayout(){
+    return useContext(LayoutContext);
+}
+export function useTree(){
+    return useContext(TreeContext);
+}
+export const useFigtreeContext={scales:useScales,layout:useLayout,tree:useTree};
+
+
+
 
 function hoverAction(dataEntry,key){
     const value = key==="id"?dataEntry.id:dataEntry.annotations[key];
