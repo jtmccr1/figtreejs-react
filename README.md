@@ -6,4 +6,4 @@ This started as an comparision of ways to work with d3 and react. It as a react-
 
 This project in under developement and key components/APIs are subject to change.
 ## Examples
--[Sars-Cov2 phylogengy with collapsed nodes](https://jtmccr1.github.io/sars2/)
+-[Sars-Cov2 phylogengy with collapsed nodes](https://artic.network/hCoV-19-viz)
