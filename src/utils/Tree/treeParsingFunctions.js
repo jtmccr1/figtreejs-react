@@ -101,14 +101,15 @@ export function typeAnnotations(annotations){
         } else if (Array.isArray(addValues)) {
             // is a set of  values
             let type;
-            if(addValues.map(v=>isNaN(v)).reduce((acc,curr)=>acc&&curr,true)) {
+            if (addValues.map(v => typeof v ==="string").reduce((acc, curr) => acc && curr, true)) {
                 type = DataType.DISCRETE;
                 annotation.type = type;
                 if (!annotation.values) {
                     annotation.values = new Set();
                 }
                 annotation.values.add(...addValues);
-            }else if(addValues.map(v=>parseFloat(v)).reduce((acc,curr)=>acc&&Number.isInteger(curr),true)){
+            }
+        else if(addValues.map(v=>parseFloat(v)).reduce((acc,curr)=>acc&&Number.isInteger(curr),true)){
                 type =DataType.INTEGER;
                 annotation.extent=extent(addValues)
             }else{
@@ -175,7 +176,7 @@ export function typeAnnotations(annotations){
 
             if (typeof addValues === typeof true) {
                 type = DataType.BOOLEAN;
-            } else if (!isNaN(addValues)) {
+            }else if (typeof addValues !== "string" && !isNaN(addValues)) {
                 type = (addValues % 1 === 0 ? DataType.INTEGER : DataType.FLOAT);
             }
 

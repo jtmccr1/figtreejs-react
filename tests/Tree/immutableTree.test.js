@@ -16,6 +16,7 @@ import {
     getTips, setLength,
 } from "../../src/utils/Tree/treeSettersandGetters";
 import {DataType} from "../../src/utils/utilities";
+import {typeAnnotations} from "../../src/utils/Tree/treeParsingFunctions";
 
 const treeString="(('A|2020-01':1,B|1980-01-11[&length_range={1,1.5},location=\"Janesburgh\",location.prob=0.8,location.set.prob={0.8,0.2},location.set={\"Janesburgh\",\"JanosAires\"}]:2):3,C|1960[&length_range={2,4},location=\"Mabalako\",location.prob=1.0,location.set.prob={1.0},location.set={\"Mabalako\"}]:4);"
 const expectedTree = {
@@ -214,5 +215,11 @@ describe("Tree Tests",()=>{
         expect(getNode(annotatedTree,"A").annotationTypes).toEqual({Host:{type:DataType.DISCRETE,values: new Set(["Bat"])}});
         expect(annotatedTree.annotationTypes).toEqual({Host:{type:DataType.DISCRETE,values: new Set(["Bat"])}});
     })
+    test("distinguish between quoted numbers and numbers",()=>{
+
+        expect(typeAnnotations({"string":"2","int":2})).toEqual({string:{type:DataType.DISCRETE,values: new Set(["2"])},int:{type:DataType.INTEGER,extent:[2,2]}})
+    })
+
+
 });
 
