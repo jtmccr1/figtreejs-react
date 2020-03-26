@@ -13,6 +13,7 @@ export function parseAnnotation(annotationString){
         annotationKey=annotationKey.replace(/\./g,"_");
         if(setRegex.test(data)) {
             data = data.split(setRegex).filter(s => s !== "").reduce((acc,curr)=>acc.concat(splitAtExposedCommas(curr)),[]);
+
             if (data.reduce((acc, curr) => (acc & !isNaN(curr)), true)) {
                 data = data.map(d => parseFloat(d));
             }else{
@@ -20,8 +21,9 @@ export function parseAnnotation(annotationString){
             }
             out[annotationKey]=data;
         }else{
+           const isString =  /\"/.test(data)|| /\'/.test(data);
             data = data.split(/[(?:\")')]/).filter(s=>s!=="")[0] ;
-            if(isNaN(data)){
+            if(isNaN(data)||isString){
                 out[annotationKey]=data
             }else{
                 out[annotationKey]=parseFloat(data);
@@ -205,6 +207,7 @@ export function typeAnnotations(annotations){
         // overwrite the existing annotation property
         // annotationTypes[key] = annotation;
     }
+
     return annotationTypes;
 }
 

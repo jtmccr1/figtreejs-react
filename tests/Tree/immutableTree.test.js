@@ -216,7 +216,10 @@ describe("Tree Tests",()=>{
         expect(annotatedTree.annotationTypes).toEqual({Host:{type:DataType.DISCRETE,values: new Set(["Bat"])}});
     })
     test("distinguish between quoted numbers and numbers",()=>{
-
+        const s=`((D:1,(B:1,C:1):1)[&s="1",s_1=1]:1,A:1);`;
+        const tree = parseNewick(s);
+        expect(tree.annotationTypes).toEqual({s:{type:DataType.DISCRETE,values:new Set(["1"])}
+            ,s_1:{type:DataType.INTEGER,extent:[1,1]}});
         expect(typeAnnotations({"string":"2","int":2})).toEqual({string:{type:DataType.DISCRETE,values: new Set(["2"])},int:{type:DataType.INTEGER,extent:[2,2]}})
     })
 

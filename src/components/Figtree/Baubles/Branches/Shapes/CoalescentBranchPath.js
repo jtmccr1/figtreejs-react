@@ -14,7 +14,6 @@ function BaseCoalescentBranch(props){
     const {vertices} =  useLayout();
     const {edge,y1,y0} =props;
     const vertex = vertices.get(edge.v0.node);
-
     const childTargets = vertex.node.children.map(child=>vertices.get(child));
     const targetRange = extent(childTargets,d=>d.x-vertex.x);
     const thisTarget = vertices.get(edge.v1.node);
@@ -24,8 +23,6 @@ function BaseCoalescentBranch(props){
     const opacityRamper=useCallback(i=>logisticRamp(i),[]);
         return <FadedPath   colorRamper={colorRamper} opacityRamper={opacityRamper} endingX={`${fadedIn}%`} gradientAttribute={"stroke"}
                            {...props}/>
-
-
 }
 
 const CoalescentBranch=React.memo(BaseCoalescentBranch,sameProps);
