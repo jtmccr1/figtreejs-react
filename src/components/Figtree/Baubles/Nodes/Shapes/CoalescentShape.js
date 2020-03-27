@@ -14,13 +14,13 @@ export default function CoalescentShape (props){
     const {vertices} =  useLayout();
     const {scales} = useScales();
 
-    const {vertex,attrs,interactions} =props;
+    const {vertex,attrs,interactions,startWidth} =props;
 
     const targets = getTips(vertex.node).map(decedent=>vertices.get(decedent))
         .concat(vertex.node.children.map(child=>vertices.get(child)));
 
     const slope = calcSlope(vertex,targets);
-    const d=makeCoalescent(vertex,targets,scales,slope);
+    const d=makeCoalescent(vertex,targets,scales,slope,startWidth);
 
 
     return  <FadedPath attrs={{...attrs,d:d}} interactions={interactions} endingX={`${100/slope}%`} colorRamper={i=>attrs.fill} opacityRamper={i=>1-i*1} />
@@ -32,6 +32,7 @@ CoalescentShape.defaultProps= {
         strokeWidth: 1,
         stroke: 'black'
     },
+    startWidth:2,
 };
 
 const link = linkHorizontal()
@@ -72,13 +73,13 @@ export function coalescentPath(source,topTarget,bottomTarget,slope=1,startWidth=
  * @param slope
  * @return string
  */
-export function makeCoalescent(vertex,targets,scales,slope=1){
+export function makeCoalescent(vertex,targets,scales,slope=1,startWidth=2){
     const xStart = scales.x(vertex.x);
     const xEnd=scales.x(max(targets,d=>d.x));
     const yStart = scales.y(vertex.y);
     const yTop=scales.y((min(targets,d=>d.y)-0.4));
     const yBottom =scales.y((max(targets,d=>d.y)+0.4));
-    return coalescentPath({x:xStart,y:yStart},{x:xEnd,y:yTop},{x:xEnd,y:yBottom},slope)
+    return coalescentPath({x:xStart,y:yStart},{x:xEnd,y:yTop},{x:xEnd,y:yBottom},slope,startWidth)
 }
 
 /**

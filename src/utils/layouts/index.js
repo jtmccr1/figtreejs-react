@@ -127,6 +127,41 @@ export function rectangularVertices(tree){
     return new Map(getNodes(tree).map(node=>[node,helper(node)]));
 }
 
+
+export function highlightedVertices(tree,squishFactor,highlightPredicate){
+    let currentY=-1;
+    let lastNodeHighlighted=true;
+    const helper =(function() {
+        const cache=new Map(); // remade every layout but that's ok for now
+
+        return function helper(node,labelBelow=0){
+            if(cache.has(node)){
+                return cache.get(node);
+            }else{
+                const vertex = makeVertexFromNode(node,labelBelow);
+                vertex.x=getDivergence(tree,node);
+
+                const step = highlightPredicate(node)?(
+                    lastNodeHighlighted?1:
+                        2):lastNodeHighlighted?2:squishFactor;
+                lastNodeHighlighted=highlightPredicate(node);
+
+                vertex.y=node.children?
+                    mean(node.children.map((child,i)=>helper(child,child.children===null?0:i).y)):
+                    (currentY+=step);
+                vertex.node=node;
+                cache.set(node,vertex);
+                return vertex;
+            }
+        }
+    }());
+
+    return new Map(getNodes(tree).map(node=>[node,helper(node)]));
+}
+
+
+
+
 export function makeEdges(vertices){
     console.log(vertices);
     return reduceIterator(vertices.keys(),(edges,node)=> {

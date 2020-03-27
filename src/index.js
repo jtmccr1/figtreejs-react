@@ -3,7 +3,7 @@ import Branches from "./components/Figtree/Baubles/Branches/Branches";
 import Nodes from "./components/Figtree/Baubles/Nodes/Nodes"
 import Axis from "./components/decorations/Axis/Axis";
 import FigTree from "./components/Figtree/FigTree";
-import {rectangularLayout,edgeFactory} from "./utils/layouts";
+import {rectangularVertices,highlightedVertices,edgeFactory} from "./utils/layouts";
 import {customDateFormater,dateToDecimal,decimalToDate} from "./utils/utilities";
 import AxisBars from "./components/decorations/Axis/AxisBars";
 import KDE from "./components/Plots/layouts/KDE";
@@ -22,7 +22,7 @@ import PlotLayer from "./components/Plots/PlotLayer"
 import Element from "./components/Plots/Elements/Element"
 import {useFigtreeContext} from "./hooks"
 export {Branches,Nodes,customDateFormater,dateToDecimal,decimalToDate,Axis,AxisBars,Legend,
-    FigTree,ImmutableTree,rectangularLayout,edgeFactory,KDE,getParent,getNode,getDivergence,getNodes,getTips,
+    FigTree,ImmutableTree,rectangularVertices,highlightedVertices,edgeFactory,KDE,getParent,getNode,getDivergence,getNodes,getTips,
     orderByNodeDensity,parseNewick,parseNexus,getRootToTipLengths,annotateNode,
     collapseUnsupportedNodes,NodeBackgrounds,Map,Features,GreatCircleArc,GreatCircleArcMissal,Timeline,getDateRange,
     InteractionContainer,Label,PlotLayer,Element,useFigtreeContext

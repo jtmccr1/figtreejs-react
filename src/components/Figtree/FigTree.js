@@ -3,7 +3,7 @@ import React,{useMemo,useReducer} from 'react';
 import {scaleLinear} from "d3-scale";
 import {extent} from "../../utils/utilities";
 import Branches from "./Baubles/Branches/Branches";
-import {makeEdges, rectangularVertices} from "../../utils/layouts";
+    import {makeEdges, rectangularVertices} from "../../utils/layouts";
 import {getDateRange} from "../../utils/Tree/treeSettersandGetters";
 import {ScaleContext,TreeContext,LayoutContext} from "../../Context/Context";
 import withConditionalInteractionProvider from "../HOC/withConditionalInteractionProvider.js"
