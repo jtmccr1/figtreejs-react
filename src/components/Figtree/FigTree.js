@@ -1,5 +1,4 @@
 import React,{useMemo,useReducer} from 'react';
-
 import {scaleLinear} from "d3-scale";
 import {extent} from "../../utils/utilities";
 import Branches from "./Baubles/Branches/Branches";
@@ -16,10 +15,11 @@ import withConditionalInteractionProvider from "../HOC/withConditionalInteractio
 
 function FigTree(props){
     const {layout,width,height,data:tree,pos} = props;
+    console.log(tree);
     const vertices = useMemo(()=>layout(tree),[tree]);
     const edges = useMemo(()=>makeEdges(vertices),[vertices]);
     const scales=useMemo(()=>{return setUpScales(width,height,vertices)},[tree]);
-
+    console.log(vertices);
     return (
         <ScaleContext.Provider value={{scales,width,height}}>
                 <TreeContext.Provider value={tree}>

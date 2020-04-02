@@ -222,6 +222,9 @@ export function removeFrontQuotes(s){
     return s;
 }
 
+export function splitNexusString(s){
+    return s.split(/\s*(?:(?<!\w)Begin\s+|(?<!\w)begin\s+|(?<!\w)BEGIN\s+|(?<!\w)end;|(?<!\w).End;|(?<!\w)END;)\s*/).filter(d=> d!=="")
+}
 export function removeEndQuotes(s){
     if (s.endsWith("\"") || s.endsWith("\'")) {
         return s.slice(0, s.length - 1);

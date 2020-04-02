@@ -5,8 +5,9 @@ import {
     parseNewick,
     orderByNodeDensity,
     rotate,
-    collapseUnsupportedNodes,
-    annotateNode
+    collapseNodes,
+    annotateNode,
+    parseNexus,
 } from "../../src/utils/Tree/treeOperations";
 import {
     getDivergence,
@@ -16,8 +17,31 @@ import {
     getTips, setLength,
 } from "../../src/utils/Tree/treeSettersandGetters";
 import {DataType} from "../../src/utils/utilities";
-import {typeAnnotations} from "../../src/utils/Tree/treeParsingFunctions";
+import {typeAnnotations,    splitNexusString
+} from "../../src/utils/Tree/treeParsingFunctions";
 
+const nexusString = `#NEXUS
+
+Begin taxa;
+\tDimensions ntax=4;
+Taxlabels
+\t'A'
+\t'B'
+\t'C'
+\t'D'
+;
+END;
+
+Begin TREES;
+Translate
+    1 A,
+    2 B,
+    3 C,
+    4 D
+    ;
+tree TREE1 = [&R] ((4:1,(2:1,3:1):1):1,1:1);
+END;
+`;
 const treeString="(('A|2020-01':1,B|1980-01-11[&length_range={1,1.5},location=\"Janesburgh\",location.prob=0.8,location.set.prob={0.8,0.2},location.set={\"Janesburgh\",\"JanosAires\"}]:2):3,C|1960[&length_range={2,4},location=\"Mabalako\",location.prob=1.0,location.set.prob={1.0},location.set={\"Mabalako\"}]:4);"
 const expectedTree = {
     id: 'node2',
@@ -104,6 +128,18 @@ describe("Tree Tests",()=>{
         expect(tree).toEqual(expectedTree)
     });
 
+    test("split nexus string",()=>{
+        const tokens = splitNexusString("#NEXUS\nBegin test;\n databegin ;\n END;\nBegin test2;\ndata2 ;\nEND;")
+
+        expect(tokens).toEqual(["#NEXUS","test;\n databegin ;","test2;\ndata2 ;"])
+    })
+
+    test("parse nexus tree",()=>{
+        const tree=parseNexus(nexusString)[0];
+        const newickTree = parseNewick("((D:1,(B:1,C:1):1):1,A:1);");
+        expect(tree).toEqual(newickTree)
+    })
+
     test("Should get node",()=>{
        const tree = parseNewick("((a:1,B:1)internal:4E-5,c:3);");
 
@@ -182,7 +218,7 @@ describe("Tree Tests",()=>{
         const s="((D:1,(B:1,C:1)0.3:1):1,A:1);";
         const tree = parseNewick(s,{labelName:"posterior"});
 
-        const collapsedTree=collapseUnsupportedNodes(tree,(node)=>node.annotations.posterior && node.annotations.posterior <0.5);
+        const collapsedTree=collapseNodes(tree,(node)=>node.annotations.posterior && node.annotations.posterior <0.5);
         expect(getParent(collapsedTree,"D")).toBe(getParent(collapsedTree,"B"));
         expect(getNode(collapsedTree,"B").length).toEqual(getNode(tree,"B").length+getParent(tree,"B").length)
     });
@@ -194,7 +230,7 @@ describe("Tree Tests",()=>{
                     ]},
                 {id:"c",length:1}
             ]}
-            expect(collapseUnsupportedNodes(t,n=>n.p<0.5).children.length).toEqual(4)
+            expect(collapseNodes(t, n=>n.p<0.5).children.length).toEqual(4)
     });
     test("rotate Nodes",()=>{
         const s="((D:1,(B:1,C:1):1):1,A:1);";

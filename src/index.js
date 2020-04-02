@@ -9,7 +9,7 @@ import AxisBars from "./components/decorations/Axis/AxisBars";
 import KDE from "./components/Plots/layouts/KDE";
 import {parseNewick,parseNexus} from "./utils/Tree/treeOperations";
 import{getParent,getNode,getDivergence,getNodes,getTips,getRootToTipLengths,getDateRange} from "./utils/Tree/treeSettersandGetters"
-import {orderByNodeDensity,annotateNode,collapseUnsupportedNodes} from "./utils/Tree/treeOperations";
+import {orderByNodeDensity,annotateNode,collapseNodes} from "./utils/Tree/treeOperations";
 import Legend from "../src/components/decorations/Legend";
 import NodeBackgrounds from "./components/Figtree/Baubles/Nodes/NodeBackgrounds";
 import Map from "./components/Map/Map";
@@ -21,9 +21,11 @@ import Label from "./components/Figtree/Baubles/Label"
 import PlotLayer from "./components/Plots/PlotLayer"
 import Element from "./components/Plots/Elements/Element"
 import {useFigtreeContext} from "./hooks"
+import {figtree,nodes,branches,nodeBackgrounds} from "./jsxFreeAPI"
+
 export {Branches,Nodes,customDateFormater,dateToDecimal,decimalToDate,Axis,AxisBars,Legend,
     FigTree,ImmutableTree,rectangularVertices,highlightedVertices,edgeFactory,KDE,getParent,getNode,getDivergence,getNodes,getTips,
     orderByNodeDensity,parseNewick,parseNexus,getRootToTipLengths,annotateNode,
-    collapseUnsupportedNodes,NodeBackgrounds,Map,Features,GreatCircleArc,GreatCircleArcMissal,Timeline,getDateRange,
-    InteractionContainer,Label,PlotLayer,Element,useFigtreeContext
+    collapseNodes,NodeBackgrounds,Map,Features,GreatCircleArc,GreatCircleArcMissal,Timeline,getDateRange,
+    InteractionContainer,Label,PlotLayer,Element,useFigtreeContext,figtree,nodes,branches,nodeBackgrounds
 }

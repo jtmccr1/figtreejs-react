@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FigTree Demo</title>
+    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+    <script src ="./lib/index.umd.js"></script>
+    <style>
+        text {
+            font-family: "helvetica-neue",  "helvetica",  "sans-serif";
+            font-size: 14pt;
+            font-weight: 300;
+        }
+
+        .branch {
+            fill: none;
+            stroke: #541753;
+            stroke-width: 2px;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .branch.hovered {
+            stroke-width: 4px;
+        }
+
+         .external-node .node-shape:not(.rough) {
+            fill: #22b680;
+            stroke: rgb(255, 255, 255);
+            stroke-width: 1;
+        }
+
+        .external-node .node-shape.hovered {
+            stroke: rgb(0,0,0);
+            /*stroke-width: 1;*/
+        }
+        .external-node .node-shape.unselected {
+            fill: #22b680;
+            /*stroke: rgb(255, 255, 255);*/
+        }
+       .external-node .node-shape.selected {
+            fill: #edb23b;
+            /*stroke: rgb(0,0,0);*/
+        }
+
+        .internal-node .node-shape {
+            fill: #29c5ef;
+            /*stroke: rgb(255, 255, 255);*/
+            /*stroke-width: 1;*/
+        }
+        .internal-node .node-shape.hovered {
+            stroke: rgb(0,0,0);
+        }
+
+
+        #root .node-shape {
+            fill: #e31e58;
+            /*stroke: rgb(255, 255, 255);*/
+            /*stroke-width: 1;*/
+        }
+
+        .node-background {
+            fill: rgb(255, 255, 255);
+            /*stroke: rgb(255, 255, 255);*/
+            /*stroke-width: 1;*/
+        }
+
+        .node-label {
+            font-family: "helvetica-neue",  "helvetica",  "sans-serif";
+            font-size: 14pt;
+            font-weight: 300;
+        }
+
+        .trend-line {
+            stroke: rgb(0,0,0);
+            stroke-width: 2px;
+            stroke-linecap: round;
+        }
+
+        .axis text {
+            font-family: "helvetica-neue",  "helvetica",  "sans-serif";
+            font-size: 12pt;
+            font-weight: 300;
+        }
+
+        .axis-label text {
+            font-family: "helvetica-neue",  "helvetica",  "sans-serif";
+            font-size: 12pt;
+            font-weight: bold;
+        }
+
+        .node-label.support {
+            font-size: 10pt;
+        }
+
+        .branch-label.length {
+            display: none;
+            font-size: 8pt;
+        }
+
+        #tooltip {
+            background: #F6EECA;
+            border: 1px solid #005C68;
+            color: #005C68;
+            border-radius: 5px;
+            padding: 5px;
+            font-family: "helvetica-neue",  "helvetica",  "sans-serif";
+            font-size: 12pt;
+            font-weight: 300;
+        }
+    </style>
+</head>
+
+<body>
+<div id="tooltip" display="none" style="position: absolute; display: none;"></div>
+
+<div>
+    <svg id="tree-2-svg"  width="500" height="300"></svg>
+    <svg id="rrt-2-svg"  width="500" height="300"></svg>
+</div>
+
+<script>
+    const {parseNewick,figtree,nodes,nodeBackgrounds,branches,rectangularVertices} =figtreejs;
+
+    const timeTreeString =
+        '((((virusA_1975:20.0,virusB_1965:10.0):10.0,virusC_1985:40.0):15.0,(virusD_1970:35.0,virusE_1955:20.0):5.0):25.0,(virusF_2000:55.0,virusG_1960:15.0):40.0);';
+
+    const tree = figtreejs.parseNewick(timeTreeString, {datePrefix:"_"});
+    console.log(tree);
+    const treeSVG = document.getElementById('tree-2-svg');
+    const figTree = new figtree(treeSVG,490,290,{x:4,y:10},tree)
+        .layout(rectangularVertices)
+        .children(
+            branches.rectangular()
+                .attr("stroke","black"),
+            nodeBackgrounds.circle()
+                .filter(v=>v.node.children===null)
+                .attr("r",6),
+            nodes.animatedCircle()
+                .filter(v=>v.node.children===null)
+                .attr("r",5)
+                .attr("fill","#ccc")
+                .hoveredAttr("r",10),
+
+
+
+
+        );
+
+
+                    // .nodeBackgrounds(
+                    //     circle()
+                    //         .attr("r",7)
+                    // )
+                    // .branches(
+                    //     branch()
+                    //         .hilightOnHover()
+                    //         .reRootOnClick()
+                    // );
+
+/*<!--    const rootToTipSVG = document.getElementById('rrt-2-svg');-->
+<!--    const margins = { top: 10, bottom: 60, left: 100, right: 100}-->
+<!--    const rootToTipPlot = new FigTree(rootToTipSVG, { top: 10, bottom: 60, left: 60, right: 100},tree)-->
+<!--    .layout(rootToTipLayout())-->
+<!--        .nodes(-->
+<!--            circle()-->
+<!--                .filter(d=>!d.children)-->
+<!--                .attr("r",d=>d.annotations.hovered?10:5)-->
+<!--                .annotateOnHover("hovered"),-->
+<!--        )-->
+<!--        .nodeBackgrounds(-->
+<!--            circle()-->
+<!--                .attr("r",7)-->
+<!--        )-->
+<!--        .branches(-->
+<!--            branch() // the trendline is a branch-->
+<!--                .curve(d3.curveBasis)-->
+<!--        )-->
+<!--        .feature(-->
+<!--            axis()-->
+<!--                .location("bottom")-->
+<!--                .y(300-margins.top-margins.bottom+5)-->
+<!--                .x(0)-->
+<!--                .title({text:"Date",-->
+<!--                    yPadding:30})-->
+
+<!--        )-->
+<!--        .feature(-->
+<!--            axis()-->
+<!--                .location("left")-->
+<!--                .y(0)-->
+<!--                .x(-5)-->
+<!--                .title({text:"Divergence",-->
+<!--                    xPadding:-50,-->
+<!--                    rotation:-90})-->
+<!--                .tickFormat(d3.format(".0f"))-->
+<!--                .ticks(4)-->
+<!--        )-->*/
+
+</script>
+</body>
+</html>

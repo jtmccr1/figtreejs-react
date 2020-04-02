@@ -4,7 +4,7 @@ import {
     getDate,
     parseAnnotation,
     reconcileAnnotations,
-    splitAtExposedCommas,
+    splitAtExposedCommas, splitNexusString,
     stripQuotes,
     typeAnnotations,
     verifyNewickString
@@ -78,7 +78,7 @@ export function parseNewick(newickString, options={}) {
         node.annotationTypes=childNodes?[typedAnnotations,...childNodes.map(c=>c.annotationTypes)].reduce((acc,curr)=>reconcileAnnotations(curr,acc),{}):typedAnnotations;
         return node;
     }
-    const root = newickSubstringParser(newickString);
+    const root = newickSubstringParser(newickString.trim());
     return root;
 }
 
@@ -89,7 +89,7 @@ export function   parseNexus(nexus,options={}){
 
         // odd parts ensure we're not in a taxon label
         //TODO make this parsing more robust
-        const nexusTokens = nexus.split(/\s*(?:^|[^\w\d])Begin(?:^|[^\w\d])|(?:^|[^\w\d])begin(?:^|[^\w\d])|(?:^|[^\w\d])end(?:^|[^\w\d])|(?:^|[^\w\d])End(?:^|[^\w\d])|(?:^|[^\w\d])BEGIN(?:^|[^\w\d])|(?:^|[^\w\d])END(?:^|[^\w\d])\s*/)
+        const nexusTokens = splitNexusString(nexus);
         const firstToken = nexusTokens.shift().trim();
         if(firstToken.toLowerCase()!=='#nexus'){
             throw Error("File does not begin with #NEXUS is it a nexus file?")
@@ -116,9 +116,12 @@ export function   parseNexus(nexus,options={}){
                         }else{
                             const treeString = token.substring(token.indexOf("("));
                             if(Object.keys(tipMap).length>0) {
+                                console.log("I think there's a tip map")
                                 const thisTree = parseNewick(treeString, {...options, tipMap,tipNames});
                                 trees.push(thisTree);
                             }else{
+                                console.log("no tip map")
+                                console.log(treeString)
                                 const thisTree = parseNewick(treeString, {...options});
                                 trees.push(thisTree);
                             }
@@ -150,7 +153,13 @@ export function rotate(tree,nodeId) {
     })
 }
 
-export function collapseUnsupportedNodes(tree, predicate){
+/**
+ * Collapse nodes that return true from predicate
+ * @param tree
+ * @param predicate
+ * @returns {Produced<Function, ReturnType<Function>>}
+ */
+export function collapseNodes(tree, predicate){
     const collapser = produce(draft=>{
         if(draft.children) {
             let lookAgain=false;
@@ -177,7 +186,13 @@ export function collapseUnsupportedNodes(tree, predicate){
     return collapser(tree);
 }
 
-
+/**
+ * Annotate node of tree
+ * @param tree
+ * @param nodeId
+ * @param annotation and object with annotation name as key and annotation value as value
+ * @returns {<Base extends Immutable<Function>>(base?: *, ...rest: Tail<Recipe extends (...args: P) => any ? P : never>) => Produced<*, ReturnType<*>>}
+ */
 export function annotateNode(tree,nodeId,annotation){
     return produce(tree,draft=>{
             let node=getNode(draft,nodeId);
@@ -194,13 +209,27 @@ export function annotateNode(tree,nodeId,annotation){
     })
 }
 
-//
-//
-// function orderChildren(tree,increasing){
-//     const factor = increasing ? -1 : 1;
-//     return produce(tree, draft => {
-//         if(draft.children){
-//             draft.children.sort((a,b)=>factor*(getTips(a).length-getTips(b).length))
-//         }
-//     });
-// }
+/**
+ * Batch annotations on tree for performance boost when annotating many nodes.
+ * @param tree
+ * @param annotations - object with nodeId as key and annotation object as entry
+ * @returns {<Base extends Immutable<Function>>(base?: *, ...rest: Tail<Recipe extends (...args: P) => any ? P : never>) => Produced<*, ReturnType<*>>}
+ */
+export function annotateNodes(tree,annotations){
+    return produce(tree,draft=>{
+        for(const [nodeId,annotation] of Object.entries(annotations)) {
+            let node = getNode(draft, nodeId);
+            for (const [key, value] of Object.entries(annotation)) {
+                node.annotations[key] = value;
+            }
+            node.annotationTypes = typeAnnotations(node.annotations);
+            let parent = getParent(draft, node.id);
+            while (parent) {
+                parent.annotationTypes = reconcileAnnotations(getNode(draft, node.id).annotationTypes, parent.annotationTypes)
+                node = parent;
+                parent = getParent(draft, node.id);
+            }
+        }
+    })
+
+}

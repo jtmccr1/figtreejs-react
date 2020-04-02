@@ -3,6 +3,8 @@ import commonjs from "rollup-plugin-commonjs";
 import resolve from "rollup-plugin-node-resolve";
 import external from "rollup-plugin-peer-deps-external";
 import { terser } from "rollup-plugin-terser";
+import globals from 'rollup-plugin-node-globals';
+
 import { uglify } from "rollup-plugin-uglify";
 import packageJSON from "./package.json";
 
@@ -67,6 +69,7 @@ export default [
             }),
             external(),
             resolve(),
+            globals(),
             commonjs({include: ['src/*','node_modules/**']})
         ]
     },
@@ -91,7 +94,8 @@ export default [
             external(),
             resolve(),
             commonjs({include: ['src/*','node_modules/**']}),
-            terser()
+            terser(),
+            globals(),
         ]
     },
     // ES
