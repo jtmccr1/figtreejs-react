@@ -12,8 +12,18 @@ import {
 import {produce} from "immer";
 
 
+
+
+
+
 export function parseNewick(newickString, options={}) {
     options ={...{labelName: "label",datePrefix:undefined,dateFormat:"%Y-%m-%d"},...options};
+
+    const str = Array.from(newickString.trim());
+    // skipuntil "("  skip spaces
+    // set last character to "(" - unreadCharacterCall
+
+
     let nodeCount=0;
 
     verifyNewickString(newickString);
@@ -41,7 +51,6 @@ export function parseNewick(newickString, options={}) {
         }
         //TODO get rid of leading and trailing empty matches
         let [emptyMatch,name,annotationsString,label,length,emptyMatch2]=nodeString.split(nodeData);
-
         if(!isInternalNode&&!annotationsString){
             name=label;
             label=null;
@@ -116,12 +125,9 @@ export function   parseNexus(nexus,options={}){
                         }else{
                             const treeString = token.substring(token.indexOf("("));
                             if(Object.keys(tipMap).length>0) {
-                                console.log("I think there's a tip map")
                                 const thisTree = parseNewick(treeString, {...options, tipMap,tipNames});
                                 trees.push(thisTree);
                             }else{
-                                console.log("no tip map")
-                                console.log(treeString)
                                 const thisTree = parseNewick(treeString, {...options});
                                 trees.push(thisTree);
                             }

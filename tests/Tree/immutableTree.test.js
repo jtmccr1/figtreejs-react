@@ -42,6 +42,25 @@ Translate
 tree TREE1 = [&R] ((4:1,(2:1,3:1):1):1,1:1);
 END;
 `;
+
+const nexusStringNoTipMap = `#NEXUS
+
+Begin taxa;
+\tDimensions ntax=4;
+Taxlabels
+\t'A'
+\t'B'
+\t'C'
+\t'D'
+;
+END;
+
+Begin TREES;
+tree TREE1 = [&R] (('D':1,('B':1,'C':1):1):1,'A':1);
+END;
+`;
+
+
 const treeString="(('A|2020-01':1,B|1980-01-11[&length_range={1,1.5},location=\"Janesburgh\",location.prob=0.8,location.set.prob={0.8,0.2},location.set={\"Janesburgh\",\"JanosAires\"}]:2):3,C|1960[&length_range={2,4},location=\"Mabalako\",location.prob=1.0,location.set.prob={1.0},location.set={\"Mabalako\"}]:4);"
 const expectedTree = {
     id: 'node2',
@@ -123,22 +142,7 @@ const expectedTree = {
     }
 };
 describe("Tree Tests",()=>{
-    test("parse newick tree parse, type and reconcile annotations",()=>{
-        const tree = parseNewick(treeString,{datePrefix:"|"});
-        expect(tree).toEqual(expectedTree)
-    });
 
-    test("split nexus string",()=>{
-        const tokens = splitNexusString("#NEXUS\nBegin test;\n databegin ;\n END;\nBegin test2;\ndata2 ;\nEND;")
-
-        expect(tokens).toEqual(["#NEXUS","test;\n databegin ;","test2;\ndata2 ;"])
-    })
-
-    test("parse nexus tree",()=>{
-        const tree=parseNexus(nexusString)[0];
-        const newickTree = parseNewick("((D:1,(B:1,C:1):1):1,A:1);");
-        expect(tree).toEqual(newickTree)
-    })
 
     test("Should get node",()=>{
        const tree = parseNewick("((a:1,B:1)internal:4E-5,c:3);");
@@ -156,12 +160,6 @@ describe("Tree Tests",()=>{
     test("Should get Parent",()=>{
         const tree = parseNewick("((a:1,B:1)internal:4E-5,c:3);");
         expect(getParent(tree,"a").id).toEqual("internal")
-    });
-    test("Handle exponential terms in branch lengths and calc divergence",()=>{
-        const treeString= "((a:1e-4,B:1)internal:4E-5,c:3);";
-        const tree = parseNewick(treeString);
-
-        expect(getDivergence(tree,getNode(tree,"a"))).toBeCloseTo(0.00014, 7);
     });
 
     test("Should get tips",()=>{
@@ -188,10 +186,6 @@ describe("Tree Tests",()=>{
         expect(getTips(orderedTree).map(tip=>tip.id)).toEqual(["B","C","D","A"]);
     });
 
-    test("Should split string at exposed commas",()=>{
-        const s = "('A|2020-01':1,B|1980-01-11[&length_range={1,1.5},location=\"Janesburgh\",location.prob={0.8,0.2},location.set={\"Janesburgh\",\"JanosAires\"}]:2):3,C|1960[&length_range={2,4},location=\"Mabalako\",location.prob=1.0,location.set={\"Mabalako\"}]:4";
-        expect(splitAtExposedCommas(s)).toEqual(["('A|2020-01':1,B|1980-01-11[&length_range={1,1.5},location=\"Janesburgh\",location.prob={0.8,0.2},location.set={\"Janesburgh\",\"JanosAires\"}]:2):3","C|1960[&length_range={2,4},location=\"Mabalako\",location.prob=1.0,location.set={\"Mabalako\"}]:4"])
-    });
 
     test("Should calculate root to tip lengths",()=>{
         const treeString= "((a:2,B:1)internal:0.5,c:3);";
