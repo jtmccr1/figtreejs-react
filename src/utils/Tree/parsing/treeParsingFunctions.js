@@ -1,110 +1,25 @@
 import {extent} from "d3-array";
-import {decimalToDate, DataType} from "../utilities";
+import {DataType, decimalToDate} from "../../utilities";
 import {timeParse} from "d3-time-format";
 
-const startComment='[',stopComment=']',line='\0',write='\0',meta='&';
 
-export function parseNewick(newickString, options={}){
-    options ={...{labelName: "label",datePrefix:undefined,dateFormat:"%Y-%m-%d"},...options};
-    verifyNewickString(newickString);
-    // read internal node and then handle root
-    let nodeNumber=0;
-
-
-
-
-
-    return readBranch(newickString.split(""),options);
-
-    function readBranch(newickString,options){
-        // make node
-        const [readUntil,getComments] = readUntilFactory(",;():");
-        let node={};
-        //check next character if it's '\0' then read it
-        if (newickString[0] === '(') {
-            // is an internal node
-            node = readInternalNode(newickString,options);
-        } else {
-            // is an external node
-            node = readExternalNode(newickString,readUntil);
-        }
-        //look for length
-        if(newickString[0]===":"){
-            newickString.shift();
-            node.length=parseFloat(readUntil(newickString))
-        }
-
-        const annotations = getComments().length>0?parseAnnotation(getComments().join("")):{};
-        let date;
-
-        if(options.datePrefix && node.name){
-            date =getDate(node.name,options.datePrefix,options.dateFormat);
-            annotations.date = date;
-        }
-
-        node.id=node.name?node.name:`node${(nodeNumber+=1)}`
-
-        node.annotations = annotations;
-
-        const annotationTypes = typeAnnotations(annotations);
-        node.annotationTypes=node.children?[annotationTypes,...node.children.map(c=>c.annotationTypes)].reduce((acc,curr)=>reconcileAnnotations(curr,acc),{}):annotationTypes;
-        return node
-    }
-    function readInternalNode(newickString,options){
-        const node = {children:[]};
-        const openingParenthesis = newickString.shift();
-        //grabs the first "(" skipping spaces, but leaves it in the string. read if last character = '\0' pulls the next one else it returns last character and sets it to '\0'
-        // skips commends
-        if(openingParenthesis!=="("){
-            throw new Error(`Expected '(' but got ${openingParenthesis}`)
-        }
-        // addChildren
-        // look again for other children
-        node.children.push(readBranch(newickString, options)) //TODO better way to get options in not getting branchlength in external node
-        let getChildren=true;
-        while(getChildren){
-            if(newickString[0]===")"){
-                newickString.shift();
-                getChildren=false
-            }else if(newickString[0]===","){
-                newickString.shift();
-                node.children.push(readBranch(newickString, options))
-            }else{
-                throw new Error("unexpected string")
-            }
-        }
-        return node;
-    }
-
-}
-
-
-
-
-
-export function readExternalNode(stringBuffer,readUntil){
-    const token = readUntil(stringBuffer);
-    return {name:token}
-}
-
-
-
+const startComment='[',stopComment=']',meta='&';
 
 export function readUntilFactory(requestedDeliminators) {
     const comments=[];
     function getToken(stringBuffer) {
         const deliminators = requestedDeliminators.split('');
-        const token = []
+        const token = [];
         let isQuoted = false, first = true;
         let char, char2, done, quoteChar;
 
         while (!done) {
-            char = stringBuffer.shift();
+            char = stringBuffer.pop();
 
             if (isQuoted && char === quoteChar) {
                 char2 = stringBuffer[0];
                 if (char2 === char) {
-                    stringBuffer.unshift();
+                    stringBuffer.push();
                     token.push(char2)
                 } else {
 
@@ -121,7 +36,7 @@ export function readUntilFactory(requestedDeliminators) {
                     comments.push(",")
                 }
                 while (keepReadingComment) {
-                    const commentChar = stringBuffer.shift();
+                    const commentChar = stringBuffer.pop();
                     if (commentChar === stopComment) {
                         keepReadingComment = false
                     } else {
@@ -133,9 +48,9 @@ export function readUntilFactory(requestedDeliminators) {
             } else if (isQuoted) {
                 token.push(char)
             } else if (deliminators.includes(char)) {
-                stringBuffer.unshift(char);
+                stringBuffer.push(char);
                 done = true;
-            } else if (!/\s/.test(char)) {
+            } else if (char!==" ") {
                 token.push(char);
                 first = false;
             }

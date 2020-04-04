@@ -1,7 +1,7 @@
 import {getVertexClassesFromNode, makeVertexFromNode} from "../../src/utils/layouts/layoutHelpers";
-import {parseNewick} from "../../src/utils/Tree/treeOperations";
 import {getNode} from "../../src/utils/Tree/treeSettersandGetters";
 import {makeEdges, rectangularLayout, rectangularVertices} from "../../src/utils/layouts";
+import {parseNewick} from "../../src";
 const tree = parseNewick("((A[&rate=0.9,host=\"bat\"]:2.1,B[&rate=1.1]:3)[&rate=1.5]:5,C[&rate=4]:1);");
 
 describe("Testing layout helper functions",()=> {
@@ -11,7 +11,6 @@ describe("Testing layout helper functions",()=> {
 
     it("Should make vertex", () => {
         expect(makeVertexFromNode(getNode(tree, "A"), false).textLabel).toEqual({
-            labelBelow: false,
             x: "12",
             y: "0",
             alignmentBaseline: "middle",
@@ -19,22 +18,23 @@ describe("Testing layout helper functions",()=> {
         })
     });
 
-    it("Should make rectangular vertex", () => {
+    it("testing new layout style", () => {
         expect(rectangularLayout(tree).vertices[0]).toEqual({
             "classes": ["external-node", "host-bat"],
             "id": "A",
-            "textLabel": {"alignmentBaseline": "middle", "labelBelow": 0, "textAnchor": "start", "x": "12", "y": "0"},
+            "textLabel": {"alignmentBaseline": "middle", "textAnchor": "start", "x": "12", "y": "0"},
             "x": 7.1,
             "y": 0
         })
     });
-    test("testing new layout style", () => {
+    test( "Should make rectangular vertex", () => {
         expect(rectangularVertices(tree).get(getNode(tree,"A"))).toEqual({
             "classes": ["external-node", "host-bat"],
             "id": "A",
-            "textLabel": {"alignmentBaseline": "middle", "labelBelow": 0, "textAnchor": "start", "x": "12", "y": "0"},
+            "textLabel": {"alignmentBaseline": "middle", "textAnchor": "start", "x": "12", "y": "0"},
             "x": 7.1,
             "y": 0,
+            annotations:getNode(tree,"A").annotations,
             node:getNode(tree,"A")
         })
     });

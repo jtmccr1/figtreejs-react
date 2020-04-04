@@ -21,7 +21,7 @@ const nodeGetter=(function(){
             if (!cache.has(tree)) {
                 // This is the first time looking for nodes in this tree
                 cache.set(tree, new Map([[tree.id,{node:tree}]]));
-                if(tree.children===null){
+                if(!tree.children){
                     if(call===nodeCalls.self && tree.id===nodeId){
                         return tree;
                     }
@@ -29,6 +29,7 @@ const nodeGetter=(function(){
                 }else{
                     // we are here do we need to update downstream?
                     let result= call===nodeCalls.self?(tree.id===nodeId?tree:null):tree.children.map(c=>c.id).includes(nodeId)?tree:null;
+                    // console.log(tree);
                     for(const child of tree.children){
                         if(cache.has(child)){
 

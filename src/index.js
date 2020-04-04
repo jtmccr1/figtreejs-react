@@ -1,4 +1,3 @@
-import {ImmutableTree} from "./utils/Tree/immutableTree";
 import Branches from "./components/Figtree/Baubles/Branches/Branches";
 import Nodes from "./components/Figtree/Baubles/Nodes/Nodes"
 import Axis from "./components/decorations/Axis/Axis";
@@ -7,7 +6,6 @@ import {rectangularVertices,highlightedVertices,edgeFactory} from "./utils/layou
 import {customDateFormater,dateToDecimal,decimalToDate} from "./utils/utilities";
 import AxisBars from "./components/decorations/Axis/AxisBars";
 import KDE from "./components/Plots/layouts/KDE";
-import {parseNewick,parseNexus} from "./utils/Tree/treeOperations";
 import{getParent,getNode,getDivergence,getNodes,getTips,getRootToTipLengths,getDateRange} from "./utils/Tree/treeSettersandGetters"
 import {orderByNodeDensity,annotateNode,collapseNodes} from "./utils/Tree/treeOperations";
 import Legend from "../src/components/decorations/Legend";
@@ -22,9 +20,11 @@ import PlotLayer from "./components/Plots/PlotLayer"
 import Element from "./components/Plots/Elements/Element"
 import {useFigtreeContext} from "./hooks"
 import {figtree,nodes,branches,nodeBackgrounds} from "./jsxFreeAPI"
+import {parseNewick} from "./utils/Tree/parsing/parseNewick";
+import {parseNexus} from "./utils/Tree/parsing/parseNexus";
 
 export {Branches,Nodes,customDateFormater,dateToDecimal,decimalToDate,Axis,AxisBars,Legend,
-    FigTree,ImmutableTree,rectangularVertices,highlightedVertices,edgeFactory,KDE,getParent,getNode,getDivergence,getNodes,getTips,
+    FigTree,rectangularVertices,highlightedVertices,edgeFactory,KDE,getParent,getNode,getDivergence,getNodes,getTips,
     orderByNodeDensity,parseNewick,parseNexus,getRootToTipLengths,annotateNode,
     collapseNodes,NodeBackgrounds,Map,Features,GreatCircleArc,GreatCircleArcMissal,Timeline,getDateRange,
     InteractionContainer,Label,PlotLayer,Element,useFigtreeContext,figtree,nodes,branches,nodeBackgrounds

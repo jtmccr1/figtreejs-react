@@ -1,6 +1,6 @@
 import React from "react";
 import {scaleLinear} from "d3-scale";
-import {parseNewick} from "../utils/Tree/treeOperations";
+import {parseNewick} from "../utils/Tree/parsing/parseNewick";
 
 export const InteractionStateContext = React.createContext(false);
 export const InteractionDispatchContext = React.createContext(false);

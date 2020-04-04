@@ -1,16 +1,13 @@
-import {splitAtExposedCommas} from "../../src/utils/Tree/immutableTree";
 import {timeParse} from "d3-time-format";
 
 import {
     getDivergence,
     getNode,
-    getParent,
-
-    getTips, setLength,
 } from "../../src/utils/Tree/treeSettersandGetters";
 import {DataType} from "../../src/utils/utilities";
-import {typeAnnotations, splitNexusString,readExternalNode,parseNewick
-} from "../../src/utils/Tree/treeParsingFunctions";
+import {typeAnnotations, splitNexusString,splitAtExposedCommas
+} from "../../src/utils/Tree/parsing/treeParsingFunctions";
+import {parseNewick, parseNexus} from "../../src";
 
 const nexusString = `#NEXUS
 
@@ -130,19 +127,6 @@ const expectedTree = {
 };
 describe("Tree Parsing Tests",()=>{
 
-    test("parse external node with quotes",()=>{
-        const tipFrag=`'Da tip':1,('`.split("");
-        const {label,comment}= readExternalNode(tipFrag);
-        expect(label).toEqual("Da tip");
-        expect(comment).toEqual(null);
-    })
-    test("parse external node with comment",()=>{
-        const tipFrag=`Datip[&comment=1]:1,('`.split("");
-        const {label,comment}= readExternalNode(tipFrag);
-        expect(label).toEqual("Datip");
-        expect(comment).toEqual("&comment=1");
-    })
-
 
     test("parse newick tree parse, type and reconcile annotations",()=>{
         const tree = parseNewick(treeString,{datePrefix:"|"});
@@ -178,13 +162,7 @@ describe("Tree Parsing Tests",()=>{
         const s = "('A|2020-01':1,B|1980-01-11[&length_range={1,1.5},location=\"Janesburgh\",location.prob={0.8,0.2},location.set={\"Janesburgh\",\"JanosAires\"}]:2):3,C|1960[&length_range={2,4},location=\"Mabalako\",location.prob=1.0,location.set={\"Mabalako\"}]:4";
         expect(splitAtExposedCommas(s)).toEqual(["('A|2020-01':1,B|1980-01-11[&length_range={1,1.5},location=\"Janesburgh\",location.prob={0.8,0.2},location.set={\"Janesburgh\",\"JanosAires\"}]:2):3","C|1960[&length_range={2,4},location=\"Mabalako\",location.prob=1.0,location.set={\"Mabalako\"}]:4"])
     });
-
-    test("rotate Nodes",()=>{
-        const s="((D:1,(B:1,C:1):1):1,A:1);";
-        const tree = parseNewick(s);
-        const rotatedTree=rotate(tree,getParent(tree,"D").id);
-        expect(getNode(rotatedTree,getParent(tree,"D").id).children).toEqual([...getNode(tree,getParent(tree,"D").id).children].reverse())
-    })
+    
     test("distinguish between quoted numbers and numbers",()=>{
         const s=`((D:1,(B:1,C:1):1)[&s="1",s_1=1]:1,A:1);`;
         const tree = parseNewick(s);
