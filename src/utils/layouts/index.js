@@ -141,14 +141,16 @@ export function highlightedVertices(tree,squishFactor,highlightPredicate){
                 const vertex = makeVertexFromNode(node,labelBelow);
                 vertex.x=getDivergence(tree,node);
 
-                const step = highlightPredicate(node)?(
-                    lastNodeHighlighted?1:
-                        2):lastNodeHighlighted?2:squishFactor;
-                lastNodeHighlighted=highlightPredicate(node);
+                if(node.children){
+                    vertex.y= mean(node.children.map((child,i)=>helper(child,child.children===null?0:i).y))
+                }else{
+                    const step = highlightPredicate(node)?(
+                        lastNodeHighlighted?1:
+                            2):lastNodeHighlighted?2:squishFactor;
 
-                vertex.y=node.children?
-                    mean(node.children.map((child,i)=>helper(child,child.children===null?0:i).y)):
-                    (currentY+=step);
+                    lastNodeHighlighted=highlightPredicate(node);
+                    vertex.y= (currentY+=step);
+                }
                 vertex.node=node;
                 cache.set(node,vertex);
                 return vertex;

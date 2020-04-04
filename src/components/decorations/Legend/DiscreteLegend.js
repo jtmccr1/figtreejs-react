@@ -22,7 +22,7 @@ import {useInteractions, useInteractionsDispatch} from "../../../hooks";
  * @constructor
  */
 
-export default function DiscreteLegend({scale,pos,width,height,swatchSize,format,annotation,columns} ){
+export default function DiscreteLegend({scale,pos,width,height,swatchSize,format,annotation,columns,onClick} ){
 //TODO hard coded location on hover call back.
     const dispatch = useInteractionsDispatch();
     const onHover=useCallback((value)=>()=>dispatch({type:"hover",payload:{dataType:DataType.DISCRETE,key:annotation,value:value}}))
@@ -38,7 +38,9 @@ export default function DiscreteLegend({scale,pos,width,height,swatchSize,format
                                                       display: flex;
                                                       align-items: center;
                                                       padding-bottom: 1px;
-                                                        `} onMouseEnter={onHover(value)} onMouseLeave={()=>onUnHover()} >
+                                                        `} onMouseEnter={onHover(value)}
+                                                            onMouseLeave={()=>onUnHover()}
+                                                            onClick={()=>onClick(value)} >
                                 <div css={css`width: ${swatchSize}px;
                                   height: ${swatchSize}px;
                                   margin: 0 0.5em 0 0;
@@ -70,4 +72,5 @@ DiscreteLegend.defaultProps={
     format:x=>x,
     title:"",
     columns:2,
+    onClick:()=>true
 }

@@ -15,11 +15,9 @@ import withConditionalInteractionProvider from "../HOC/withConditionalInteractio
 
 function FigTree(props){
     const {layout,width,height,data:tree,pos} = props;
-    console.log(tree);
-    const vertices = useMemo(()=>layout(tree),[tree]);
+    const vertices = useMemo(()=>layout(tree),[tree,layout]);
     const edges = useMemo(()=>makeEdges(vertices),[vertices]);
-    const scales=useMemo(()=>{return setUpScales(width,height,vertices)},[tree]);
-    console.log(vertices);
+    const scales=useMemo(()=>{return setUpScales(width,height,vertices)},[vertices]);
     return (
         <ScaleContext.Provider value={{scales,width,height}}>
                 <TreeContext.Provider value={tree}>
