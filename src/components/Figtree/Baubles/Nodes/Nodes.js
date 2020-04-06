@@ -20,7 +20,7 @@ function NodesHOC(ShapeComponent) {
         const shapeProps = useAttributeMappers(props,hoverKey,selectionKey);
         return (
             <>
-                {[...vertices.values()].sort((a,b)=>sortFactor*(b.x-a.x)).reduce( (all, v) => {
+                {[...vertices.values()].sort((a,b)=>sortFactor*(a.x-b.x)).reduce( (all, v) => {
                     if (filter(v)) {
                         const element = <ShapeComponent key={v.id} {...rest}  {...shapeProps(v)}   vertex={v}  x={scales.x(v.x)} y={scales.y(v.y)}/>
                             all.push(element)
@@ -74,6 +74,7 @@ CoalescentNodes.defualtProps={
     },
     tooltip:{},
     filter:(v)=>true,
+    sortFactor:1
 };
 const Nodes={Circle:CircleNodes,Coalescent:CoalescentNodes,AnimatedCircleNodes:AnimatedCircleNodes,Rectangle:RectangularNodes};
 export default Nodes;

@@ -289,7 +289,7 @@ export function removeFrontQuotes(s){
 }
 
 export function splitNexusString(s){
-    return s.split(/\s*(?:(?<!\w)Begin\s+|(?<!\w)begin\s+|(?<!\w)BEGIN\s+|(?<!\w)end;|(?<!\w).End;|(?<!\w)END;)\s*/).filter(d=> d!=="")
+    return s.split(/\s*(?:\bBegin\s+|\bbegin\s+|\bBEGIN\s+|\bend\s*;|\bEnd\s*;|\bEND\s*;)\s*/).filter(d=> d!=="")
 }
 export function removeEndQuotes(s){
     if (s.endsWith("\"") || s.endsWith("\'")) {
