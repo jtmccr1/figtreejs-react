@@ -19,14 +19,14 @@ function BranchesHOC(PathComponent) {
             }
         };
 
-        return (<>
+        return (<g className={"branch-layer"}>
             {edges.filter(filter).map(e => {
                 return (<PathComponent  key={`branch-${e.id}`} {...getPosition(e)}
                                        attrs={attrMapper(e)}
                                        edge={e}/>)
             })
             }
-        </>)
+        </g>)
     }
 }
 

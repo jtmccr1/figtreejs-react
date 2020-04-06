@@ -23,10 +23,10 @@ import {useInteractions, useInteractionsDispatch} from "../../../hooks";
  */
 
 export default function DiscreteLegend({scale,pos,width,height,swatchSize,format,annotation,columns,onClick} ){
-//TODO hard coded location on hover call back.
     const dispatch = useInteractionsDispatch();
     const onHover=useCallback((value)=>()=>dispatch({type:"hover",payload:{dataType:DataType.DISCRETE,key:annotation,value:value}}))
     const onUnHover = useCallback(()=>dispatch({type:"unhover",payload:{}}));
+    // TODO safari doesn't like the legend with two columns maybe move out of svg but need to scale and position so behaves the same
     return(
         <foreignObject x={pos.x} y={pos.y} width={width} height={height}>
             <div css={css`display: flex; align-items: center; min-height: 33px; font: 12px sans-serif;`}>

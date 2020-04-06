@@ -19,7 +19,7 @@ function NodesHOC(ShapeComponent) {
         const {filter,hoverKey,selectionKey,sortFactor,...rest} = props;
         const shapeProps = useAttributeMappers(props,hoverKey,selectionKey);
         return (
-            <>
+            <g className={"node-layer"}>
                 {[...vertices.values()].sort((a,b)=>sortFactor*(a.x-b.x)).reduce( (all, v) => {
                     if (filter(v)) {
                         const element = <ShapeComponent key={v.id} {...rest}  {...shapeProps(v)}   vertex={v}  x={scales.x(v.x)} y={scales.y(v.y)}/>
@@ -28,7 +28,7 @@ function NodesHOC(ShapeComponent) {
                     return all
                 }, [])
                 }
-            </>
+            </g>
         )
     }
 }

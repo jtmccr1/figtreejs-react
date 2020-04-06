@@ -16,7 +16,7 @@ export  default function Axis(props) {
         tickValues = scale.ticks(ticks.number);
     }
 
-    const transform=direction==="horizontal"? `translate(${0},${height+gap})`:`translate(${-1*gap},${0})`;
+    const transform=direction==="horizontal"? `translate(${0},${scales.y.range()[1]+gap})`:`translate(${-1*gap},${0})`;
 
 //TODO break this into parts HOC with logic horizontal/ vertical axis ect.
     return(

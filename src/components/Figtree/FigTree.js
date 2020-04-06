@@ -14,18 +14,20 @@ import withConditionalInteractionProvider from "../HOC/withConditionalInteractio
 
 
 function FigTree(props){
-    const {layout,width,height,data:tree,pos} = props;
+    const {layout,width,height,tree,margins} = props;
     const vertices = useMemo(()=>layout(tree),[tree,layout]);
     const edges = useMemo(()=>makeEdges(vertices),[vertices]);
-    const scales=useMemo(()=>{return setUpScales(width,height,vertices)},[vertices]);
+    const scales=useMemo(()=>{return setUpScales(width,height,margins,vertices)},[vertices]);
     return (
         <ScaleContext.Provider value={{scales,width,height}}>
                 <TreeContext.Provider value={tree}>
                     <LayoutContext.Provider value={{vertices:vertices,edges:edges}}>
+                        <svg viewBox={`0,0,${width},${height}`}>
                         {/*<rect x="0" y="0" width="100%" height="100%" fill="none" pointerEvents={"visible"} onClick={()=>nodeDispatch({type:"clearSelection"})}/>*/}
-                        <g transform={`translate(${pos.x},${pos.y})`}>
+                        <g transform={`translate(${margins.left},${margins.top})`}>
                             {props.children}
                         </g>
+                        </svg>
                     </LayoutContext.Provider>
                 </TreeContext.Provider>
         </ScaleContext.Provider>
@@ -34,7 +36,7 @@ function FigTree(props){
 
 export default withConditionalInteractionProvider(FigTree);
 
-function setUpScales(width,height,vertices){
+function setUpScales(width,height,margins,vertices){
     const xdomain = extent(vertices.values(),d=>d.x);
     const ydomain =  extent(vertices.values(),d=>d.y);
     // padding
@@ -43,11 +45,11 @@ function setUpScales(width,height,vertices){
 
     const x = scaleLinear()
         .domain(xdomain)
-        .range([0, width]);
+        .range([0, width - margins.left -margins.right]);
 
     const y = scaleLinear()
         .domain(ydomain)
-        .range([0,height]);
+        .range([0,height - margins.top-margins.bottom]);
     return {x,y};
 }
 
