@@ -14,16 +14,17 @@ export default function CoalescentShape (props){
     const {vertices} =  useLayout();
     const {scales} = useScales();
 
-    const {vertex,attrs,interactions,startWidth} =props;
+    const {vertex,attrs,interactions,startWidth,FadeEndpoint,curveSlope} =props;
 
     const targets = getTips(vertex.node).map(decedent=>vertices.get(decedent))
         .concat(vertex.node.children.map(child=>vertices.get(child)));
 
-    const slope = calcSlope(vertex,targets);
+    const slope =calcSlope(targets,curveSlope);
+
     const d=makeCoalescent(vertex,targets,scales,slope,startWidth);
+    const endingX= FadeEndpoint==="min"?100/slope:FadeEndpoint==="max"?100:parseFloat(FadeEndpoint)?parseFloat(FadeEndpoint):100/slope;
 
-
-    return  <FadedPath attrs={{...attrs,d:d}} interactions={interactions} endingX={`${100/slope}%`} colorRamper={i=>attrs.fill} opacityRamper={i=>1-i*1} />
+    return  <FadedPath attrs={{...attrs,d:d}} interactions={interactions} endingX={`${endingX}%`} colorRamper={i=>attrs.fill} opacityRamper={i=>1-i*1} />
 };
 
 CoalescentShape.defaultProps= {
@@ -33,6 +34,8 @@ CoalescentShape.defaultProps= {
         stroke: 'black'
     },
     startWidth:2,
+    FadeEndpoint:"min",
+    curveSlope:"min"
 };
 
 const link = linkHorizontal()
@@ -86,13 +89,26 @@ export function makeCoalescent(vertex,targets,scales,slope=1,startWidth=2){
  * A helper function that takes the source and target vertices
  * and calculates the slope so that the curve flattens and at
  * at the closest vertex (in the x direction).
- * @param source
+
  * @param targets
  */
-export function calcSlope(source,targets){
+export function calcSlope(targets,option){
     const [min,max]=extent(targets,d=>d.x);
+
+    switch (option) {
+        case "min":
+            return max/min;
+        case "max":
+            return 1;
+        case parseFloat(option):
+            return max/(min+ (max-min)*parseFloat(option))
+        default:
+            return max/min;
+    }
     return max / min;
 }
+
+
 
 // const CoalescentShape = withLinearGradient(BaseCoalescentShape);
 // CoalescentShape.defaultProps={

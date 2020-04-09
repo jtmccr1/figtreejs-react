@@ -74,7 +74,7 @@ CoalescentNodes.defualtProps={
     },
     tooltip:{},
     filter:(v)=>true,
-    sortFactor:1
+    sortFactor:1,
 };
 const Nodes={Circle:CircleNodes,Coalescent:CoalescentNodes,AnimatedCircleNodes:AnimatedCircleNodes,Rectangle:RectangularNodes};
 export default Nodes;
